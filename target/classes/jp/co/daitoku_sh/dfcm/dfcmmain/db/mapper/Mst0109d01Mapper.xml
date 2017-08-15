@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0109d01Mapper">
+	<select id="getSJigyoInfo"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo"
+		parameterType="map">
+		SELECT JGY.JGYCD, JGY.JGYMEI FROM MST_S_JIGYO JGY
+		WHERE
+		JGY.DELFLG = '0'
+		AND JGY.STRYMD &lt;= #{businessDate}
+		AND JGY.ENDYMD &gt;= #{businessDate}
+		ORDER BY JGY.JGYCD
+	</select>
+	
+	<select id="getSearchResult"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCorrectKbMst0109d01"
+		parameterType="map">
+		SELECT
+		${Search_Max}
+		MAX(CRK.St_Kb)　as stKb,
+		MAX(CSJ.Jigyo_Code) as jigyoCode,
+		CRK.Cust_Code as custCode,
+		MAX(CST.Cust_Nm_R) as custNmR,
+		CRK.Correct_Kb as correctKb,
+		MAX(CRK.Correct_Cause) as correctCause,
+		MAX(CRK.Zero_Dlvdat_Flg) as zeroDlvdatFlg,
+		MAX(CRK.Bikou) as biKou,
+		MAX(CRK.STS_Code) as stsCode
+		FROM MST_CORRECT_KB CRK 
+		LEFT JOIN MST_CUSTOMER CST ON (CRK.Cust_Code = CST.Cust_Code)
+		LEFT JOIN MST_CUSTJGYO CSJ ON (CRK.Cust_Code = CSJ.Cust_Code)
+		WHERE 1=1
+		<if test="JigyoshoCode != ''">
+			AND CSJ.Jigyo_Code = #{JigyoshoCode}
+		</if>
+		<if test="CustCode != ''">
+			AND CRK.Cust_Code = #{CustCode}
+		</if>
+		<if test="CustNmR != ''">
+			AND CST.Cust_Nm LIKE #{CustNmR}
+		</if>
+		<if test="CorrectKb != ''">
+			AND CRK.Correct_Kb = #{CorrectKb}
+		</if>
+		<if test="ZeroDlvdatFlg != ''">
+			AND CRK.Zero_Dlvdat_Flg = #{ZeroDlvdatFlg}
+		</if>
+		<if test="STS_Code != true">
+			AND CRK.STS_Code = '1'
+		</if>
+		<if test="St_Kb != true">
+			AND CRK.St_Kb = '2'
+		</if>
+		GROUP BY CRK.Cust_Code, CRK.Correct_Kb
+		ORDER BY CRK.Cust_Code
+	</select>
+	
+	<select id="getCustName"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCustName0109d01"
+		parameterType="map">
+		SELECT CST.Cust_Nm_R as CustNm, CSJ.Jigyo_Code as JigyoCode
+		FROM MST_CUSTOMER CST
+		LEFT JOIN MST_CUSTJGYO CSJ ON (CST.Cust_Code = CSJ.Cust_Code)
+		WHERE CST.Cust_Code = #{CustCode}
+		AND CSJ.Jigyo_Code = #{JigyoCode}
+	</select>	
+</mapper>

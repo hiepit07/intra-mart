@@ -1,0 +1,1406 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.SeikyuCommonMapper">
+
+<!-- ******************************************************************************** -->
+<!-- *** 請求共通用SQL定義                                                        *** -->
+<!-- ******************************************************************************** -->
+
+	<!-- 事業所リストの取得 -->
+	<select id="getJigyoshoList" resultType="hashmap" parameterType="string">
+
+<![CDATA[
+SELECT
+	 JGY.JGYCD  AS JIGYOSHO_CD
+	,JGY.JGYMEI AS JIGYOSHO_NAME
+FROM
+-- 事業所マスタ
+	MST_S_JIGYO JGY
+WHERE
+	JGY.DELFLG = '0'
+AND JGY.STRYMD <= #{businessDate}
+AND JGY.ENDYMD >= #{businessDate}
+ORDER BY
+	JGY.JGYCD
+]]>
+
+	</select>
+	
+	<!-- 当月売掛月度の取得  -->
+	<select id="getTogetsuUrikakeGetsudo" resultType="string" parameterType="string">
+
+<![CDATA[
+SELECT
+	T.Present_Mon
+FROM
+-- 事業所月次確定情報
+	TBL_GET01_JIG_CONFIRM T
+WHERE
+	T.Jigyo_Code = #{jigyoshoCd}
+]]>
+
+	</select>
+	
+	<!-- 帳票情報の取得  -->
+	<select id="getChohyoInfo" resultType="map" parameterType="string">
+
+<![CDATA[
+SELECT
+	 T.List_Svr_Nm	AS LIST_SVR_NM
+	,T.List_Dir		AS LIST_DIR
+	,T.List_Nm		AS LIST_NAME
+FROM
+-- 帳票定義マスタ
+	MST_LIST_FORM T
+WHERE
+	T.List_Id = #{chohyoId}
+]]>
+
+	</select>
+	
+	<!-- 請求データ配信バッチパスの取得  -->
+	<select id="getSeikyuDataHaishinBatchPath" resultType="string" parameterType="string">
+
+<![CDATA[
+SELECT
+  T.File_Path
+FROM
+  MST_JOBEXEC T
+WHERE
+  T.HULFT_ID = #{id}
+]]>
+
+	</select>
+	
+	
+		<!-- 請求締め済みの確認  -->
+	<select id="checkSeikyuShimeSumi" resultType="string" parameterType="map">
+
+<![CDATA[
+SELECT
+  MIN(Bild_Id) AS seikyuId
+FROM
+  TBL_SEI01_HEAD SHE
+WHERE
+    SHE.Cust_Code   = #{SEIKYUSAKI_CD}
+AND SHE.Jigyo_Code  = #{JIGYOSHO_CD}
+AND SHE.Bild_Date   > #{SEIKYU_SHIMEBI}
+AND SHE.Sts_Code    = '1'
+]]>
+
+	</select>
+	
+	<!-- ■■■■■■ 請求データ作成 ■■■■■■  -->
+	
+	<!-- 請求明細元データの取得（逐次処理）  -->
+	<select id="getSeikyuMeisaiMotoDataList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.SeikyuMeisaiMotoData" parameterType="map">
+
+<![CDATA[
+SELECT
+   WRK.CHAIN_CODE					AS chainCode
+  ,WRK.CHAIN_IDX					AS chainIdx
+  ,WRK.CUST_CODE					AS tokuisakiCd
+  ,WRK.SHOP_CODE					AS tempoCd
+  ,WRK.JIGYO_CODE					AS jigyoshoCd
+  ,WRK.REG_TYPE						AS nyuryokuKeitai
+  ,URH.Den_No						AS jishaDempyoNo
+  ,URH.Den_Idx						AS jishaDempyoNoIdx
+  ,URH.Deli_Date					AS nohinBi
+  ,URH.Cust_Den_No					AS tokuisakiDempyoNo
+  ,URH.Tax_Inc_Kb					AS uchizeiKokyakuKbn
+  ,URH.Tax_Rate						AS taxRate
+  ,URH.Sum_Sake_Amt					AS sumHanbaiKingaku
+  ,URH.Sale_Kb						AS hambaiKbn
+  ,CASE
+     -- 定番、店直
+     WHEN URH.Deli_Kb = '1' AND URH.Sale_Kb = '1' THEN CST.BN_Code_ST_S
+     -- 定番、センター
+     WHEN URH.Deli_Kb = '2' AND URH.Sale_Kb = '1' THEN CST.BN_Code_ST_C
+     -- 特売、店直
+     WHEN URH.Deli_Kb = '1' AND URH.Sale_Kb = '2' THEN CST.BN_Code_SP_S
+     -- 特売、センター
+     WHEN URH.Deli_Kb = '2' AND URH.Sale_Kb = '2' THEN CST.BN_Code_SP_C
+     ELSE                                              ''
+   END   							AS bunruiCd
+  ,URH.Dat_Kb						AS dataKbn
+  ,WRK.TORIHIKI_GAKU				AS torihikiGaku
+  ,WRK.SEMPO_SHIKIRIKA_KINGAKU		AS sempoShikiriKingaku
+  ,ISNULL(SHP.Sum_Shop_Jkn, '')		AS tempoShuyakuJoken
+  ,ISNULL(SHP.Sum_Shop_Kb, '')		AS shuyakusakiTempoKbn
+  ,ISNULL(SHP.Sum_Shop_Code, '')	AS shuyakuTempoCode
+  ,CASE
+     WHEN SHP.Sum_Shop_Code IS NOT NULL AND SHP.Sum_Shop_Code <> '' THEN SHP.Sum_Shop_Code
+     ELSE                                                                WRK.SHOP_CODE
+   END								AS wrkTempoCd
+FROM
+-- WORKテーブル
+  (
+    SELECT
+       UWK.CHAIN_CODE
+      ,UWK.CHAIN_IDX
+      ,UWK.CUST_CODE
+      ,UWK.SHOP_CODE
+      ,UWK.JIGYO_CODE
+      ,UWK.DEN_NO
+      ,UWK.DEN_IDX
+      ,UWK.REG_TYPE
+      ,SUM( UWK.TORIHIKI_GAKU )           AS TORIHIKI_GAKU
+      ,SUM( UWK.SEMPO_SHIKIRIKA_KINGAKU ) AS SEMPO_SHIKIRIKA_KINGAKU
+    FROM
+    -- UNION WORK
+      (
+        -- 売掛WORK
+        SELECT
+           SUB.Chain_Code   AS CHAIN_CODE
+          ,SUB.Chain_Idx    AS CHAIN_IDX
+          ,SUB.Cust_Code    AS CUST_CODE
+          ,SUB.Shop_Code    AS SHOP_CODE
+          ,SUB.Jigyo_Code   AS JIGYO_CODE
+          ,SUB.Den_No       AS DEN_NO
+          ,SUB.Den_Idx      AS DEN_IDX
+          ,SUB.Reg_Type     AS REG_TYPE
+          ,SUB.Trd_Price    AS TORIHIKI_GAKU
+          ,SUB.Cust_Skr_Amt AS SEMPO_SHIKIRIKA_KINGAKU
+        FROM
+          MST_CUSTOMER CST
+        INNER JOIN
+          TBL_SEI01_URK_BODY SUB
+        ON
+              SUB.Cust_Code  =  CST.Cust_Code
+          AND SUB.Jigyo_Code =  #{JIGYOSHO_CD}
+          AND ( SUB.Bild_Id IS NULL OR SUB.Bild_Id = 0 )
+          AND SUB.Trd_Date   <= #{SEIKYU_SHIMEBI}
+          AND SUB.Trd_Kb       IN ('01', '02', '03', '04')
+          --AND SUB.Reg_Type NOT IN ('2', '3')
+        WHERE
+              CST.STS_Code    = '1'
+          AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+          AND CST.Bild_Unt_Kb = '1'
+          AND ( ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' AND CST.Bild_Code = #{SEIKYUSAKI_CD} ) OR
+                ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '1' AND CST.Cust_Code = #{SEIKYUSAKI_CD} )    )
+        
+        UNION ALL
+        
+        -- 未収WORK
+        SELECT
+           SMB.Chain_Code AS CHAIN_CODE
+          ,SMB.Chain_Idx  AS CHAIN_IDX
+          ,SMB.Cust_Code  AS CUST_CODE
+          ,SMB.Shop_Code  AS SHOP_CODE
+          ,SMB.Jigyo_Code AS JIGYO_CODE
+          ,SMB.Den_No     AS DEN_NO
+          ,SMB.Den_Idx    AS DEN_IDX
+          ,SMB.Reg_Type   AS REG_TYPE
+          ,SMB.Trd_Price  AS TORIHIKI_GAKU
+          ,0              AS SEMPO_SHIKIRIKA_KINGAKU
+        FROM
+        -- 得意先マスタ
+          MST_CUSTOMER CST
+        -- 未収明細
+        INNER JOIN
+          TBL_SEI01_MSH_BODY SMB
+        ON
+              SMB.Cust_Code  =  CST.Cust_Code
+          AND SMB.Jigyo_Code =  #{JIGYOSHO_CD}
+          AND ( SMB.Bild_Id IS NULL OR SMB.Bild_Id = 0 )
+          AND SMB.Trd_Date   <= #{SEIKYU_SHIMEBI}
+          AND SMB.Trd_Kb       IN ('01', '02', '03', '04')
+          --AND SMB.Reg_Type NOT IN ('2', '3')
+        WHERE
+              CST.STS_Code    = '1'
+          AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+          AND CST.Bild_Unt_Kb = '1'
+          AND ( ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' AND CST.Bild_Code = #{SEIKYUSAKI_CD} ) OR
+                ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '1' AND CST.Cust_Code = #{SEIKYUSAKI_CD} )    )
+      ) UWK
+    GROUP BY
+       UWK.CHAIN_CODE
+      ,UWK.CHAIN_IDX
+      ,UWK.CUST_CODE
+      ,UWK.SHOP_CODE
+      ,UWK.JIGYO_CODE
+      ,UWK.DEN_NO
+      ,UWK.DEN_IDX
+      ,UWK.REG_TYPE
+  ) WRK
+-- 売上ヘッダ
+INNER JOIN
+  TBL_URI01_HEAD URH
+ON
+      URH.Den_No   = WRK.DEN_NO
+  AND URH.Den_Idx  = WRK.DEN_IDX
+  AND URH.Sts_Code = '1'
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  CST.Cust_Code = WRK.CUST_CODE
+-- 店舗マスタ
+LEFT JOIN
+  MST_SHOP SHP
+ON
+      SHP.Cust_Code = WRK.CUST_CODE
+  AND SHP.Shop_Code = WRK.SHOP_CODE
+  AND ( SHP.Close_Date IS NULL OR SHP.Close_Date = '' OR SHP.Close_Date > #{BIZ_DATE} )
+  AND SHP.STS_Code  = '1'
+ORDER BY
+   tokuisakiCd
+  ,wrkTempoCd
+  ,tokuisakiDempyoNo
+  ,shuyakusakiTempoKbn DESC
+  ,jishaDempyoNo
+  ,jishaDempyoNoIdx
+]]>
+
+	</select>
+	
+		<!-- 請求明細（集約店舗）の更新 -->
+	<update id="updateSeikyuMeisaiForShuyakuTempo" parameterType="map">
+	
+UPDATE
+  TBL_SEI01_SEI_BODY
+SET
+   Trd_Price = Trd_Price + #{TORIHIKI_GAKU}
+  ,Trd_Tax   = <choose>
+                 <when test="TAX_HASU_SHORI == 1">
+                   -- 四捨五入
+                   FLOOR( ROUND((Trd_Price + #{TORIHIKI_GAKU}) * #{TAX_RATE} / 100, 0) )
+                 </when>
+                 <when test="TAX_HASU_SHORI == 2">
+                   -- 切捨て
+                   FLOOR((Trd_Price + #{TORIHIKI_GAKU}) * #{TAX_RATE} / 100)
+                 </when>
+                 <otherwise>
+                   -- 切り上げ
+                   CEILING((Trd_Price + #{TORIHIKI_GAKU}) * #{TAX_RATE} / 100)
+                 </otherwise>
+               </choose>
+WHERE
+      Bild_Id     = #{SEIKYU_ID}
+  AND Shop_Code   = #{TEMPO_CD}
+  AND Cust_Den_No = #{TOKUISAKI_DEMPYO_NO}
+	
+	</update>
+	
+	<!-- 得意先計・店舗計消費税の取得 -->
+	<select id="getTaxTokuisakiOrTempoSummary" resultType="int" parameterType="map">
+
+SELECT
+  ISNULL(SUM(WRK.TAX), 0)  AS TAX
+FROM
+-- 消費税WORK
+  (
+    SELECT
+      <choose>
+        <when test="TAX_HASU_SHORI == 1">
+          -- 四捨五入
+          FLOOR( ROUND(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100, 0) ) AS TAX
+        </when>
+        <when test="TAX_HASU_SHORI == 2">
+          -- 切捨て
+          FLOOR(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS TAX
+        </when>
+        <otherwise>
+          -- 切り上げ
+          CEILING(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS TAX
+        </otherwise>
+      </choose>
+    FROM
+    -- 請求明細
+      TBL_SEI01_SEI_BODY SEB
+    WHERE
+      SEB.Bild_Id = #{SEIKYU_ID}
+    GROUP BY
+       SEB.Bild_Code
+      ,SEB.Cust_Code
+      <if test="TEMPO_FLAG == true">
+        ,SEB.SHOP_Code
+      </if>
+  ) WRK
+
+	</select>
+	
+	<!-- 消費税の更新 -->
+	<update id="updateTaxOnSeikyuHeader" parameterType="map">
+
+<![CDATA[
+UPDATE
+  -- 請求ヘッダ
+  TBL_SEI01_HEAD
+SET
+   Cur_Tax    = #{TAX}
+  ,Cur_UTax   = #{TAX} - Cur_MTax
+  ,Cur_UAmt   = Cur_UUri + #{TAX} - Cur_MTax + Cur_UKur
+  ,Uri_Zan    = Cur_UUri + #{TAX} - Cur_MTax
+  ,UPD_USERID = #{USER_ID}
+  ,UPD_PGID   = #{PROGRAM_ID}
+  ,UPD_YMD    = #{CURRENT_DATE}
+  ,UPD_TIME   = #{CURRENT_TIME}
+WHERE
+  Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+	<!-- 売掛明細の更新 -->
+	<update id="updateUrikakeMeisai" parameterType="map">
+
+<![CDATA[
+UPDATE
+  SUB
+SET
+   SUB.Bild_Id = #{SEIKYU_ID}
+  ,UPD_USERID  = #{USER_ID}
+  ,UPD_PGID    = #{PROGRAM_ID}
+  ,UPD_YMD     = #{CURRENT_DATE}
+  ,UPD_TIME    = #{CURRENT_TIME}
+FROM
+-- 売掛明細
+  TBL_SEI01_URK_BODY SUB
+INNER JOIN
+-- 得意先マスタ
+  MST_CUSTOMER CST
+ON
+      SUB.Cust_Code  = CST.Cust_Code
+  AND SUB.Jigyo_Code = #{JIGYOSHO_CD}
+  AND ( SUB.Bild_Id IS NULL OR SUB.Bild_Id = 0 )
+  AND SUB.Trd_Date  <= #{SEIKYU_SHIMEBI}
+  AND SUB.Trd_Kb IN ('01', '02', '03', '04')
+  AND SUB.Reg_Type <> '2'
+WHERE
+      CST.STS_Code    = '1'
+  AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+  AND CST.Bild_Unt_Kb = '1'
+  AND ( ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' AND CST.Bild_Code = #{SEIKYUSAKI_CD} ) OR
+        ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '1' AND CST.Cust_Code = #{SEIKYUSAKI_CD} )    )
+  AND SUB.UPD_YMD + SUB.UPD_TIME < #{HAITA_CHECK_NICHIJI}
+]]>
+
+	</update>
+	
+	<!-- 未収明細の更新 -->
+	<update id="updateMishuMeisai" parameterType="map">
+	
+<![CDATA[
+UPDATE
+  SMB
+SET
+   SMB.Bild_Id = #{SEIKYU_ID}
+  ,UPD_USERID  = #{USER_ID}
+  ,UPD_PGID    = #{PROGRAM_ID}
+  ,UPD_YMD     = #{CURRENT_DATE}
+  ,UPD_TIME    = #{CURRENT_TIME}
+FROM
+-- 未収明細
+  TBL_SEI01_MSH_BODY SMB
+INNER JOIN
+-- 得意先マスタ
+  MST_CUSTOMER CST
+ON
+      SMB.Cust_Code  = CST.Cust_Code
+  AND SMB.Jigyo_Code = #{JIGYOSHO_CD}
+  AND ( SMB.Bild_Id IS NULL OR SMB.Bild_Id = 0 )
+  AND SMB.Trd_Date  <= #{SEIKYU_SHIMEBI}
+  AND SMB.Trd_Kb IN ('01', '02', '03', '04')
+  AND SMB.Reg_Type <> '2'
+WHERE
+      CST.STS_Code    = '1'
+  AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+  AND CST.Bild_Unt_Kb = '1'
+  AND ( ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' AND CST.Bild_Code = #{SEIKYUSAKI_CD} ) OR
+        ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '1' AND CST.Cust_Code = #{SEIKYUSAKI_CD} )    )
+  AND SMB.UPD_YMD + SMB.UPD_TIME < #{HAITA_CHECK_NICHIJI}
+]]>
+
+	</update>
+	
+	<!-- 前回請求ヘッダの更新 -->
+	<update id="updatePrevSeikyuHeader" parameterType="map">
+
+<![CDATA[
+UPDATE
+  -- 請求ヘッダ
+  TBL_SEI01_HEAD
+SET
+   Bild_New_Flg = '0'
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+WHERE
+      Bild_Id            = #{SEIKYU_ID}
+  AND Sts_Code           = '1'
+  AND UPD_YMD + UPD_TIME < #{HAITA_CHECK_NICHIJI}
+]]>
+
+	</update>
+	
+	<!-- 請求ヘッダ数の検索 -->
+	<select id="getSeikyuHeaderCount" resultType="int" parameterType="map">
+
+<![CDATA[
+SELECT
+  COUNT(SHE.Bild_Id)
+FROM
+-- 請求ヘッダ
+  TBL_SEI01_HEAD SHE
+WHERE
+      SHE.Sts_Code               = '1'
+  AND SHE.Cust_Code              = #{SEIKYUSAKI_CD}
+  AND SHE.Jigyo_Code             = #{JIGYOSHO_CD}
+  AND SHE.UPD_YMD + SHE.UPD_TIME < #{HAITA_CHECK_NICHIJI}
+]]>
+
+	</select>
+	
+	<!-- 売上明細（売掛）の更新 -->
+	<update id="updateUriageMeisaiUrikake" parameterType="long">
+
+<![CDATA[
+UPDATE
+  URB
+SET
+   URB.Bill_Flg = '1'
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+FROM
+-- 売上明細
+  TBL_URI01_BODY URB
+-- 売掛明細
+INNER JOIN
+  TBL_SEI01_URK_BODY SUB
+ON
+      SUB.Den_No       = URB.Den_No
+  AND SUB.Den_Idx      = URB.Den_Idx
+  AND SUB.Cust_Den_Row = URB.Cust_Den_Row
+WHERE
+  SUB.Bild_Id = #{SEIKYU_ID}
+]]>
+	</update>
+	
+	<!-- 売上明細（未収）の更新 -->
+	<update id="updateUriageMeisaiMishu" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URB
+SET
+   URB.Bill_Flg = '1'
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+FROM
+-- 売上明細
+  TBL_URI01_BODY URB
+-- 未収明細
+INNER JOIN
+  TBL_SEI01_MSH_BODY SMB
+ON
+      SMB.Den_No       = URB.Den_No
+  AND SMB.Den_Idx      = URB.Den_Idx
+  AND SMB.Cust_Den_Row = URB.Cust_Den_Row
+WHERE
+  SMB.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+	<!-- 売上ヘッダ（売掛）の更新 -->
+	<update id="updateUriageHeaderUrikake" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URH
+SET
+   URH.Bill_Flg = '1'
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+FROM
+-- 売上ヘッダ
+  TBL_URI01_HEAD URH
+-- 売掛明細
+INNER JOIN
+  TBL_SEI01_URK_BODY SUB
+ON
+      SUB.Den_No  = URH.Den_No
+  AND SUB.Den_Idx = URH.Den_Idx
+WHERE
+  SUB.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+	<!-- 売上ヘッダ（未収）の更新 -->
+	<update id="updateUriageHeaderMishu" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URH
+SET
+   URH.Bill_Flg = '1'
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+FROM
+-- 売上ヘッダ
+  TBL_URI01_HEAD URH
+-- 未収明細
+INNER JOIN
+  TBL_SEI01_MSH_BODY SMB
+ON
+      SMB.Den_No = URH.Den_No
+  AND SMB.Den_Idx= URH.Den_Idx
+WHERE
+  SMB.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+	<!-- ■■■■■■ 請求書出力 ■■■■■■  -->
+	
+	<!-- 請求ヘッダ情報の取得 -->
+	<select id="getSeikyuHeaderInfo" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.SeikyuHeaderInfo" parameterType="map">
+
+<![CDATA[
+SELECT
+   SHE.Bild_Id						AS seikyuId
+  ,SHE.Bild_Date					AS seikyuShimebi
+  ,SHE.Nyu_Date					    AS nyukinYoteibi
+  ,SHE.Cust_Code					AS seikyusakiCd
+  ,SHE.Jigyo_Code					AS jigyoshoCd
+  ,CST.Cust_Nm						AS tokuisakiName
+  ,CST.Bild_Nm						AS seikyusakiName
+  ,CST.Bild_Nm_R					AS seikyusakiNameR
+  ,CST.Bild_Zip_Code				AS seikyusakiZipCode
+  ,CST.Bild_Adr_1					AS seikyusakiAddr1
+  ,CST.Bild_Adr_2					AS seikyusakiAddr2
+  ,CST.Rcvm_Cls						AS nyukinCls
+  ,GEN.Target_1						AS nyukinClsName
+  ,CST.Bild_Tanka					AS seikyushoTanka
+  ,CST.Bild_Typ_ID					AS seikyushoShuruiChohyoId
+  ,CST.Bild_Ptn						AS seikyushoPattern
+  ,CST.Tax_Unt_Kb					AS taxKeisanTani
+  ,CST.Tax_Frc_Kb					AS taxHasuShori
+  ,CST.TR_Code						AS torihikiCd
+  ,CST.DN_Kb_ST_S					AS dempyoKbn
+  ,FRM.List_Svr_Nm					AS chohyoSrvName
+  ,FRM.List_Dir						AS chohyoDir
+  ,FRM.List_Nm_R					AS chohyoNameR
+  ,FRM.Den_Cls						AS dempyoCls
+  ,FRM.List_Id_1					AS multiChohyoId
+  ,JGY.JGYMEI						AS jigyoshoName
+  ,JGY.TELNO						AS jigyoshoTelNo
+  ,JGY.ADDR1						AS jigyoshoAddr1
+  ,JGY.ADDR2						AS jigyoshoAddr2
+  ,USR.User_Nm						AS tantoshaName
+  ,SHE.Prev_UAmt + SHE.Prev_MAmt	AS zenkaiSeikyuGaku
+  ,SHE.Cur_UNyu  + SHE.Cur_MNyu		AS konkaiNyukin
+  ,SHE.Cur_USou  + SHE.Cur_MSou		AS konkaiSosai
+  ,SHE.Cur_UCho  + SHE.Cur_MCho		AS konkaiChosei
+  ,SHE.Cur_UKur  + SHE.Cur_MKur		AS kurikoshiGaku
+  ,SHE.Cur_UUri  + SHE.Cur_MUri		AS konkaiUriage
+  ,SHE.Cur_Tax						AS konkaiTax
+  ,SHE.Cur_UAmt  + SHE.Cur_MAmt		AS konkaiSeikyuGaku
+FROM
+-- 請求ヘッダ
+  TBL_SEI01_HEAD SHE
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  CST.Cust_Code = SHE.Cust_Code
+-- 得意先事業所マスタ
+INNER JOIN
+  MST_CUSTJGYO CSJ
+ON
+      CSJ.Cust_Code  = CST.Cust_Code
+  AND CSJ.Jigyo_Code = SHE.Jigyo_Code
+-- 事業所マスタ
+INNER JOIN
+  MST_S_JIGYO JGY
+ON
+      JGY.JGYCD  =  CSJ.Jigyo_Code
+  AND JGY.STRYMD <= #{BIZ_DATE}
+  AND JGY.ENDYMD >= #{BIZ_DATE}
+  AND JGY.DELFLG =  0
+-- 担当者マスタ
+INNER JOIN
+  MST_USER USR
+ON
+      USR.User_Code     = CSJ.Jm_Tan_Code
+  AND USR.Jigyosho_Code = CSJ.Jigyo_Code
+  AND USR.STS_Code      = '1'
+-- 帳票定義マスタ
+INNER JOIN
+  MST_LIST_FORM FRM
+ON
+  FRM.List_Id = CST.Bild_Typ_ID
+-- 汎用マスタ
+LEFT JOIN
+  MST_GENERAL GEN
+ON
+      GEN.Gl_Kb   = 'Rcvm_Cls'
+  AND GEN.Gl_Code = CST.Rcvm_Cls
+WHERE
+  SHE.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</select>
+	
+	<!-- ■■■■■■ 自社請求書 ■■■■■■  -->
+	
+	<!-- 得意先情報リストの取得 -->
+	<select id="getSeikyuTokuisakiInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.SeikyuTokuisakiInfo" parameterType="map">
+
+SELECT
+   WRK.Chain_Code										AS chainCd
+  ,WRK.Chain_Idx										AS chainIdx
+  ,WRK.Bild_Code										AS seikyusakiCd
+  ,WRK.Cust_Code										AS tokuisakiCd
+  ,CST.TR_Code											AS torihikiCd
+  ,CST.Cust_Nm											AS tokuisakiName
+  ,CST.Bild_Nm											AS seikyusakiName
+  ,CST.Bild_Zip_Code									AS seikyusakiZipCode
+  ,CST.Bild_Adr_1										AS seikyusakiAddr1
+  ,CST.Bild_Adr_2										AS seikyusakiAddr2
+  ,WRK.URIAGE_GAKU										AS uriageGaku
+  ,WRK.SHOHI_ZEI										AS tax
+  ,WRK.PAGE_NO											AS pageNo
+  ,SUM(WRK.URIAGE_GAKU) OVER (PARTITION BY WRK.PAGE_NO)	AS pageSum
+  ,MAX(WRK.PAGE_NO) OVER ()								AS maxPageNo
+FROM
+-- 得意先一覧WORK
+  (
+<choose>
+  <when test="TAX_KEISAN_TANI != '04'">
+    -- 請求先・得意先・店舗でない
+    SELECT
+       CEILING(
+         (ROW_NUMBER() OVER(ORDER BY SEB.Bild_Code, SEB.Cust_Code) - 0.9) / #{KAIPAGE_GYOSU}
+       ) AS PAGE_NO
+      ,SEB.Chain_Code
+      ,SEB.Chain_Idx
+      ,SEB.Bild_Code
+      ,SEB.Cust_Code
+      ,SUM(SEB.Trd_Price) AS URIAGE_GAKU
+      <choose>
+        <when test="TAX_KEISAN_TANI == '03'">
+          -- 請求先・得意先
+          <choose>
+            <when test="TAX_HASU_SHORI == 1">
+              -- 四捨五入
+              ,FLOOR( ROUND(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100, 0) ) AS SHOHI_ZEI
+            </when>
+            <when test="TAX_HASU_SHORI == 2">
+              -- 切捨て
+              ,FLOOR(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS SHOHI_ZEI
+            </when>
+            <otherwise>
+              -- 切り上げ
+              ,CEILING(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS SHOHI_ZEI
+            </otherwise>
+          </choose>
+        </when>
+        <otherwise>
+          -- 請求先・得意先でない
+          ,SUM(SEB.Trd_Tax) AS SHOHI_ZEI
+        </otherwise>
+      </choose>
+    FROM
+    -- 請求明細
+      TBL_SEI01_SEI_BODY SEB
+    WHERE
+      SEB.Bild_Id = #{SEIKYU_ID}
+    GROUP BY
+       SEB.Chain_Code
+      ,SEB.Chain_Idx
+      ,SEB.Bild_Code
+      ,SEB.Cust_Code
+  </when>
+  <otherwise>
+    -- 請求先・得意先・店舗
+    SELECT
+       CEILING(
+         (ROW_NUMBER() OVER(ORDER BY WRK2.Bild_Code, WRK2.Cust_Code) - 0.9) / #{KAIPAGE_GYOSU}
+       ) AS PAGE_NO
+      ,WRK2.Chain_Code
+      ,WRK2.Chain_Idx
+      ,WRK2.Bild_Code
+      ,WRK2.Cust_Code
+      ,SUM(WRK2.URIAGE_GAKU) AS URIAGE_GAKU
+      ,SUM(WRK2.SHOHI_ZEI)   AS SHOHI_ZEI
+    FROM
+    -- WORKテーブル
+      (
+        SELECT
+           SEB.Chain_Code
+          ,SEB.Chain_Idx
+          ,SEB.Bild_Code
+          ,SEB.Cust_Code
+          ,SUM(SEB.Trd_Price) AS URIAGE_GAKU
+          <choose>
+            <when test="TAX_HASU_SHORI == 1">
+              -- 四捨五入
+              ,FLOOR( ROUND(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100, 0) ) AS SHOHI_ZEI
+            </when>
+            <when test="TAX_HASU_SHORI == 2">
+              -- 切捨て
+              ,FLOOR(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS SHOHI_ZEI
+            </when>
+            <otherwise>
+              -- 切り上げ
+              ,CEILING(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS SHOHI_ZEI
+            </otherwise>
+          </choose>
+        FROM
+        -- 請求明細
+          TBL_SEI01_SEI_BODY SEB
+        WHERE
+          SEB.Bild_Id = #{SEIKYU_ID}
+        GROUP BY
+           SEB.Chain_Code
+          ,SEB.Chain_Idx
+          ,SEB.Bild_Code
+          ,SEB.Cust_Code
+          ,SEB.Shop_Code
+      ) WRK2
+    GROUP BY
+       WRK2.Chain_Code
+      ,WRK2.Chain_Idx
+      ,WRK2.Bild_Code
+      ,WRK2.Cust_Code
+  </otherwise>
+</choose>
+  ) WRK
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  CST.Cust_Code = WRK.Cust_Code
+ORDER BY
+   WRK.Bild_Code
+  ,WRK.Cust_Code
+
+	</select>
+
+	<!-- 店舗情報リストの取得 -->
+	<select id="getSeikyuTempoInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.SeikyuTempoInfo" parameterType="map">
+
+SELECT
+   WRK.Chain_Code										AS chainCode
+  ,WRK.Chain_Idx										AS chainIdx
+  ,WRK.Bild_Code										AS seikyusakiCd
+  ,WRK.Cust_Code										AS tokuisakiCd
+  ,WRK.Shop_Code										AS tempoCd
+  ,SHP.Shop_Nm											AS tempoName
+  ,WRK.URIAGE_GAKU										AS uriageGaku
+  ,WRK.SHOHI_ZEI										AS tax
+  ,WRK.PAGE_NO											AS pageNo
+  ,SUM(WRK.URIAGE_GAKU) OVER (PARTITION BY WRK.PAGE_NO)	AS pageSum
+  ,MAX(WRK.PAGE_NO) OVER ()                             AS maxPageNo
+FROM
+-- 店舗一覧WORK
+  (
+    SELECT
+       CEILING(
+         (ROW_NUMBER() OVER (ORDER BY SEB.Bild_Code, SEB.Cust_Code, SEB.Shop_Code) - 0.9) / #{KAIPAGE_GYOSU}
+       ) AS PAGE_NO
+      ,SEB.Chain_Code
+      ,SEB.Chain_Idx
+      ,SEB.Bild_Code
+      ,SEB.Cust_Code
+      ,SEB.Shop_Code
+      ,SUM(SEB.Trd_Price) AS URIAGE_GAKU
+      <choose>
+        <when test="TAX_KEISAN_TANI == '04'">
+          -- 請求先・得意先・店舗
+          <choose>
+            <when test="TAX_HASU_SHORI == 1">
+              -- 四捨五入
+              ,FLOOR( ROUND(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100, 0) ) AS SHOHI_ZEI
+            </when>
+            <when test="TAX_HASU_SHORI == 2">
+              -- 切捨て
+              ,FLOOR(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS SHOHI_ZEI
+            </when>
+            <otherwise>
+              -- 切り上げ
+              ,CEILING(SUM(SEB.Trd_Price) * #{TAX_RATE} / 100) AS SHOHI_ZEI
+            </otherwise>
+          </choose>
+        </when>
+        <otherwise>
+          -- 請求先・得意先・店舗でない
+          ,SUM(SEB.Trd_Tax) AS SHOHI_ZEI
+        </otherwise>
+      </choose>
+    FROM
+    -- 請求明細
+      TBL_SEI01_SEI_BODY SEB
+    WHERE
+          SEB.Bild_Id   = #{SEIKYU_ID}
+      AND SEB.Cust_Code = #{TOKUISAKI_CD}
+    GROUP BY
+       SEB.Chain_Code
+      ,SEB.Chain_Idx
+      ,SEB.Bild_Code
+      ,SEB.Cust_Code
+      ,SEB.Shop_Code
+  ) WRK
+-- 店舗マスタ
+LEFT JOIN
+  MST_SHOP SHP
+ON
+      SHP.Cust_Code = WRK.Cust_Code
+  AND SHP.Shop_Code = WRK.Shop_Code
+ORDER BY
+   WRK.Bild_Code
+  ,WRK.Cust_Code
+  ,WRK.Shop_Code
+
+	</select>
+	
+	<!-- 請求明細情報リストの取得（逐次処理） -->
+	<select id="getSeikyuMeisaiInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.SeikyuMeisaiInfo" parameterType="map">
+
+SELECT
+   WRK.Chain_Code										AS chainCd
+  ,WRK.Chain_Idx										AS chainIdx
+  ,WRK.Bild_Code										AS seikyusakiCd
+  ,WRK.Cust_Code										AS tokuisakiCd
+  ,WRK.Shop_Code										AS tempoCd
+  ,WRK.Deli_Date										AS nohinbi
+  ,WRK.Cust_Den_No										AS tokuisakiDempyoNo
+  ,WRK.URIAGE_GAKU										AS uriageGaku
+  ,WRK.SHOHI_ZEI										AS tax
+  ,WRK.PAGE_NO											AS pageNo
+  ,SUM(WRK.URIAGE_GAKU) OVER (PARTITION BY WRK.PAGE_NO) AS pageSum
+  ,MAX(WRK.PAGE_NO) OVER ()                             AS maxPageNo
+FROM
+-- 一覧WORK
+  (
+    SELECT
+      <choose>
+        <when test="TOKUISAKI_CD != null and TEMPO_CD != null">
+          -- 請求先、得意先、店舗、納品日で並び替え
+          CEILING(
+            (ROW_NUMBER() OVER (ORDER BY SEB.Bild_Code, SEB.Cust_Code, SEB.Shop_Code, SEB.Deli_Date) - 0.9) / #{KAIPAGE_GYOSU}
+          ) AS PAGE_NO
+        </when>
+        <when test="TOKUISAKI_CD != null and TEMPO == null">
+          -- 請求先、得意先、納品日で並び替え
+          CEILING(
+            (ROW_NUMBER() OVER (ORDER BY SEB.Bild_Code, SEB.Cust_Code, SEB.Deli_Date) - 0.9) / #{KAIPAGE_GYOSU}
+          ) AS PAGE_NO
+        </when>
+        <when test="TOKUISAKI_CD == null and TEMPO_CD != null">
+          -- 請求先、店舗、納品日で並び替え
+          CEILING(
+            (ROW_NUMBER() OVER (ORDER BY SEB.Bild_Code, SEB.Shop_Code, SEB.Deli_Date) - 0.9) / #{KAIPAGE_GYOSU}
+          ) AS PAGE_NO
+        </when>
+        <otherwise>
+          -- 請求先、納品日で並び替え
+          CEILING(
+            (ROW_NUMBER() OVER (ORDER BY SEB.Bild_Code, SEB.Deli_Date) - 0.9) / #{KAIPAGE_GYOSU}
+          ) AS PAGE_NO
+        </otherwise>
+      </choose>
+      ,SEB.Chain_Code
+      ,SEB.Chain_Idx
+      ,SEB.Bild_Code
+      ,SEB.Cust_Code
+      ,SEB.Shop_Code
+      ,SEB.Deli_Date
+      ,SEB.Cust_Den_No
+      ,SEB.Trd_Price AS URIAGE_GAKU
+      ,SEB.Trd_Tax   AS SHOHI_ZEI
+    FROM
+    -- 請求明細
+      TBL_SEI01_SEI_BODY SEB
+    WHERE
+          SEB.Bild_Id   = #{SEIKYU_ID}
+      <if test = "TOKUISAKI_CD != null">
+        AND SEB.Cust_Code = #{TOKUISAKI_CD}
+      </if>
+      <if test = "TEMPO_CD != null">
+        AND SEB.Shop_Code = #{TEMPO_CD}
+      </if>
+  ) WRK
+ORDER BY
+   WRK.Bild_Code
+  <if test = "TOKUISAKI_CD != null">
+    ,WRK.Cust_Code
+  </if>
+  <if test = "TEMPO_CD != null">
+    ,WRK.Shop_Code
+  </if>
+  ,WRK.Deli_Date
+
+	</select>
+	
+	<!-- ■■■■■■ イオン請求書 ■■■■■■  -->
+	
+	<!-- イオン明細情報リストの取得（逐次処理） -->
+	<select id="getAeonMeisaiInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.AeonMeisaiInfo" parameterType="string">
+
+<![CDATA[
+SELECT
+   SEB.Deli_Date		AS nohinbi
+  ,SEB.Shop_Code		AS tempoCd
+  ,CST.BN_Code_ST_S		AS bunruiCdStShop
+  ,CST.BN_Code_ST_C		AS bunruiCdStCenter
+  ,CST.BN_Code_SP_S		AS bunruiCdSpShop
+  ,CST.BN_Code_SP_C		AS bunruiCdSpCenter
+  ,URH.Deli_Kb			AS nohinKbn
+  ,URH.Sale_Kb			AS hambaiKbn
+  ,SEB.Cust_Den_No		AS tokuisakiDempyoNo
+  ,SEB.Trd_Price		AS uriageGaku
+  ,SEB.Trd_Tax			AS tax
+FROM
+-- 請求明細情報
+  TBL_SEI01_SEI_BODY SEB
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  CST.Cust_Code = SEB.Cust_Code
+-- 売上ヘッダ
+INNER JOIN
+  TBL_URI01_HEAD URH
+ON
+      URH.Den_No   = SEB.Den_No
+  AND URH.Den_Idx  = SEB.Den_Idx
+  AND URH.Sts_Code = '1'
+WHERE
+  SEB.Bild_Id = #{seikyuId}
+ORDER BY
+   SEB.Deli_Date
+  ,SEB.Shop_Code
+  ,SEB.Cust_Den_No
+]]>
+
+	</select>
+	
+	<!-- イオン当月納品・返品情報の取得 -->
+	<select id="getAeonTogetsuNohinHempinInfo" resultType="map" parameterType="string">
+
+<![CDATA[
+SELECT
+   SUM( CASE
+          WHEN URH.Den_Kb = '1' THEN URH.Sum_Deli_Amt
+          WHEN URH.Den_Kb = '4' THEN ( URH.Sum_Deli_Amt * -1 )
+          ELSE                       0
+        END
+      )					AS NOHIN_KINGAKU
+  ,SUM( CASE
+          WHEN URH.Den_Kb = '1' THEN URH.Sum_Snp_Skri_Amt
+          WHEN URH.Den_Kb = '4' THEN ( URH.Sum_Snp_Skri_Amt * -1 )
+          ELSE                       0
+        END
+      )					AS NOHIN_SEMPO_SHIKIRI_KINGAKU
+  ,SUM( CASE
+          WHEN URH.Den_Kb IN ('2', '3') THEN URH.Sum_Deli_Amt
+          ELSE                               0
+        END
+      )					AS HEMPIN_KINGAKU
+  ,SUM( CASE
+          WHEN URH.Den_Kb IN ('2', '3') THEN URH.Sum_Snp_Skri_Amt
+          ELSE                               0
+        END
+      )					AS HEMPIN_SEMPO_SHIKIRI_KINGAKU
+FROM
+-- 請求明細
+  TBL_SEI01_SEI_BODY SEB
+-- 売上ヘッダ
+INNER JOIN
+  TBL_URI01_HEAD URH
+ON
+      URH.Den_No   = SEB.Den_No
+  AND URH.Den_Idx  = SEB.Den_Idx
+  AND URH.Sts_Code = '1'
+WHERE
+      SEB.Bild_Id =  #{seikyuId}
+  AND URH.Den_Kb  IN ('1', '2', '3', '4')
+]]>
+
+	</select>
+	
+	<!-- ■■■■■■ オークワ請求書 ■■■■■■  -->
+	
+	<!-- オークワ店舗情報リストの取得 -->
+	<select id="getOkuwaTempoInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.OkuwaTempoInfo" parameterType="string">
+
+<![CDATA[
+SELECT
+   SEB.Shop_Code			AS tempoCd
+  ,COUNT(SEB.Cust_Den_No)	AS recordSu
+  ,SUM(SEB.Trd_Price)		AS uriageGaku
+  ,SUM(SEB.Trd_Tax)			AS tax
+  ,DAT.Valid_Digit			AS validDigit
+FROM
+-- 請求明細
+  TBL_SEI01_SEI_BODY SEB
+-- 伝票採番マスタ
+INNER JOIN
+  MST_DAT_IDX DAT
+ON
+      DAT.Cust_Code = SEB.Cust_Code
+  AND DAT.Shop_Code = SEB.Shop_Code
+WHERE
+  SEB.Bild_Id = #{seikyuId}
+GROUP BY
+   SEB.Bild_Code
+  ,SEB.Cust_Code
+  ,SEB.Shop_Code
+  ,DAT.Valid_Digit
+ORDER BY
+   SEB.Bild_Code
+  ,SEB.Cust_Code
+  ,SEB.Shop_Code
+]]>
+
+	</select>
+	
+	<!-- オークワ明細情報リストの取得（逐次処理） -->
+	<select id="getOkuwaMeisaiInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.OkuwaMeisaiInfo" parameterType="string">
+
+<![CDATA[
+SELECT
+   SEB.Shop_Code		AS tempoCd
+  ,SHP.Shop_Nm			AS tempoName
+  ,SEB.Deli_Date		AS nohinbi
+  ,SEB.Cust_Den_No		AS tokuisakiDempyoNo
+  ,SEB.Trd_Price		AS uriageGaku
+  ,SEB.Trd_Tax			AS tax
+FROM
+-- 請求明細
+  TBL_SEI01_SEI_BODY SEB
+-- 店舗マスタ
+LEFT JOIN
+  MST_SHOP SHP
+ON
+      SHP.Cust_Code = SEB.Cust_Code
+  AND SHP.Shop_Code = SEB.Shop_Code
+WHERE
+  SEB.Bild_Id = #{seikyuId}
+ORDER BY
+   SEB.Bild_Code
+  ,SEB.Cust_Code
+  ,SEB.Shop_Code
+  ,SEB.Deli_Date
+  ,SEB.Cust_Den_No
+]]>
+
+	</select>
+	
+	<!-- ■■■■■■ 大学生協請求書 ■■■■■■  -->
+	
+	<!-- 大学生協明細情報リストの取得（逐次処理） -->
+	<select id="getDaigakuSeikyoMeisaiInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.DaigakuSeikyoMeisaiInfo" parameterType="string">
+
+<![CDATA[
+SELECT
+   SEB.Cust_Code				AS tokuisakiCd
+  ,CST.Bild_Nm					AS seikyusakiName
+  ,CST.Cust_Nm					AS tokuisakiName
+  ,SEB.Shop_Code				AS tempoCd
+  ,SHP.Shop_Nm					AS tempoName
+  ,ISNULL( SUM( CASE
+                 WHEN CST.Bild_Tanka = '1' THEN
+                   CASE
+                     WHEN URH.Den_Kb = '1' THEN URH.Sum_Deli_Amt
+                     WHEN URH.Den_Kb = '4' THEN ( URH.Sum_Deli_Amt * -1 )
+                     ELSE                       0
+                   END
+                 ELSE
+                   CASE
+                     WHEN URH.Den_Kb = '1' THEN URH.Sum_Snp_Skri_Amt
+                     WHEN URH.Den_Kb = '4' THEN (URH.Sum_Snp_Skri_Amt * -1)
+                     ELSE                       0
+                   END
+               END
+             ), 0)					AS nohinKingaku
+  ,ISNULL( COUNT( CASE
+                    WHEN URH.Den_Kb IN ('1', '4') THEN URH.Den_No
+                    ELSE                               NULL
+                  END
+                ), 0)				AS nohinDempyoSu
+  ,ISNULL( SUM( CASE
+                  WHEN CST.Bild_Tanka = '1' THEN
+                    CASE
+                      WHEN URH.Den_Kb IN ('2', '3') THEN URH.Sum_Deli_Amt
+                      ELSE                               0
+                    END
+                  ELSE
+                    CASE
+                      WHEN URH.Den_Kb IN ('2', '3') THEN URH.Sum_Snp_Skri_Amt
+                      ELSE                               0
+                    END
+                END
+              ), 0)					AS hempinKingaku
+  ,ISNULL( COUNT( CASE
+                    WHEN URH.Den_Kb IN ('2', '3') THEN URH.Den_No
+                    ELSE                               NULL
+                  END
+                ), 0)				AS hempinDempyoSu
+FROM
+-- 請求明細
+  TBL_SEI01_SEI_BODY SEB
+-- 売上ヘッダ
+INNER JOIN
+  TBL_URI01_HEAD URH
+ON
+      URH.Den_No   = SEB.Den_No
+  AND URH.Den_Idx  = SEB.Den_Idx
+  AND URH.Sts_Code = '1'
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  CST.Cust_Code = SEB.Cust_Code
+-- 店舗マスタ
+LEFT JOIN
+  MST_SHOP SHP
+ON
+      SHP.Cust_Code = SEB.Cust_Code
+  AND SHP.Shop_Code = SEB.Shop_Code
+WHERE
+      SEB.Bild_Id = #{seikyuId}
+  AND URH.Den_Kb IN ('1', '2', '3', '4')
+GROUP BY
+   SEB.Cust_Code
+  ,CST.Bild_Nm
+  ,CST.Cust_Nm
+  ,SEB.Shop_Code
+  ,SHP.Shop_Nm
+ORDER BY
+   SEB.Cust_Code
+  ,SEB.Shop_Code
+]]>
+
+	</select>
+	
+	<!-- 大学生協鏡情報の取得 -->
+	<select id="getDaigakuSeikyoKagamiInfo" resultType="map" parameterType="string">
+
+<![CDATA[
+SELECT
+   SUM(WRK.KINGAKU_URIAGE) AS KINGAKU_URIAGE
+  ,SUM(WRK.TAX_URIAGE)     AS TAX_URIAGE
+  ,SUM(WRK.KINGAKU_NEBIKI) AS KINGAKU_NEBIKI
+  ,SUM(WRK.TAX_NEBIKI)     AS TAX_NEBIKI
+  ,SUM(WRK.KINGAKU_HEMPIN) AS KINGAKU_HEMPIN
+  ,SUM(WRK.TAX_HEMPIN)     AS TAX_HEMPIN
+FROM
+-- UNIONテーブル
+  (
+    SELECT
+       CASE
+         WHEN Trd_Kb = '01' THEN SUB.Trd_Price
+         ELSE                    0
+       END AS KINGAKU_URIAGE
+      ,CASE
+         WHEN Trd_Kb = '01' THEN SUB.Trd_Tax
+         ELSE                    0
+       END AS TAX_URIAGE
+      ,CASE
+         WHEN Trd_Kb = '04' THEN SUB.Trd_Price
+         ELSE                    0
+       END AS KINGAKU_NEBIKI
+      ,CASE
+         WHEN Trd_Kb = '04' THEN SUB.Trd_Tax
+         ELSE                    0
+       END AS TAX_NEBIKI
+      ,CASE
+         WHEN Trd_Kb IN ('02', '03') THEN SUB.Trd_Price
+         ELSE                             0
+       END AS KINGAKU_HEMPIN
+      ,CASE
+         WHEN Trd_Kb IN ('02', '03') THEN SUB.Trd_Tax
+         ELSE                             0
+       END AS TAX_HEMPIN
+    FROM
+    -- 売掛明細
+      TBL_SEI01_URK_BODY SUB
+    WHERE
+          SUB.Bild_Id = #{seikyuId}
+      AND SUB.Trd_Kb IN ('01', '02', '03', '04')
+    
+    UNION ALL
+    
+    SELECT
+       CASE
+         WHEN Trd_Kb = '01' THEN SMB.Trd_Price
+         ELSE                    0
+       END AS KINGAKU_URIAGE
+      ,CASE
+         WHEN Trd_Kb = '01' THEN SMB.Trd_Tax
+         ELSE                    0
+       END AS TAX_URIAGE
+      ,CASE
+         WHEN Trd_Kb = '04' THEN SMB.Trd_Price
+         ELSE                    0
+       END AS KINGAKU_NEBIKI
+      ,CASE
+         WHEN Trd_Kb = '04' THEN SMB.Trd_Tax
+         ELSE                    0
+       END AS TAX_NEBIKI
+      ,CASE
+         WHEN Trd_Kb IN ('02', '03') THEN SMB.Trd_Price
+         ELSE                             0
+       END AS KINGAKU_HEMPIN
+      ,CASE
+         WHEN Trd_Kb IN ('02', '03') THEN SMB.Trd_Tax
+         ELSE                             0
+       END AS TAX_HEMPIN
+    FROM
+    -- 未収明細
+      TBL_SEI01_MSH_BODY SMB
+    WHERE
+          SMB.Bild_Id = #{seikyuId}
+      AND SMB.Trd_Kb IN ('01', '02', '03', '04')
+  ) WRK
+]]>
+
+	</select>
+	
+	<!-- ■■■■■■ 請求書印刷フラグ更新 ■■■■■■ -->
+	
+	
+	<!-- 売上明細（売掛）の更新 -->
+	<update id="updateInsatsuFlagOnUriageMeisaiUrikake" parameterType="long">
+
+<![CDATA[
+UPDATE
+  URB
+SET
+   URB.Bill_Print_Flg = '1'
+  ,UPD_USERID         = #{USER_ID}
+  ,UPD_PGID           = #{PROGRAM_ID}
+  ,UPD_YMD            = #{CURRENT_DATE}
+  ,UPD_TIME           = #{CURRENT_TIME}
+FROM
+-- 売上明細
+  TBL_URI01_BODY URB
+-- 売掛明細
+INNER JOIN
+  TBL_SEI01_URK_BODY SUB
+ON
+      SUB.Den_No       = URB.Den_No
+  AND SUB.Den_Idx      = URB.Den_Idx
+  AND SUB.Cust_Den_Row = URB.Cust_Den_Row
+WHERE
+  SUB.Bild_Id = #{SEIKYU_ID}
+]]>
+	</update>
+	
+	<!-- 売上明細（未収）の更新 -->
+	<update id="updateInsatsuFlagOnUriageMeisaiMishu" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URB
+SET
+   URB.Bill_Print_Flg = '1'
+  ,UPD_USERID         = #{USER_ID}
+  ,UPD_PGID           = #{PROGRAM_ID}
+  ,UPD_YMD            = #{CURRENT_DATE}
+  ,UPD_TIME           = #{CURRENT_TIME}
+FROM
+-- 売上明細
+  TBL_URI01_BODY URB
+-- 未収明細
+INNER JOIN
+  TBL_SEI01_MSH_BODY SMB
+ON
+      SMB.Den_No       = URB.Den_No
+  AND SMB.Den_Idx      = URB.Den_Idx
+  AND SMB.Cust_Den_Row = URB.Cust_Den_Row
+WHERE
+  SMB.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+	<!-- 売上ヘッダ（売掛）の更新 -->
+	<update id="updateInsatsuFlagOnUriageHeaderUrikake" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URH
+SET
+   URH.Bill_Print_Flg = '1'
+  ,UPD_USERID         = #{USER_ID}
+  ,UPD_PGID           = #{PROGRAM_ID}
+  ,UPD_YMD            = #{CURRENT_DATE}
+  ,UPD_TIME           = #{CURRENT_TIME}
+FROM
+-- 売上ヘッダ
+  TBL_URI01_HEAD URH
+-- 売掛明細
+INNER JOIN
+  TBL_SEI01_URK_BODY SUB
+ON
+      SUB.Den_No  = URH.Den_No
+  AND SUB.Den_Idx = URH.Den_Idx
+WHERE
+  SUB.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+	<!-- 売上ヘッダ（未収）の更新 -->
+	<update id="updateInsatsuFlagOnUriageHeaderMishu" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URH
+SET
+   URH.Bill_Print_Flg = '1'
+  ,UPD_USERID         = #{USER_ID}
+  ,UPD_PGID           = #{PROGRAM_ID}
+  ,UPD_YMD            = #{CURRENT_DATE}
+  ,UPD_TIME           = #{CURRENT_TIME}
+FROM
+-- 売上ヘッダ
+  TBL_URI01_HEAD URH
+-- 未収明細
+INNER JOIN
+  TBL_SEI01_MSH_BODY SMB
+ON
+      SMB.Den_No = URH.Den_No
+  AND SMB.Den_Idx= URH.Den_Idx
+WHERE
+  SMB.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+	<!-- ■■■■■■ 請求データ送信フラグ更新 ■■■■■■ -->
+	
+	<update id="updateSeikyuSendFlagOnSeikyuHeader" parameterType="map">
+
+<![CDATA[
+UPDATE
+  -- 請求ヘッダ
+  TBL_SEI01_HEAD
+SET
+   Bild_Dat_Flg = #{FLAG}
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+WHERE
+      Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+	
+</mapper>

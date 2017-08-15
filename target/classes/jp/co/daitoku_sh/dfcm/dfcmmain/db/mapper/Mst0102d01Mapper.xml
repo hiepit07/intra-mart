@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0102d01Mapper">
+
+	<select id="getCustomerList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0102d01CustomerList" parameterType="map" >
+		SELECT ${searchMax} CST.Cain_Code chainCode,
+				CST.Cain_Idx chainEda,
+				CHN.CHNMEI chainName,
+				CST.Cust_Code customerCode,
+				CST.Cust_Nm customerName,
+				CSJ.Jigyo_Code jigyouShoCode,
+				JGY.JGYMEI jigyouShoName,
+				CSJ.Eg_Tan_Code eigyouTantoushaCode,
+				USR1.User_Nm eigyouTantoushaName,
+				CSJ.Jm_Tan_Code jimuTantoushaCode,
+				USR2.User_Nm jimuTantoushaName,
+				GEN1.Target_1 customerType,
+				GEN2.Target_1 uchizeiKokyakuKubun,
+				CST.STS_Code stsCode
+		FROM MST_CUSTOMER CST
+		LEFT JOIN MST_CUSTJGYO CSJ
+			ON CST.Cust_Code = CSJ.Cust_Code
+			AND CST.Manager_Jigyo_Code = CSJ.Jigyo_Code
+		LEFT JOIN MST_S_CHAIN CHN
+			ON CST.Cain_Code = CHN.CHNCD
+			AND CST.Cain_Idx = CHN.CHNEDA
+		LEFT JOIN MST_S_JIGYO JGY
+			ON CSJ.Jigyo_Code = JGY.JGYCD
+			AND JGY.DELFLG = #{delFlg}
+			AND JGY.STRYMD &lt;= #{businessDate}
+			AND JGY.ENDYMD >= #{businessDate}
+		LEFT JOIN MST_USER USR1
+			ON CSJ.Eg_Tan_Code = USR1.User_Code
+			AND USR1.STS_Code = #{stsCode}
+		LEFT JOIN MST_USER USR2
+			ON CSJ.Jm_Tan_Code = USR2.User_Code
+			AND USR2.STS_Code = #{stsCode}
+		LEFT JOIN MST_GENERAL GEN1
+			ON CST.Cust_Cls = GEN1.Gl_Code
+			AND GEN1.Gl_Kb = 'Cust_Cls'
+		LEFT JOIN MST_GENERAL GEN2
+			ON CST.Tax_Inc_Kb = GEN2.Gl_Code
+			AND GEN2.Gl_Kb = 'Tax_Inc_Kb'
+		WHERE 1 = 1
+		<if test="jigyouShoCode != null and jigyouShoCode != ''">
+			AND CSJ.Jigyo_Code = #{jigyouShoCode}
+		</if>
+		<if test="chainCode != null and chainCode != ''">
+			AND CST.Cain_Code = #{chainCode}
+		</if>
+		<if test="chainEda != null and chainEda != ''">
+			AND CST.Cain_Idx = #{chainEda}
+		</if>
+		<if test="customerCode != null and customerCode != ''">
+			AND CST.Cust_Code = #{customerCode}
+		</if>
+		<if test="customerName != null and customerName != ''">
+			AND CST.Cust_Nm LIKE #{customerName}
+		</if>
+		<if test="eigyouTantoushaCode != null and eigyouTantoushaCode != ''">
+			AND CSJ.Eg_Tan_Code = #{eigyouTantoushaCode}
+		</if>
+		<if test="jimuTantoushaCode != null and jimuTantoushaCode != ''">
+			AND CSJ.Jm_Tan_Code = #{jimuTantoushaCode}
+		</if>
+		<if test="customerType != null and customerType != ''">
+			AND CST.Cust_Cls = #{customerType}
+		</if>
+		<if test="uchizeiKokyakuKubun != null and uchizeiKokyakuKubun != ''">
+			AND CST.Tax_Inc_Kb = #{uchizeiKokyakuKubun}
+		</if>
+		<if test="chkCancelData != null and chkCancelData != 1">
+			AND CST.STS_Code = #{stsCode}
+		</if>
+		<if test="chkCustomer == 1 or chkBilling == 1 or chkCustomerBilling == 1">
+			AND (
+		</if>		
+		<if test="chkCustomer == 1">
+			(CST.Cust_Flg = 1 AND CST.Bild_Flg = 0) OR
+		</if>
+		<if test="chkBilling == 1">
+			(CST.Cust_Flg = 0 AND CST.Bild_Flg = 1) OR
+		</if>
+		<if test="chkCustomerBilling == 1">
+			(CST.Cust_Flg = 1 AND CST.Bild_Flg = 1) OR
+		</if>
+		<if test="chkCustomer == 1 or chkBilling == 1 or chkCustomerBilling == 1">
+			1 = 0)
+		</if>
+		ORDER BY CST.Cust_Code
+	</select>
+
+	<select id="getCsvOutputData" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0102d01ExportCsvDataObject" parameterType="map" >
+		SELECT 
+			CST.Cust_Code custCode,
+			CST.Cain_Code cainCode,
+			CST.Cain_Idx cainIdx,
+			CST.Cust_Flg custFlg,
+			CST.Bild_Flg bildFlg,
+			CST.Bild_Code bildCode,
+			CST.Cust_Nm custNm,
+			CST.Cust_Nm_Kana custNmKana,
+			CST.Cust_Nm_R custNmR,
+			CST.Zip_Code zipCode,
+			CST.Adr_1 adr1,
+			CST.Adr_2 adr2,
+			CST.Tel_No telNo,
+			CST.Fax_No faxNo,
+			CST.Cust_Tan custTan,
+			CST.Cust_Tan_Mail custTanMail,
+			CST.Manager_Jigyo_Code managerJigyoCode,
+			CST.Cust_Cls custCls,
+			CST.Gyotai_Kb gyotaiKb,
+			CST.Deli_Center_Code deliCenterCode,
+			CST.Rel_Com_Cls relComCls,
+			CST.Rel_Com_Sub relComSub,
+			CST.DatIdx_Kb datIdxKb,
+			CST.Shop_Kb shopKb,
+			CST.YG_Kb ygKb,
+			CST.Tax_Inc_Kb taxIncKb,
+			CST.Tax_Inc_Frc_Kb taxIncFrcKb,
+			CST.Col_Mon_Kb colMonKb,
+			CST.Col_Mmrk_Kb colMmrkKb,
+			CST.Sums_Flg sumsFlg,
+			CST.Ships_Kb shipsKb,
+			CST.Ships_Typ_ID shipsTypId,
+			CST.Ships_Typ_Cls shipsTypCls,
+			CST.Ships_rud_Kb shipsRudKb,
+			CST.Ships_Code_Kb shipsCodeKb,
+			CST.Bild_Nm bildNm,
+			CST.Bild_Nm_Kana bildNmKana,
+			CST.Bild_Nm_R bildNmR,
+			CST.Bild_Zip_Code bildZipCode,
+			CST.Bild_Adr_1 bildAdr1,
+			CST.Bild_Adr_2 bildAdr2,
+			CST.Bild_Tel_No bildTelNo,
+			CST.Bild_Fax_No bildFaxNo,
+			CST.Bild_Unt_Kb bildUntKb,
+			CST.Bild_Tanka bildTanka,
+			CST.Bild_Typ_ID bildTypId,
+			CST.Bild_Typ_Cls bildTypCls,
+			CST.Sum_Bild_Kb sumBildKb,
+			CST.Sum_Bild_Jgyo sumBildJgyo,
+			CST.Bild_Ptn bildPtn,
+			CST.Bild_Adr_Out_Kb bildAdrOutKb,
+			CST.Bild_Sum_Kb bildSumKb,
+			CST.Tax_Unt_Kb taxUntKb,
+			CST.Tax_Frc_Kb taxFrcKb,
+			CST.Bild_Chk_Kb bildChkKb,
+			CST.Bild_Chk_Srt bildChkSrt,
+			CST.Total_Date_1 totalDate1,
+			CST.Col_Term_Kb_1 colTermKb1,
+			CST.Col_Date_1 colDate1,
+			CST.Total_Date_2 totalDate2,
+			CST.Col_Term_Kb_2 colTermKb2,
+			CST.Col_Date_2 colDate2,
+			CST.Rcvm_Cls rcvmCls,
+			CST.Rcvm_Acc rcvmAcc,
+			CST.Rece_Note_Site receNoteSite,
+			CST.Rcv_Dat_Kb rcvDatKb,
+			CST.Bild_Dat_Kb bildDatKb,
+			CST.Mod_Dat_Kb modDatKb,
+			CST.Mod_kb_Hpn modKbHpn,
+			CST.Mod_kb_Kpn modKbKpn,
+			CST.Mod_kb_Ssi modKbSsi,
+			CST.Pay_Dat_Kb payDatKb,
+			CST.TR_Code trCode,
+			CST.BN_Code_ST_S bnCodeStS,
+			CST.DN_Kb_ST_S dnKbStS,
+			CST.BN_Code_ST_C bnCodeStC,
+			CST.DN_Kb_ST_C dnKbStC,
+			CST.BN_Code_SP_S bnCodeSpS,
+			CST.DN_Kb_SP_S dnKbSpS,
+			CST.BN_Code_SP_C bnCodeSpC,
+			CST.DN_Kb_SP_C dnKbSpC,
+			CST.Bild_Dat_ID bildDatId,
+			CST.Sum_Code_1 sumCode1,
+			CST.Sum_Code_2 sumCode2,
+			CST.Close_Date closeDate,
+			CST.STS_Code stsCode,
+			CST.Snd_Flg sndFlg,
+			CSJ.Cust_Code custJigyoCustCode,
+			CSJ.Jigyo_Code custJigyoJigyoCode,
+			CSJ.Eg_Tan_Code custJigyoEgtCode,
+			CSJ.Jm_Tan_Code custJigyoJmtTanCode,
+			CHN.CHNMEI schainChnMei,
+			JGY.JGYMEI sjigyoJgyMei,
+			USR1.User_Nm user1UserNm,
+			USR2.User_Nm user2UserNm,
+			GEN1.Target_1 genCustCls,
+			GEN2.Target_1 genGyotaiKb,
+			GEN3.Target_1 genRelComCls,
+			GEN4.Target_1 genDatIdxKb,
+			GEN5.Target_1 genShopKb,
+			GEN6.Target_1 genYgKb,
+			GEN7.Target_1 genTaxIncKb,
+			GEN8.Target_1 genTaxIncFrcKb,
+			GEN9.Target_1 genColMonKb,
+			GEN10.Target_1 genColMmrkKb,
+			GEN11.Target_1 genSumsFlg,
+			GEN12.Target_1 genShipsKb,
+			GEN13.Target_1 genShipsRudKb,
+			GEN14.Target_1 genShipsCodeKb,
+			GEN15.Target_1 genBildUntKb,
+			GEN16.Target_1 genBildTanka,
+			GEN17.Target_1 genBildTyp,
+			GEN18.Target_1 genSumBildKb,
+			GEN19.Target_1 genBildPtn,
+			GEN20.Target_1 genBildAdrOutKb,
+			GEN21.Target_1 genTaxUntKb,
+			GEN22.Target_1 genTaxFrcKb,
+			GEN23.Target_1 genBildChkKb,
+			GEN24.Target_1 genBildChkSrt,
+			GEN25.Target_1 genColTermKb1,
+			GEN26.Target_1 genColTermKb2,
+			GEN27.Target_1 genRcvmCls,
+			GEN28.Target_1 genRcvmAcc,
+			GEN29.Target_1 genRcvDatKb,
+			GEN30.Target_1 genBildDatKb,
+			GEN31.Target_1 genModDatKb,
+			GEN32.Target_1 genPayDatKb
+		FROM MST_CUSTOMER CST
+		LEFT JOIN MST_CUSTJGYO CSJ
+			ON CST.Cust_Code = CSJ.Cust_Code
+			AND CST.Manager_Jigyo_Code = CSJ.Jigyo_Code
+		LEFT JOIN MST_S_CHAIN CHN
+			ON CST.Cain_Code = CHN.CHNCD
+			AND CST.Cain_Idx = CHN.CHNEDA
+		LEFT JOIN MST_S_JIGYO JGY
+			ON CSJ.Jigyo_Code = JGY.JGYCD
+			AND JGY.DELFLG = #{delFlg}
+			AND JGY.STRYMD &lt;= #{businessDate}
+			AND JGY.ENDYMD >= #{businessDate}
+		LEFT JOIN MST_USER USR1
+			ON CSJ.Eg_Tan_Code = USR1.User_Code
+			AND USR1.STS_Code = #{stsCode}
+		LEFT JOIN MST_USER USR2
+			ON CSJ.Jm_Tan_Code = USR2.User_Code
+			AND USR2.STS_Code = #{stsCode}
+		LEFT JOIN MST_GENERAL GEN1
+			ON CST.Cust_Cls = GEN1.Gl_Code
+			AND GEN1.Gl_Kb = 'Cust_Cls'
+		LEFT JOIN MST_GENERAL GEN2
+			ON CST.Tax_Inc_Kb = GEN2.Gl_Code
+			AND GEN2.Gl_Kb = 'Gyotai_Kb'
+		LEFT JOIN MST_GENERAL GEN3
+			ON CST.Rel_Com_Cls = GEN3.Gl_Code
+			AND GEN3.Gl_Kb = 'Rel_Com_Cls'
+		LEFT JOIN MST_GENERAL GEN4
+			ON CST.DatIdx_Kb = GEN4.Gl_Code
+			AND GEN4.Gl_Kb = 'DatIdx_Kb'
+		LEFT JOIN MST_GENERAL GEN5
+			ON CST.Shop_Kb = GEN5.Gl_Code
+			AND GEN5.Gl_Kb = 'Shop_Kb'
+		LEFT JOIN MST_GENERAL GEN6
+			ON CST.YG_Kb = GEN6.Gl_Code
+			AND GEN6.Gl_Kb = 'YG_Kb'
+		LEFT JOIN MST_GENERAL GEN7
+			ON CST.Tax_Inc_Kb = GEN7.Gl_Code
+			AND GEN7.Gl_Kb = 'Tax_Inc_Kb'
+		LEFT JOIN MST_GENERAL GEN8
+			ON CST.Tax_Inc_Frc_Kb = GEN8.Gl_Code
+			AND GEN8.Gl_Kb = 'Tax_Inc_Frc_Kb'
+		LEFT JOIN MST_GENERAL GEN9
+			ON CST.Col_Mon_Kb = GEN9.Gl_Code
+			AND GEN9.Gl_Kb = 'Col_Mon_Kb'
+		LEFT JOIN MST_GENERAL GEN10
+			ON CST.Col_Mmrk_Kb = GEN10.Gl_Code
+			AND GEN10.Gl_Kb = 'Col_Mmrk_Kb'
+		LEFT JOIN MST_GENERAL GEN11
+			ON CST.Sums_Flg = GEN11.Gl_Code
+			AND GEN11.Gl_Kb = 'Sums_Flg'
+		LEFT JOIN MST_GENERAL GEN12
+			ON CST.Ships_Kb = GEN12.Gl_Code
+			AND GEN12.Gl_Kb = 'Ships_Kb'
+		LEFT JOIN MST_GENERAL GEN13
+			ON CST.Ships_rud_Kb = GEN13.Gl_Code
+			AND GEN13.Gl_Kb = 'Ships_rud_Kb'
+		LEFT JOIN MST_GENERAL GEN14
+			ON CST.Ships_Code_Kb = GEN14.Gl_Code
+			AND GEN14.Gl_Kb = 'Ships_Code_Kb'
+		LEFT JOIN MST_GENERAL GEN15
+			ON CST.Bild_Unt_Kb = GEN15.Gl_Code
+			AND GEN15.Gl_Kb = 'Bild_Unt_Kb'
+		LEFT JOIN MST_GENERAL GEN16
+			ON CST.Bild_Tanka = GEN16.Gl_Code
+			AND GEN16.Gl_Kb = 'Bild_Tanka'
+		LEFT JOIN MST_GENERAL GEN17
+			ON CST.Bild_Typ_ID = GEN17.Gl_Code
+			AND GEN17.Gl_Kb = 'Bild_Typ'
+		LEFT JOIN MST_GENERAL GEN18
+			ON CST.Sum_Bild_Kb = GEN18.Gl_Code
+			AND GEN18.Gl_Kb = 'Sum_Bild_Kb'
+		LEFT JOIN MST_GENERAL GEN19
+			ON CST.Bild_Ptn = GEN19.Gl_Code
+			AND GEN19.Gl_Kb = 'Bild_Ptn'
+		LEFT JOIN MST_GENERAL GEN20
+			ON CST.Bild_Adr_Out_Kb = GEN20.Gl_Code
+			AND GEN20.Gl_Kb = 'Bild_Adr_Out_Kb'
+		LEFT JOIN MST_GENERAL GEN21
+			ON CST.Tax_Unt_Kb = GEN21.Gl_Code
+			AND GEN21.Gl_Kb = 'Tax_Unt_Kb'
+		LEFT JOIN MST_GENERAL GEN22
+			ON CST.Tax_Frc_Kb = GEN22.Gl_Code
+			AND GEN22.Gl_Kb = 'Tax_Frc_Kb'
+		LEFT JOIN MST_GENERAL GEN23
+			ON CST.Bild_Chk_Kb = GEN23.Gl_Code
+			AND GEN23.Gl_Kb = 'Bild_Chk_Kb'
+		LEFT JOIN MST_GENERAL GEN24
+			ON CST.Bild_Chk_Srt = GEN24.Gl_Code
+			AND GEN24.Gl_Kb = 'Bild_Chk_Srt'
+		LEFT JOIN MST_GENERAL GEN25
+			ON CST.Col_Term_Kb_1 = GEN25.Gl_Code
+			AND GEN25.Gl_Kb = 'Col_Term_Kb_1'
+		LEFT JOIN MST_GENERAL GEN26
+			ON CST.Col_Term_Kb_2 = GEN26.Gl_Code
+			AND GEN26.Gl_Kb = 'Col_Term_Kb_2'
+		LEFT JOIN MST_GENERAL GEN27
+			ON CST.Rcvm_Cls = GEN27.Gl_Code
+			AND GEN27.Gl_Kb = 'Rcvm_Cls'
+		LEFT JOIN MST_GENERAL GEN28
+			ON CST.Rcvm_Acc = GEN28.Gl_Code
+			AND GEN28.Gl_Kb = 'Rcvm_Acc'
+		LEFT JOIN MST_GENERAL GEN29
+			ON CST.Rcv_Dat_Kb = GEN29.Gl_Code
+			AND GEN29.Gl_Kb = 'Rcv_Dat_Kb'
+		LEFT JOIN MST_GENERAL GEN30
+			ON CST.Bild_Dat_Kb = GEN30.Gl_Code
+			AND GEN30.Gl_Kb = 'Bild_Dat_Kb'
+		LEFT JOIN MST_GENERAL GEN31
+			ON CST.Mod_Dat_Kb = GEN31.Gl_Code
+			AND GEN31.Gl_Kb = 'Mod_Dat_Kb'
+		LEFT JOIN MST_GENERAL GEN32
+			ON CST.Pay_Dat_Kb = GEN32.Gl_Code
+			AND GEN32.Gl_Kb = 'Pay_Dat_Kb'
+		WHERE 1 = 1
+		<if test="jigyouShoCode != null and jigyouShoCode != ''">
+			AND CSJ.Jigyo_Code = #{jigyouShoCode}
+		</if>
+		<if test="chainCode != null and chainCode != ''">
+			AND CST.Cain_Code = #{chainCode}
+		</if>
+		<if test="chainEda != null and chainEda != ''">
+			AND CST.Cain_Idx = #{chainEda}
+		</if>
+		<if test="customerCode != null and customerCode != ''">
+			AND CST.Cust_Code = #{customerCode}
+		</if>
+		<if test="customerName != null and customerName != ''">
+			AND CST.Cust_Nm LIKE #{customerName}
+		</if>
+		<if test="eigyouTantoushaCode != null and eigyouTantoushaCode != ''">
+			AND CSJ.Eg_Tan_Code = #{eigyouTantoushaCode}
+		</if>
+		<if test="jimuTantoushaCode != null and jimuTantoushaCode != ''">
+			AND CSJ.Jm_Tan_Code = #{jimuTantoushaCode}
+		</if>
+		<if test="customerType != null and customerType != ''">
+			AND CST.Cust_Cls = #{customerType}
+		</if>
+		<if test="uchizeiKokyakuKubun != null and uchizeiKokyakuKubun != ''">
+			AND CST.Tax_Inc_Kb = #{uchizeiKokyakuKubun}
+		</if>
+		<if test="chkCancelData != 1">
+			AND CST.STS_Code = #{stsCode}
+		</if>
+		<if test="chkCustomer == 1 or chkBilling == 1 or chkCustomerBilling == 1">
+			AND (
+		</if>		
+		<if test="chkCustomer == 1">
+			(CST.Cust_Flg = 1 AND CST.Bild_Flg = 0) OR
+		</if>
+		<if test="chkBilling == 1">
+			(CST.Cust_Flg = 0 AND CST.Bild_Flg = 1) OR
+		</if>
+		<if test="chkCustomerBilling == 1">
+			(CST.Cust_Flg = 1 AND CST.Bild_Flg = 1) OR
+		</if>
+		<if test="chkCustomer == 1 or chkBilling == 1 or chkCustomerBilling == 1">
+			1 = 0)
+		</if>
+		ORDER BY CST.Cust_Code, CSJ.Jigyo_Code
+	</select>
+
+	<select id="getChainName" resultType="java.lang.String" parameterType="map" >
+		SELECT CHN.CHNMEI
+		FROM MST_S_CHAIN CHN
+		WHERE CHN.CHNCD = #{chainCode}
+	    	AND CHN.CHNEDA = #{chainEda}
+	    	AND CHN.DELFLG = #{delFlg}
+	    	AND (LTRIM(RTRIM(CHN.STRYMD)) = '' OR CHN.STRYMD &lt;= #{businessDate})
+    		AND (LTRIM(RTRIM(CHN.ENDYMD)) = '' OR CHN.ENDYMD >= #{businessDate})
+	</select>
+
+</mapper>

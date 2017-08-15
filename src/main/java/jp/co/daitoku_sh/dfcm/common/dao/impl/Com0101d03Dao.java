@@ -1,0 +1,55 @@
+/**
+ * パッケージ名:jp.co.daitoku_sh.dfcm.common.dao.impl
+ * ファイル名:Com0101d03Dao.java
+ * 
+ * <p>作成者:アクトブレーンベトナム
+ * 作成日:2015/09/22
+ * 
+ * <p>履歴
+ * -------------------------------------------------------------------------
+ * 日付 指示者 担当 内容
+ * -------------------------------------------------------------------------
+ * 2015/09/22 1.00 ABV)コイー 新規開発
+ * -------------------------------------------------------------------------
+ * 
+ *<p>ALL RIGHTS RESERVED COPYRIGHT (C)2015 TSUZUKI DENKI CO.,LTD.
+ */
+
+package jp.co.daitoku_sh.dfcm.common.dao.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import jp.co.daitoku_sh.dfcm.common.db.mapper.Com0101d03Mapper;
+import jp.co.daitoku_sh.dfcm.common.db.mapper.MstUserMapper;
+
+/**
+ * @author QuanTran
+ * @version 1.0.0
+ * @since 1.0.0
+ */
+@Component
+public class Com0101d03Dao {
+
+  @Autowired
+  private Com0101d03Mapper com0101d03Mapper;
+
+  @Autowired
+  private MstUserMapper mstUserMapper;
+
+  public MstUserMapper getMstUserMapper() {
+    return mstUserMapper;
+  }
+
+  public void setMstUserMapper(MstUserMapper mstUserMapper) {
+    this.mstUserMapper = mstUserMapper;
+  }
+
+  public Com0101d03Mapper getCom0101d03Mapper() {
+    return com0101d03Mapper;
+  }
+
+  public void setCom0101d03Mapper(Com0101d03Mapper com0101d03Mapper) {
+    this.com0101d03Mapper = com0101d03Mapper;
+  }
+
+}

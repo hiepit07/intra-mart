@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Com0102d03Mapper">
+	<select id="getMstCustomerData"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap"
+		parameterType="map">
+		SELECT CST.Cust_Code,
+		CST.Cust_Nm_R
+		FROM MST_CUSTOMER CST
+		WHERE CST.Cust_Code = #{customerCode}
+		AND ((LTRIM(RTRIM(CST.Close_Date))) = '' OR CST.Close_Date &gt;#{date})
+		AND CST.STS_Code = '1'
+	</select>	
+	<select id="getSearchResult"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstShopMapper.BaseResultMap"
+		parameterType="map">
+		SELECT 
+		TOP ${searchMax}
+		SHP.Shop_Code shopCode,
+		SHP.Shop_Nm_R shopNmR
+		FROM MST_SHOP SHP
+		WHERE SHP.Cust_Code = #{customerCode}
+		<if test="shopCode != ''">
+			AND SHP.Shop_Code = #{shopCode}
+		</if>
+		<if test="shopName != ''">
+			AND SHP.Shop_Nm like #{shopName}
+		</if>
+		AND ((LTRIM(RTRIM(SHP.Close_Date))) = '' OR SHP.Close_Date > #{date})
+		AND SHP.STS_Code = '1'
+		ORDER BY SHP.Shop_Code
+	</select>
+	<select id="getMstShopInfo"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstShopMapper.BaseResultMap"
+		parameterType="map">
+		SELECT 
+		SHP.Cust_Code,
+		SHP.Shop_Code,
+		SHP.Shop_Nm,
+		SHP.Shop_Nm_Kana,
+		SHP.Shop_Nm_R,
+		SHP.Zip_Code,
+		SHP.Adr_1,
+		SHP.Adr_2,
+		SHP.Tel_No,
+		SHP.Fax_No,
+		SHP.Jigyo_Code,
+		SHP.Sum_Shop_Kb,
+		SHP.Sum_Shop_Jkn,
+		SHP.Deli_Center_Code,
+		SHP.Sunks_Kb,
+		SHP.Sum_Shop_Code,
+		SHP.ST_Code_ST_S,
+		SHP.ST_Code_ST_C,
+		SHP.ST_Code_SP_S,
+		SHP.ST_Code_SP_C,
+		SHP.Close_Date,
+		SHP.STS_Code,
+		SHP.Snd_Flg,
+		SHP.INS_USERID,
+		SHP.INS_PGID,
+		SHP.INS_YMD,
+		SHP.INS_TIME,
+		SHP.UPD_USERID,
+		SHP.UPD_PGID,
+		SHP.UPD_YMD,
+		SHP.UPD_TIME
+		FROM
+		MST_SHOP SHP
+		WHERE SHP.Cust_Code = #{customerCode}
+		AND SHP.Shop_Code = #{shopCode}
+	</select>
+
+</mapper>

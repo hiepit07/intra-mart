@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Sei0107d01Mapper">
+
+	<select id="divisionChange"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.RstSei0107d01"
+		parameterType="map">
+		SELECT
+  		WRK.SHIMEBI
+		FROM
+  		(
+    	<!-- 締め日1 -->
+    	SELECT
+      	CST.Total_Date_1 AS SHIMEBI
+    	FROM
+    	<!-- 得意先マスタ -->
+      	MST_CUSTOMER CST
+    	WHERE
+          CST.STS_Code     = '1'
+	      AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+	      AND CST.Bild_Flg     = '1'
+	      AND CST.Bild_Unt_Kb  = '1'
+	      AND CST.Bild_Sum_Kb  = #{SEIKYU_SHUKEI_HYO_KBN}
+	      AND CST.Total_Date_1 IS NOT NULL
+
+    UNION
+    	SELECT
+      	CST.Total_Date_2 AS SHIMEBI
+    	FROM
+    	<!-- 得意先マスタ -->
+      	MST_CUSTOMER CST
+    	WHERE
+	      CST.STS_Code        = '1'
+	      AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+	      AND CST.Bild_Flg    = '1'
+	      AND CST.Bild_Unt_Kb = '1'
+	      AND CST.Bild_Sum_Kb = #{SEIKYU_SHUKEI_HYO_KBN}
+	      AND CST.Total_Date_2 IS NOT NULL
+  		) WRK
+		GROUP BY
+  			WRK.SHIMEBI
+		ORDER BY
+  			WRK.SHIMEBI
+	</select>
+	
+	<select id="bildInformationList"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.RstSei0107d01"
+		parameterType="map">
+		SELECT
+	   		  SHE.Bild_Date
+	  		  ,SHE.Cust_Code
+			  ,CST.Cust_Nm
+			  ,SUM( CASE
+			          WHEN SHE.Jigyo_Code = #{NARA_JIGYOSHO_CODE}       THEN SHE.Cur_UAmt + SHE.Cur_MAmt
+			          ELSE                                                   0
+			        END ) AS NARA_SEIKYU_GAKU
+			  ,SUM( CASE
+			          WHEN SHE.Jigyo_Code = #{CHUKYO_JIGYOSHO_CODE}     THEN SHE.Cur_UAmt + SHE.Cur_MAmt
+			          ELSE                                                   0
+			        END ) AS CHUKYO_SEIKYU_GAKU
+			  ,SUM( CASE
+			          WHEN SHE.Jigyo_Code = #{FUJINOMIYA_JIGYOSHO_CODE} THEN SHE.Cur_UAmt + SHE.Cur_MAmt
+			          ELSE                                                   0
+			        END ) AS FUJINOMIYA_SEIKYU_GAKU
+			  ,SUM( CASE
+			          WHEN SHE.Jigyo_Code = #{UTSUNOMIYA_JIGYOSHO_CODE} THEN SHE.Cur_UAmt + SHE.Cur_MAmt
+			          ELSE                                                   0
+			        END ) AS UTSUNOMIYA_SEIKYU_GAKU
+			  ,SUM( CASE
+			          WHEN SHE.Jigyo_Code = #{SAPPORO_JIGYOSHO_CODE}    THEN SHE.Cur_UAmt + SHE.Cur_MAmt
+			          ELSE                                                   0
+			        END ) AS SAPPORO_SEIKYU_GAKU
+	   FROM
+			<!--請求ヘッダ
+			  TBL_SEI01_HEAD SHE
+			得意先マスタ -->
+			INNER JOIN
+			  MST_CUSTOMER CST
+			ON
+			  SHE.Cust_Code = CST.Cust_Code
+	   WHERE
+			  CST.Bild_Sum_Kb = #{SEIKYU_SHUKEI_HYO_KBN}
+			<if test="">
+			  AND SHE.Bild_Date LIKE #{SEIKYU_MM}  -- #{SEIKYU_MM} = '201512%'
+			</if>
+			<if test="">
+			  AND SHE.Bild_Date =    #{SEIKYU_SHIMEBI}
+			</if>
+			GROUP BY
+			   SHE.Bild_Date
+			  ,SHE.Cust_Code
+			  ,CST.Cust_Nm
+			  ,SHE.Jigyo_Code
+	</select>
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Com0102d04Mapper">
+
+	<select id="getMstCustomerData"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.com.Com0102d04Model"
+		parameterType="map">
+		SELECT 
+		TOP ${searchMax}
+		CST.Cain_Code cainCode,
+		CST.Cain_Idx cainIdx
+		FROM MST_CUSTOMER CST
+		WHERE
+		CST.Cust_Code = #{customerCodeWk}
+		AND
+		(LTRIM(RTRIM(CST.Close_Date)) = '' OR CST.Close_Date > #{deadlineWk})
+		AND CST.STS_Code = '1'
+	</select>
+
+	<select id="getMstSSeihn"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.com.Com0102d04Model"
+		parameterType="map">
+		SELECT 
+		TOP ${searchMax}
+		SHN.HINCD cainCode,
+		SHN.HINRYAKU cainIdx
+		FROM MST_S_SEIHN SHN
+		WHERE 
+		SHN.CHNCD = #{changeCodeWk}
+		AND SHN.CHNEDA = #{changeBranchWk}
+		AND (((LTRIM(RTRIM(SHN.STRYMD))='') AND (LTRIM(RTRIM(SHN.STRBIN))=''))
+		 OR ((SHN.STRYMD + SHN.STRBIN) &lt;=(#{deadlineWk} + #{flightWk})))
+		AND (((LTRIM(RTRIM(SHN.ENDYMD))='') AND (LTRIM(RTRIM(SHN.ENDBIN))='')) 
+		OR  ((SHN.ENDYMD + SHN.ENDBIN) >= (#{deadlineWk} + #{flightWk})))
+		 AND SHN.DELFLG = '0'
+		<if test = 'ourCompanyItemCodeWk !=""'>
+		AND SHN.HINCD = #{ourCompanyItemCodeWk}
+		</if>
+ 		ORDER BY SHN.HINCD
+
+	</select>
+	<select id="getMstCustTanKaSeihn"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.com.Com0102d04Model"
+		parameterType="map">
+		SELECT 
+		TOP ${searchMax}
+		TCU.Item_Code cainCode ,
+		SHN.HINRYAKU cainIdx
+		FROM MST_CUST_TANKA TCU
+		INNER JOIN MST_S_SEIHN SHN ON
+		(SHN.HINCD = TCU.Item_Code
+		AND SHN.CHNCD = #{changeCodeWk}
+		AND SHN.CHNEDA = #{changeBranchWk}
+		AND (
+		((LTRIM(RTRIM(SHN.STRYMD))='' AND LTRIM(RTRIM(SHN.STRBIN))='')
+		 OR ((SHN.STRYMD + SHN.STRBIN) &lt;=(#{deadlineWk} + #{flightWk})))
+		 )
+		AND (
+		((LTRIM(RTRIM(SHN.ENDYMD))='' AND LTRIM(RTRIM(SHN.ENDBIN))='')
+		OR  ((SHN.ENDYMD + SHN.ENDBIN) >= (#{deadlineWk} + #{flightWk})))
+		)
+		)
+		WHERE
+		TCU.Cust_Code = #{customerCodeWk}
+		AND (
+  		(LTRIM(RTRIM(TCU.Valid_From)) = '') OR (TCU.Valid_From  &lt;= #{deadlineWk})
+  		)
+		AND  (
+   		(LTRIM(RTRIM(TCU.Valid_To)) = '' OR TCU.Valid_To >= #{deadlineWk}) 
+   		)
+		AND TCU.SALES_KB = #{saleTypeWk}
+		AND TCU.STS_Code = '1'
+		<if test = 'ourCompanyItemCodeWk != ""'>
+		AND TCU.Item_Code = #{ourCompanyItemCodeWk}
+		</if>
+		ORDER BY SHN.HINCD
+	</select>
+	<select id="getSearchMstSSeihn"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.com.Com0102d04Model"
+		parameterType="map">
+		SELECT 
+		TOP ${searchMax}
+		SHN.HINCD cainCode,
+		SHN.HINRYAKU cainIdx
+		FROM MST_S_SEIHN SHN
+		WHERE 
+		SHN.CHNCD = #{changeCodeWk}
+		AND SHN.CHNEDA = #{changeBranchWk}
+		AND (((LTRIM(RTRIM(SHN.STRYMD))='') AND (LTRIM(RTRIM(SHN.STRBIN))=''))
+		 OR ((SHN.STRYMD + SHN.STRBIN) &lt;=(#{deadlineWk} + #{flightWk}) )
+		AND ((LTRIM(RTRIM(SHN.ENDYMD))='') AND (LTRIM(RTRIM(SHN.ENDBIN))=''))
+		OR  ((SHN.ENDYMD + SHN.ENDBIN) >= (#{deadlineWk} + #{flightWk}) ))
+		 AND SHN.DELFLG = '0'
+		 <if test = "ourCompanyItemCodeWk !=''">
+		AND SHN.HINCD = #{ourCompanyItemCodeWk}
+		 </if>
+		 <if test = "ourCompanyItemNameWk !=''">
+		AND SHN.HINMEI like #{ourCompanyItemNameWk}
+		 </if>
+		ORDER BY SHN.HINCD
+	</select>
+	<select id="getSearchMstCustTanKaSeihn"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.com.Com0102d04Model"
+		parameterType="map">
+		SELECT 
+		TOP ${searchMax}
+		TCU.Item_Code cainCode ,
+		SHN.HINRYAKU cainIdx
+		FROM MST_CUST_TANKA TCU
+		INNER JOIN MST_S_SEIHN SHN ON
+		(SHN.HINCD = TCU.Item_Code
+		AND SHN.CHNCD = #{changeCodeWk}
+		AND SHN.CHNEDA = #{changeBranchWk}
+		AND (
+		((LTRIM(RTRIM(SHN.STRYMD))='' AND LTRIM(RTRIM(SHN.STRBIN))='')
+		 OR ((SHN.STRYMD + SHN.STRBIN) &lt;=(#{deadlineWk} + #{flightWk})))
+		 )
+		AND (
+		((LTRIM(RTRIM(SHN.ENDYMD))='' AND LTRIM(RTRIM(SHN.ENDBIN))='')
+		OR  ((SHN.ENDYMD + SHN.ENDBIN) >= (#{deadlineWk} + #{flightWk})))
+		)
+		)
+		WHERE
+		TCU.Cust_Code = #{customerCodeWk}
+		AND (
+  		(LTRIM(RTRIM(TCU.Valid_From)) = '') OR (TCU.Valid_From  &lt;= #{deadlineWk})
+  		)
+		AND  (
+   		(LTRIM(RTRIM(TCU.Valid_To)) = '' OR TCU.Valid_To >= #{deadlineWk}) 
+   		)
+		AND TCU.SALES_KB = #{saleTypeWk}
+		AND TCU.STS_Code = '1'
+		 <if test = "ourCompanyItemCodeWk !=''">
+		AND TCU.Item_Code = #{ourCompanyItemCodeWk}
+		 </if>
+		 <if test = "ourCompanyItemNameWk !=''">
+		AND SHN.HINMEI like #{ourCompanyItemNameWk}
+		 </if>
+		ORDER BY SHN.HINCD
+	</select>
+
+	
+</mapper>

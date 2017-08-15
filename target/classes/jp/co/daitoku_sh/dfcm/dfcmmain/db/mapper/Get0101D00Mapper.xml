@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Get0101D00Mapper">
+	<select id="getofficeinfo"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.get.GetOfficeInformationGet0101d00"
+		parameterType="map">
+		SELECT
+		JGY.JGYCD jgycd, JGY.JGYMEI jgymei
+		FROM MST_S_JIGYO JGY
+		WHERE
+		JGY.DELFLG = #{delFlg}
+		AND
+		JGY.STRYMD &lt; #{businessDate}
+		ORDER BY JGY.KANJIJGYCD ASC
+	</select>
+	<select id="getHeaderUirageHeader"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.get.GetHeaderUirageGet0101d00"
+		parameterType="map">
+		SELECT URH.Den_No denno, URH.Den_Idx denidx
+		FROM TBL_URI01_HEAD URH
+		WHERE URH.Office_Code = #{Office_Code}
+		AND	URH.Bill_Date = #{Bill_Date}
+		AND URH.Bill_Flg = #{Bill_Flg_or1} 
+		OR URH.Bill_Flg = #{Bill_Flg_or2}
+		AND URH.Sts_Code = #{Sts_Code}
+		ORDER BY URH.Den_No, URH.Den_Idx
+		ASC
+	</select>
+	<select id="getNextMonthAccountReceivableGet0101d00"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.get.GetNextMonthAccountGet0101d00"
+		parameterType="map">
+		SELECT
+		SMS2.Jigyo_Code jigyocode ,
+		SMS2.Chain_Code chaincode ,
+		SMS2.Chain_Idx chainidx ,
+		SMS2.Cust_Code custcode ,
+		SMS2.Shop_Code shopcode ,
+		SMS2.Cur_Urikake_Ttl cururikakettl ,
+		SMS2.Cur_Urikake_Tax cururikaketax ,
+		SMS2.Cur_Mishu_Ttl curmishuttl ,
+		SMS2.Cur_Mishu_Tax curmishutax
+		FROM TBL_SEI01_URK_MSH_HEAD SMS2
+		WHERE
+		SMS2.Jigyo_Code = #{Jigyo_CodeWK}
+		AND SMS2.Chain_Code = #{Chain_CodeWK}
+		AND SMS2.Chain_Idx = #{Chain_IdxWK}
+		AND SMS2.Cust_Code = #{Cust_CodeWK}
+		AND SMS2.Shop_Code = #{Shop_CodeWK}
+		AND SMS2.Account_Month = #{nextmonthWK}
+		AND (LTRIM(RTRIM(SMS2.Close_Date)) = '' or SMS2.Close_Date > #{businessDateWK})
+	</select>   
+	<select id="getNextMonthAccountGet0101d00"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.get.GetNextMonthAccountGet0101d00"
+		parameterType="map">
+		SELECT
+		SMS.Jigyo_Code jigyocode ,
+		SMS.Chain_Code chaincode,
+		SMS.Chain_Idx chainidx ,
+		SMS.Cust_Code custcode ,
+		SMS.Shop_Code shopcode ,
+		SMS.Cur_Urikake_Ttl cururikakettl ,
+		SMS.Cur_Urikake_Tax	cururikaketax ,
+		SMS.Cur_Mishu_Ttl curmishuttl ,
+		SMS.Cur_Mishu_Tax curmishutax
+		FROM TBL_SEI01_URK_MSH_HEAD SMS
+		WHERE SMS.Jigyo_Code = #{jigyocodecond}
+		AND 
+		SMS.Account_Month = #{accountmonthcond}
+		AND 
+		(LTRIM(RTRIM(SMS.Close_Date)) = '' or SMS.Close_Date > #{businessDateWK})
+		ORDER by
+		SMS.Jigyo_Code ASC,
+		SMS.Chain_Code ASC,
+		SMS.Chain_Idx ASC,
+		SMS.Cust_Code ASC,
+		SMS.Shop_Code ASC
+	</select>
+	<update id="updateUrikakeMishu" parameterType="map">
+		UPDATE
+		TBL_SEI01_URK_MSH_HEAD SMS4
+		SET
+		SMS4.Cur_Urikake_Ttl = #{UrikakeWK},
+		SMS4.Cur_Urikake_Tax = #{UrikakeTaxWK},
+		SMS4.Cur_Mishu_Ttl = #{Mishu_TtlWK},
+		SMS4.Cur_Mishu_Tax = #{Mishu_TaxWK},
+		SMS4.Bgn_Urikake_Ttl = #{currentUrikakeWK},
+		SMS4.Bgn_Urikake_Tax = #{currentUrikakeTaxWK},
+		SMS4.Bgn_Mishu_Ttl = #{Cur_Mishu_TtlWK},
+		SMS4.Bgn_Mishu_Tax = #{Cur_Mishu_TaxWK}
+		WHERE
+		SMS4.Jigyo_Code = #{officeCodeWK}
+		AND SMS4.Chain_Code = #{chainCodeWK}
+		AND SMS4.Chain_Idx = #{chainBranchWK}
+		AND SMS4.Cust_Code = #{customerCodeWK}
+		AND
+		SMS4.Shop_Code = #{shopCodeWK}
+		AND SMS4.Account_Month = #{nextmonthWK}
+		AND (LTRIM(RTRIM(SMS4.Close_Date)) = '' or SMS4.Close_Date > #{businessDateWK})
+	</update>
+	<update id="updateCurrentProcessDate" parameterType="map">
+		UPDATE
+		TBL_GET01_JIG_CONFIRM JGC
+		SET
+		JGC.Determ_Mon = #{thismonthFixWK}
+		JGC.Start_DateTime = #{currentProcessStartDateTimeWK}
+		JGC.End_DateTime = #{currentProcessEndDateTimeWK}
+		JGC.Getsuji_Flg = '1'
+		WHERE
+		JGC.Jigyo_Code = #{officeCodeWK}
+	</update>
+</mapper>

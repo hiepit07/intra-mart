@@ -1,0 +1,60 @@
+@CHARSET "UTF-8";
+
+input.txtDiaOurCompanyItemCodeWk {
+	height: 16px;
+	width: 100px;
+	margin: 0;
+	ime-mode: disabled;
+}
+
+input.txtDiaOurCompanyItemNameWk {
+	height: 16px;
+	width: 300px;
+	margin: 0;
+	ime-mode: active;
+}
+
+.tblSearchResult_head {
+	width: 660px;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 12px;
+}
+	.tblSearchResult_head th {
+		border-collapse: collapse;
+		background-color: #aa5930;
+		line-height: 25px;
+		color: #fff;
+	}
+
+	.tblSearchResult_head th:nth-child(2) {
+		border-left: 1px solid #FEF1CF;
+	}
+
+.tblSearchResult_body {
+	width: 660px;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 12px;
+}
+
+	.tblSearchResult_body tr:nth-child(even){
+		background: #faf9e5;
+	}
+
+	.tblSearchResult_body tr:nth-child(odd){
+		background: #fff;
+	}
+
+	.tblSearchResult_body td {
+		text-align: center;
+		border-collapse: collapse;
+		color: #0066cc;
+		line-height: 25px;
+	}
+
+	.tblSearchResult_body td:nth-child(2){
+		text-align: left;
+		padding-left: 10px;
+		border-left: 1px solid #FEF1CF;
+	}

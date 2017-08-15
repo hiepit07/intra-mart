@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Sei0101d00Mapper">
+	<select id="getSJigyoInfo" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo" parameterType="map">
+		SELECT JGY.JGYCD, JGY.JGYMEI FROM MST_S_JIGYO JGY
+		WHERE
+		JGY.DELFLG = '0'
+		AND JGY.STRYMD &lt;= #{businessDate}
+		AND JGY.ENDYMD &gt;= #{businessDate}
+		ORDER BY JGY.JGYCD
+	</select>
+</mapper>

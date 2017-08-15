@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0109d02Mapper">
+	<select id="getCustInfo" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCustInfo0109d02"
+		parameterType="map">
+		SELECT CST.Cust_Nm_R custNameR, CSJ.Jigyo_Code jigyoCode
+		FROM MST_CUSTOMER CST LEFT JOIN MST_CUSTJGYO CSJ ON (CST.Cust_Code = CSJ.Cust_Code)
+		WHERE CST.Cust_Code = #{CustCode}
+		<if test="SysAdminFlag != '1'">
+			AND CSJ.Jigyo_Code = #{JigyoshoCode}
+		</if>
+	</select>
+	
+	<select id="getCorrectInfo" resultType="String">
+		SELECT TOP 1 CRK.Cust_Code
+		FROM MST_CORRECT_KB CRK
+		WHERE CRK.Cust_Code = #{CustCode}
+			AND CRK.Correct_Kb = #{CorrectKb}
+	</select>
+</mapper>

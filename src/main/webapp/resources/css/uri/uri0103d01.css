@@ -1,0 +1,219 @@
+﻿Width % */
+.td_width4per {
+	width: 4%;
+}
+.td_width5per {
+	width: 5%;
+}
+.td_width6per {
+	width: 6%;
+}
+.td_width7per {
+	width: 7%;
+}
+.td_width8per {
+	width: 8%;
+}
+.td_width9per {
+	width: 9%;
+}
+.td_width10per {
+	width: 10%;
+}
+.td_width11per {
+	width: 11%;
+}
+.td_width14per {
+	width: 14%;
+}
+.td_width15per {
+	width: 15%;
+}
+.td_width16per {
+	width: 16%;
+}
+.td_width75per {
+	width: 75%;
+}
+.td_width100per {
+	width: 100%;
+}
+/* Width px */
+.td_width3 {
+	width: 3px;
+}
+.span_width25 {
+	width: 25px;
+	display: inline-block;
+}
+.span_width33 {
+	width: 33px;
+	display: inline-block;
+}
+.span_width50 {
+	width: 50px;
+	display: inline-block;
+}
+.span_width102 {
+	width: 102px;
+	display: inline-block;
+}
+
+.txt_width30 {
+	width: 30px;
+}
+.txt_width50 {
+	width: 50px;
+}
+.txt_width100 {
+	width: 100px;
+}
+.txt_width75per {
+	width: 75%;
+}
+.cbx_width70 {
+	width: 70px;
+}
+.cbx_width103 {
+	width: 103px;
+}
+.cbx_w100per {
+	width:100%;
+}
+.height270{
+	height: 270px;
+}
+
+.bg_faf9e5 {
+	background-color: #faf9e5;
+}
+.bg_aa5930 {
+	background-color: #aa5930;
+}
+.bg_ffffcc {
+	background-color: #ffffcc;
+}
+.bg_white {
+	background-color: #fff;
+}
+
+/* Table �f�[�^�Ăяo������
+  ========================================================================== */
+.tbl_data_condition1 {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition1 td {
+		border-bottom: 2px solid #fff;
+		vertical-align: middle;
+	}
+	.tbl_data_condition1 td:nth-child(1),
+	.tbl_data_condition1 td:nth-child(4),
+	.tbl_data_condition1 td:nth-child(7){
+		padding-right: 10px;
+		width: 115px;
+	}
+	.tbl_data_condition1 td:nth-child(3),
+	.tbl_data_condition1 td:nth-child(6),
+	.tbl_data_condition1 td:nth-child(9){
+		padding-left: 3px;
+	}
+	.tbl_data_condition1 td:nth-child(3) {
+		width: 250px;
+	}
+	.tbl_data_condition1 td:nth-child(9) {
+		width: 336px;
+	}
+
+.tbl_data_condition2 {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition2 td {
+		border-bottom: 2px solid #fff;
+		vertical-align: middle;
+	}
+	.tbl_data_condition2 td:nth-child(1),
+	.tbl_data_condition2 td:nth-child(4),
+	.tbl_data_condition2 td:nth-child(7){
+		padding-right: 10px;
+		width: 115px;
+	}
+	.tbl_data_condition2 td:nth-child(3),
+	.tbl_data_condition2 td:nth-child(6),
+	.tbl_data_condition2 td:nth-child(9){
+		padding-left: 3px;
+	}
+	.tbl_data_condition2 td:nth-child(3) {
+		width: 250px;
+	}
+	.tbl_data_condition2 td:nth-child(9) {
+		width: 336px;
+	}
+
+.option_regis_area {
+	height: 35px;
+	margin: 0 auto;
+	width: 1200px;
+	position: relative;
+	font-size: 12px;
+}
+.option_regis {
+	float: left;
+	height: 22px;
+	width: 300px;
+	margin-left: 50px;
+	margin-right: 50px;
+	margin-top: 4px;
+	padding-top: 3px;
+	text-align: center;
+	border: 1px solid #d9d9d9;
+}
+	.option_regis label {
+		vertical-align: middle;
+	}
+.slip_no {
+	float: left;
+	margin-right: 50px;
+	margin-top: 4px;
+}
+	.slip_no label {
+		border-right: 3px solid #f09036;
+		padding-right: 10px;
+}
+
+input.slipNo {
+	width: 70px;
+	height: 20px !important;
+}
+.cor_class {
+	padding-top: 4px;
+}
+	.cor_class label {
+		border-right: 3px solid #f09036;
+		padding-right: 10px;
+		padding-top: 2px;
+	}
+
+.money_total {
+	color: white;
+}
+
+.btn_width130 {
+	width: 130px !important;
+}
+.tax_customer {
+	position: absolute;
+	right: 100px;
+	top: 50px;
+}
+	.txt_tax {
+		color: red;
+		font-size: 22px;
+	}

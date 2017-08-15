@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Com0103d01Mapper">
+	<select id="getDiaJigyo"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo"
+		parameterType="map">
+		SELECT JGY.JGYCD, JGY.JGYMEI 
+		FROM MST_S_JIGYO JGY
+		WHERE JGY.DELFLG = '0'
+		AND (LTRIM(RTRIM(JGY.STRYMD)) = '' OR JGY.STRYMD &lt; #{systemDate})
+		AND (LTRIM(RTRIM(JGY.ENDYMD)) = '' OR JGY.ENDYMD &gt; #{systemDate})
+		ORDER BY JGY.JGYCD
+	</select>
+	<select id="getMstUser" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstUserMapper.BaseResultMap" parameterType="map">
+		SELECT USR.User_Nm		
+		FROM MST_USER USR
+		WHERE USR.User_Code = #{userCodeWK} AND USR.STS_Code = '1'
+	</select>
+	<select id="getCom01Job"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.Com01Job"
+		parameterType="map">
+		SELECT 	${searchMax}
+				CJE.Job_No AS jobNo,
+				CJE.Job_Typ AS jobTyp,
+				CJE.Job_ID AS jobId,
+				CJE.Job_Nm AS jobNm,
+				CJE.User_Code_Exec AS userCodeExec,
+				CJE.User_Nm_Exec AS userNmExec,
+				CJE.Start_Date AS startDate,
+				CJE.Start_Time AS startTime,
+				CJE.End_Date AS endDate,
+				CJE.End_Time AS endTime,
+				CJE.File_Nm_Exec AS fileNmExec,
+				CJE.Parameters AS parameters,
+				CJE.Result AS result,
+				CJE.Re_Flg AS reFlg,
+				CJE.Message AS message
+		FROM 	TBL_COM01_JOB_EXEC CJE
+		WHERE 	(CJE.Start_Date + CJE.Start_Time) &gt;= #{processStartDateTimeWK}
+				AND (CJE.End_Date + CJE.End_Time) &lt;= #{processEndDateTimeWK}
+				AND (CJE.Jigyo_Code = #{officeCodeWk} OR CJE.Jigyo_Code = '00')
+				<if test="processTypeWK != null">
+					AND CJE.Job_Typ = #{processTypeWK}
+				</if>
+				<if test="processJobWK != ''">
+					AND CJE.Job_ID = #{processJobWK}
+				</if>
+				<if test="userCodeWK != null">
+					AND CJE.User_Code_Exec = #{userCodeWK}
+				</if>			
+				<if test="concentrateFlag and sendFlag">
+					AND (CJE.Rs_Flg = '1' OR CJE.Rs_Flg = '2')
+				</if>
+				<if test="concentrateFlag and !sendFlag">
+					AND CJE.Rs_Flg = '1'
+				</if>
+				<if test="!concentrateFlag and sendFlag">
+					AND CJE.Rs_Flg = '2'
+				</if>
+				<if test="abnormalFlag">
+					AND CJE.Result = '1'
+				</if>
+	</select>
+</mapper>

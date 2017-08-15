@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0105d00Mapper">
+	<resultMap id="BaseResultMap" type="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.OlCustConvMasterData">
+		<id column="OL_Center_Code" property="olCenterCode" jdbcType="NVARCHAR" />
+		<id column="OL_Torihiki_Code" property="olTorihikiCode" jdbcType="NVARCHAR" />
+		<id column="AT_Torihiki_Code" property="atTorihikiCode" jdbcType="NVARCHAR" />
+		<id column="AT_Ten_Code" property="atTenCode" jdbcType="NVARCHAR" />
+		<result column="Cust_Code" property="custCode" jdbcType="NCHAR" />
+		<result column="Shop_Code" property="shopCode" jdbcType="NVARCHAR" />
+		<result column="Deli_Kb" property="deliKb" jdbcType="NCHAR" />
+		<result column="STS_Code" property="stsCode" jdbcType="NCHAR" />
+		<result column="INS_USERID" property="insUserid" jdbcType="NCHAR" />
+		<result column="INS_PGID" property="insPgid" jdbcType="NVARCHAR" />
+		<result column="INS_YMD" property="insYmd" jdbcType="NCHAR" />
+		<result column="INS_TIME" property="insTime" jdbcType="NCHAR" />
+		<result column="UPD_USERID" property="updUserid" jdbcType="NCHAR" />
+		<result column="UPD_PGID" property="updPgid" jdbcType="NVARCHAR" />
+		<result column="UPD_YMD" property="updYmd" jdbcType="NCHAR" />
+		<result column="UPD_TIME" property="updTime" jdbcType="NCHAR" />
+		<result column="Cust_Nm_R" property="custNmR" jdbcType="NVARCHAR" />
+		<result column="Shop_Nm_R" property="shopNmR" jdbcType="NVARCHAR" />
+		<result column="Target_1" property="target1" jdbcType="NVARCHAR" />
+	</resultMap>
+	
+	<!-- (1) オンライン得意先変換マスタより該当する得意先名称を取得する。 -->
+	<select id="getCustNmR" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map">
+		SELECT
+			CSC.Cust_Code,
+			MAX(CST.Cust_Nm_R) Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN 
+			MST_CUSTOMER CST
+		ON 
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date = '' OR CST.Close_Date > #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+		GROUP BY
+			CSC.Cust_Code
+		ORDER BY
+			CSC.Cust_Code
+	</select>
+	
+	<!-- (2) オンライン得意先変換マスタより該当する得意先名称を取得する。 -->
+	<select id="getPartnerCustCode" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map">
+		SELECT
+			CSC.Cust_Code,
+			MAX(CST.Cust_Nm_R) Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN 
+			MST_CUSTOMER CST
+		ON 
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date = '' OR CST.Close_Date > #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+			AND CSC.AT_Torihiki_Code = #{AT_Torihiki_Code} 
+			<if test="OL_Torihiki_Code != null and OL_Torihiki_Code != ''">
+				AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code}
+			</if>
+		GROUP BY
+			CSC.Cust_Code
+		ORDER BY
+			CSC.Cust_Code
+	</select>
+	
+	<!-- オンライン得意先変換マスタより該当する得意先名称を取得する。 -->
+	<select id="getCustNmRForCsv" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map">
+		SELECT
+			CSC.Cust_Code,
+			CST.Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN 
+			MST_CUSTOMER CST
+		ON 
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date = '' OR CST.Close_Date > #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+		ORDER BY
+			CSC.Cust_Code
+	</select>
+	
+	<select id="getPartnerCustCodeForCsv" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map">
+		SELECT
+			CSC.Cust_Code,
+			CST.Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN 
+			MST_CUSTOMER CST
+		ON 
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date = '' OR CST.Close_Date > #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+			AND CSC.AT_Torihiki_Code = #{AT_Torihiki_Code} 
+			<if test="OL_Torihiki_Code != null and OL_Torihiki_Code != ''">
+				AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code}
+			</if>
+		ORDER BY
+			CSC.Cust_Code
+	</select>
+	
+	<!-- 【関数】OL得意先変換マスタ一覧データ取得 -->
+	<select id="getOlCustConvMasterDataList" resultMap="BaseResultMap" parameterType="map">
+		SELECT
+			${Search_Max}
+			CSC.OL_Center_Code,
+			CSC.OL_Torihiki_Code,
+			CSC.AT_Torihiki_Code,
+			CSC.Cust_Code,
+			MAX(CST.Cust_Nm_R) Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN
+			MST_CUSTOMER CST
+		ON
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date ='' OR CST.Close_Date &gt; #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			1 = 1
+			<include refid="condition"/>
+		GROUP BY
+			CSC.OL_Center_Code,
+			CSC.OL_Torihiki_Code,
+			CSC.AT_Torihiki_Code,
+			CSC.Cust_Code
+		ORDER BY
+			CSC.OL_Center_Code,
+			CSC.OL_Torihiki_Code,
+			CSC.AT_Torihiki_Code,
+			CSC.Cust_Code
+	</select>
+	
+	<select id="getOlCustConvMasterInfoListForCsv" resultMap="BaseResultMap" parameterType="map">
+		SELECT
+			CSC.OL_Center_Code,
+			CSC.OL_Torihiki_Code,
+			CSC.AT_Torihiki_Code,
+			CSC.AT_Ten_Code,
+			CSC.Cust_Code,
+			CST.Cust_Nm_R,
+			CSC.Shop_Code,
+			SHP.Shop_Nm_R,
+			CSC.Deli_Kb,
+			GEN.Target_1,
+			CSC.STS_Code,
+			CSC.INS_USERID,
+			CSC.INS_PGID,
+			CSC.INS_YMD,
+			CSC.INS_TIME,
+			CSC.UPD_USERID,
+			CSC.UPD_PGID,
+			CSC.UPD_YMD,
+			CSC.UPD_TIME
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN
+			MST_CUSTOMER CST
+		ON
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date ='' OR CST.Close_Date > #{Close_Date})
+			AND CST.STS_Code = '1'
+		LEFT JOIN
+			MST_SHOP SHP
+		ON
+			CSC.Shop_Code = SHP.Shop_Code
+			AND CSC.Cust_Code = SHP.Cust_Code
+			AND (SHP.Close_Date ='' OR SHP.Close_Date > #{Close_Date})
+			AND SHP.STS_Code = '1'
+		LEFT JOIN
+			MST_GENERAL GEN
+		ON
+			CSC.Deli_Kb = GEN.Gl_Code
+			AND GEN.Gl_Kb = 'Deli_Kb'
+		WHERE 
+			1 = 1
+			<include refid="condition"></include>
+		ORDER BY
+			CSC.OL_Center_Code,
+			CSC.OL_Torihiki_Code,
+			CSC.AT_Torihiki_Code,
+			CSC.Cust_Code
+	</select>
+	
+	<!-- オンライン得意先変換マスタ取得の為のSQLを生成する。 -->
+	<select id="getOlCustConvDataList02" resultMap="BaseResultMap" parameterType="map">
+		SELECT
+			CSC.OL_Center_Code,
+			CSC.OL_Torihiki_Code,
+			CSC.AT_Torihiki_Code,
+			CSC.AT_Ten_Code,
+			CSC.Cust_Code,
+			CST.Cust_Nm_R,
+			CSC.Shop_Code,
+			SHP.Shop_Nm_R,
+			CSC.Deli_Kb,
+			GEN.Target_1,
+			CSC.STS_Code,
+			'0' AS addFlg,
+			'0' AS updateFlg,
+			'0' AS deleteFlg
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN
+			MST_CUSTOMER CST
+		ON
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date ='' OR CST.Close_Date > #{Close_Date})
+			AND CST.STS_Code = '1'
+		LEFT JOIN
+			MST_SHOP SHP
+		ON
+			CSC.Shop_Code = SHP.Shop_Code
+			AND CSC.Cust_Code = SHP.Cust_Code
+			AND (SHP.Close_Date ='' OR SHP.Close_Date > #{Close_Date})
+			AND SHP.STS_Code = '1'
+		LEFT JOIN
+			MST_GENERAL GEN
+		ON
+			CSC.Deli_Kb = GEN.Gl_Code
+			AND GEN.Gl_Kb = 'Deli_Kb'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+			AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code}
+			<if test="AT_Torihiki_Code != null and AT_Torihiki_Code != ''">
+				AND CSC.AT_Torihiki_Code = #{AT_Torihiki_Code} 
+			</if>
+		ORDER BY
+			CSC.OL_Center_Code,
+			CSC.OL_Torihiki_Code,
+			CSC.AT_Torihiki_Code,
+			CSC.Cust_Code
+	</select>
+	
+	<!-- 検索条件の設定 -->
+	<sql id="condition">
+		<if test="OL_Center_Code != null and OL_Center_Code != ''">
+			AND CSC.OL_Center_Code = #{OL_Center_Code} 
+		</if>
+		<if test="OL_Torihiki_Code != null and OL_Torihiki_Code != ''">
+			AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code} 
+		</if>
+		<if test="AT_Torihiki_Code != null and AT_Torihiki_Code != ''">
+			AND CSC.AT_Torihiki_Code = #{AT_Torihiki_Code} 
+		</if>
+		<if test="!chkCancellationData">
+			AND CSC.STS_Code = '1'
+		</if>
+	</sql>
+	<!-- オンラインセンター名称取得処理 -->
+	<select id="getOlCenterName" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map">
+		SELECT
+			CSC.Cust_Code,
+			MAX(CST.Cust_Nm_R) Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN 
+			MST_CUSTOMER CST
+		ON 
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date = '' OR CST.Close_Date > #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+			<if test="OL_Torihiki_Code != null and OL_Torihiki_Code != ''">
+				AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code} 
+			</if>
+		GROUP BY
+			CSC.Cust_Code
+		ORDER BY
+			CSC.Cust_Code
+	</select>
+	
+	<!-- オンラインセンター名称取得処理 -->
+	<select id="getOppCustName" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map">
+		SELECT
+			TOP 1
+			CSC.Cust_Code,
+			CST.Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN 
+			MST_CUSTOMER CST
+		ON 
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date = '' OR CST.Close_Date > #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+			AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code}
+			<choose>
+				<when test="AT_Torihiki_Code != null and AT_Torihiki_Code != ''">
+					AND CSC.AT_Torihiki_Code = #{AT_Torihiki_Code}
+				</when>
+				<otherwise>
+					AND CSC.AT_Torihiki_Code = NONE
+				</otherwise>
+			</choose>
+		ORDER BY
+			CSC.Cust_Code
+	</select>
+	<select id="getPartnerCustCode02" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map">
+		SELECT
+			CSC.Cust_Code,
+			MAX(CST.Cust_Nm_R) Cust_Nm_R
+		FROM 
+			MST_CUST_CONV CSC
+		LEFT JOIN 
+			MST_CUSTOMER CST
+		ON 
+			CSC.Cust_Code = CST.Cust_Code
+			AND (CST.Close_Date = '' OR CST.Close_Date > #{Close_Date} )
+			AND CST.STS_Code = '1'
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code}
+			AND CSC.AT_Torihiki_Code = #{AT_Torihiki_Code} 
+			<if test="OL_Torihiki_Code != null and OL_Torihiki_Code != ''">
+				AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code}
+			</if>
+		GROUP BY
+			CSC.Cust_Code
+	</select>
+	
+	<!-- オンライン得意先変換マスタデータ検索 -->
+	<select id="searchMstConvCustData"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustConvMapper.BaseResultMap"
+		parameterType="map">
+		SELECT 
+			CSC.*
+		FROM 
+			MST_CUST_CONV CSC
+		WHERE
+			CSC.OL_Center_Code = #{OL_Center_Code} 
+			AND CSC.OL_Torihiki_Code = #{OL_Torihiki_Code}
+			AND CSC.AT_Torihiki_Code = #{AT_Torihiki_Code}
+			AND CSC.AT_Ten_Code = #{AT_Ten_Code} 
+	</select>
+	
+</mapper>

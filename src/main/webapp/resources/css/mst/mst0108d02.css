@@ -1,0 +1,60 @@
+@CHARSET "UTF-8";
+/* table
+=====================================================*/ 
+.tbl_new_registration {
+	width: 1200px;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+.tbl_new_registration td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_new_registration td:nth-child(1),
+	.tbl_new_registration td:nth-child(4) {
+		padding-right: 10px;
+	}
+	.tbl_new_registration td:nth-child(3),
+	.tbl_new_registration td:nth-child(6){
+		padding-left: 3px;
+	}
+	.tbl_new_registration img {
+		vertical-align:middle;
+	}
+/* width_tbl
+==============================================================*/ 
+.tbl_width800{
+	width : 800px;
+	margin: 0 auto;
+}
+/* width_td
+=============================================================*/
+.td_width3{
+	width:3px;
+}
+.td_width540{
+	width:540px;
+}
+/* width_cbx
+=============================================================*/
+.cbx_width82{
+	width:82px;
+}
+.cbx_width116{
+	width:75px;
+}
+/* width txt
+==============================================================*/
+.txt_width30{
+	width:30px;
+}
+.txt_width110{
+	width:110px;
+}
+.img_displaynone {
+	display: none;
+}
+
+.text_color_black {
+	color: #000;
+}

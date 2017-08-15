@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Com0102d01Mapper">
+
+	<select id="getMstSChainData"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSChainMapper.BaseResultMap"
+		parameterType="map">
+		SELECT
+		TOP ${searchMax}
+		CHN.CHNCD,CHN.CHNEDA,CHN.CHNMEI
+		FROM MST_S_CHAIN CHN
+		WHERE (LTRIM(RTRIM(CHN.STRYMD)) = '' OR CHN.STRYMD &lt;= #{date})
+		AND (LTRIM(RTRIM(CHN.ENDYMD)) = '' OR CHN.ENDYMD >= #{date})
+		<if test="chainCd != ''">
+			AND CHN.CHNCD = #{chainCd}
+		</if>
+		<if test="chainEda !=''">
+			AND CHN.CHNEDA = #{chainEda}
+		</if>
+		AND CHN.DELFLG = '0'
+		ORDER BY CHN.CHNCD,CHN.CHNEDA
+	</select>
+
+
+	<select id="getSearchResult"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSChainMapper.BaseResultMap"
+		parameterType="map">
+		SELECT
+		TOP ${searchMax}
+		CHN.CHNCD,CHN.CHNEDA,CHN.CHNMEI
+		FROM MST_S_CHAIN CHN
+		WHERE (LTRIM(RTRIM(CHN.STRYMD)) = '' OR CHN.STRYMD &lt;= #{date})
+		AND (LTRIM(RTRIM(CHN.ENDYMD)) = '' OR CHN.ENDYMD >= #{date})
+		<if test="chainCd != ''">
+			AND CHN.CHNCD = #{chainCd}
+		</if>
+		<if test="chainEda != ''">
+			AND CHN.CHNEDA = #{chainEda}
+		</if>
+		<if test="chainNm != ''">
+			AND CHN.CHNMEI like #{chainNm}
+		</if>
+		AND CHN.DELFLG = '0'
+		ORDER BY CHN.CHNCD,CHN.CHNEDA
+	</select>
+</mapper>

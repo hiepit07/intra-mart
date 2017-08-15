@@ -1,0 +1,38 @@
+﻿/* CONTENT 
+  ========================================================================== */
+.bg_body {
+	background-color: #fef1cf !important;
+}
+.td_width3 {
+	width: 3px;
+}
+
+.txt_width180{
+	width: 180px;
+}
+
+.td_width150 {
+	width: 150px;
+}
+.td_width200 {
+	width: 200px;
+}
+
+.tbl_data_condition {
+	width: 800px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4){
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6){
+		padding-left: 3px;
+	}

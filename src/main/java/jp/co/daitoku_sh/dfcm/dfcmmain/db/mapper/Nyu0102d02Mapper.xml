@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Nyu0102d02Mapper">
+
+<!-- ******************************************************************************** -->
+<!-- *** 締め請求未回収設定画面用SQL定義                                          *** -->
+<!-- ******************************************************************************** -->
+
+	<!-- 締め請求先リストの取得 -->
+	<select id="getShimeSeikyusakiList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.nyu.NyuSeikyusakiInfo" parameterType="map">
+
+<![CDATA[
+SELECT
+   CST.Cain_Code   AS chainCd
+  ,CST.Cain_Idx    AS chainIdx
+  ,CST.Cust_Code   AS seikyusakiCd
+  ,CST.Cust_Nm_R   AS seikyusakiName
+  ,CST.Bild_Unt_Kb AS seikyuTani
+  ,CST.Cust_Cls    AS tokuisakiCls
+  ,CST.Rel_Com_Cls AS kankeiKaishaCls
+  ,CST.Rel_Com_Sub AS kankeiKaishaHojoKamoku
+  ,SHE.Jigyo_Code  AS jigyoshoCd
+  ,JGY.JGYMEI      AS jigyoshoName
+  ,SHE.Bild_Id     AS seikyuId
+  ,SHE.Bild_Date   AS seikyuShimebi
+  ,SHE.Nyu_Date    AS nyukinYoteibi
+  ,SHE.Cur_UAmt + SHE.Cur_MAmt               AS seikyuGaku
+  ,SHE.Cur_UUri + SHE.Cur_Muri + SHE.Cur_Tax AS uriageGaku
+  ,SHE.Uri_Zan + SHE.Mis_Zan                 AS mikaishuGaku
+FROM
+-- 請求ヘッダ
+  TBL_SEI01_HEAD SHE
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  SHE.Cust_Code = CST.Cust_Code
+-- 事業所マスタ
+INNER JOIN
+  MST_S_JIGYO JGY
+ON
+  SHE.Jigyo_Code = JGY.JGYCD
+WHERE
+      CST.Bild_Flg     =  '1'
+  AND CST.Bild_Unt_Kb  =  '1'
+  AND CST.STS_Code     =  '1'
+  AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+  AND SHE.Jigyo_Code   =  #{JIGYOSHO_CD}
+  AND SHE.Bild_sime_Kb IN ('1', '2', '3')  -- 通常締め、臨時締め、取り纏め元
+  AND SHE.Sts_Code     =  '1'
+  AND ( (SHE.Uri_Zan + SHE.Mis_Zan) > 0 )
+]]>
+
+<if test="SEIKYUSAKI_CD_FROM != ''">
+  <![CDATA[
+  -- 請求先コードFrom
+  AND SHE.Cust_Code >= #{SEIKYUSAKI_CD_FROM}
+  ]]>
+</if>
+
+<if test="SEIKYUSAKI_CD_TO != ''">
+  <![CDATA[
+  -- 請求先コードTo
+  AND SHE.Cust_Code <= #{SEIKYUSAKI_CD_TO}
+  ]]>
+</if>
+
+<if test="NYUKIN_YOTEIBI_FROM != ''">
+  <![CDATA[
+  -- 入金予定日From
+  AND SHE.Nyu_Date >= #{NYUKIN_YOTEIBI_FROM}
+  ]]>
+</if>
+
+<if test="NYUKIN_YOTEIBI_TO != ''">
+  <![CDATA[
+  -- 入金予定日To
+  AND SHE.Nyu_Date <= #{NYUKIN_YOTEIBI_TO}
+  ]]>
+</if>
+
+ORDER BY
+   SHE.Cust_Code
+  ,SHE.Bild_Id
+
+	</select>
+
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0101d01Mapper">
+	<select id="getSJigyoInfo"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo"
+		parameterType="map">
+		SELECT JGY.JGYCD, JGY.JGYMEI FROM MST_S_JIGYO JGY
+		WHERE
+		JGY.DELFLG = '0'
+		AND JGY.STRYMD &lt;= #{businessDate}
+		AND JGY.ENDYMD &gt;= #{businessDate}
+		ORDER BY JGY.JGYCD
+	</select>
+
+	<select id="getSearchResult"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstUserInfoMst0101d02"
+		parameterType="map">
+		SELECT
+		${Search_Max}
+		USR.User_Code AS userCode,
+		USR.User_Nm AS userNm,
+		USR.User_Nm_Kana AS userNmKana,
+		USR.Jigyosho_Code AS jigyoshoCode,
+		JGY.JGYMEI AS jgymei,
+		USR.Auth_Code AS authCode,
+		GEN1.Target_1 AS targetAuth,
+		USR.User_Post AS userPost,
+		USR.Mail_Adr AS mailAdr,
+		USR.Tel_No AS telNo,
+		USR.Fax_No AS faxNo,
+		USR.User_Status AS userStatus,
+		GEN2.Target_1 AS targetUserStatus,
+		USR.Login_Err_Cnt AS loginErrCnt,
+		USR.Lockout_Datetime AS lockoutDatetime,
+		USR.Last_Login_Datetime AS lastLoginDatetime,
+		USR.STS_Code AS stsCode,
+		USR.INS_USERID AS insUserid,
+		USR.INS_PGID AS insPgid,
+		USR.INS_YMD AS insYmd,
+		USR.INS_TIME AS insTime,
+		USR.UPD_USERID AS updUserid,
+		USR.UPD_PGID AS updPgid,
+		USR.UPD_YMD AS updYmd,
+		USR.UPD_TIME AS updTime
+		FROM MST_USER USR LEFT JOIN MST_GENERAL
+		GEN1 ON (USR.Auth_Code = GEN1.Gl_Code AND
+		GEN1.Gl_Kb = 'Auth_Code')
+		LEFT JOIN MST_GENERAL GEN2 ON (USR.User_Status = GEN2.Gl_Code AND
+		GEN2.Gl_Kb = 'User_Status')
+		LEFT JOIN MST_S_JIGYO JGY ON
+		(USR.Jigyosho_Code = JGY.JGYCD AND JGY.DELFLG = '0' AND JGY.STRYMD &lt;= #{YMD} AND JGY.ENDYMD &gt;= #{YMD})
+		WHERE 1 = 1
+		<if test="Jigyosho_Code != ''">
+			AND USR.Jigyosho_Code = #{Jigyosho_Code}
+		</if>
+		<if test="User_Code != ''">
+			AND USR.User_Code = #{User_Code}
+		</if>
+		<if test="User_Nm != ''">
+			AND USR.User_Nm LIKE #{User_Nm}
+		</if>
+		<if test="Auth_Code != ''">
+			AND USR.Auth_Code = #{Auth_Code}
+		</if>
+		<if test="STS_Code == false">
+			AND USR.STS_Code = '1'
+		</if>
+		<if test="User_Status == true">
+			AND USR.User_Status = '3'
+		</if>
+	</select>
+
+	<select id="getuserName" resultType="String" parameterType="map">
+		SELECT TOP 1 USR.User_Nm FROM MST_USER USR
+		WHERE 1 = 1
+		<if test="Jigyosho_Code != ''">
+			AND USR.Jigyosho_Code = #{Jigyosho_Code}
+		</if>
+		AND USR.User_Code = #{User_Code}
+		AND USR.STS_Code = '1'
+	</select>
+</mapper>

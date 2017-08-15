@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Com0101d01Mapper">
+	<select id="getPersonalCharge" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstUserMapper.BaseResultMap" parameterType="map">
+		SELECT
+			User_Nm,
+			User_Nm_Kana,
+			Jigyosho_Code,
+			Auth_Code,
+			Password,
+			User_Status,
+			Last_Login_Datetime,
+			Login_Err_Cnt
+		FROM MST_USER
+		WHERE
+			User_Code = #{userCode}
+			AND STS_Code = '1'
+	</select>
+	<select id="getOfficeInformation" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSJigyoMapper.BaseResultMap" parameterType="map">
+		SELECT
+			JIG.JGYMEI
+		FROM 
+			MST_S_JIGYO JIG
+		WHERE
+			JIG.JGYCD = #{jigyoshoCode}
+			AND JIG.DELFLG = '0'
+	</select>
+	
+	<select id="getGeneral" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstGeneralMapper.BaseResultMap" parameterType="map">
+		SELECT
+			Target_1,
+			Target_2,
+			Target_3,
+			Target_4,
+			Target_5,
+			Target_6,
+			Target_7,
+			Target_8,
+			Target_9,
+			Target_10
+		FROM 
+			MST_GENERAL
+		WHERE
+			Gl_Kb = 'Auth_Kb'
+			AND Gl_Code = #{Gl_Code}
+	</select>
+	
+	<update id="updateLoginErrCnt" parameterType="map">
+		UPDATE 
+			MST_USER
+		SET 
+			Login_Err_Cnt = #{loginErrCnt,jdbcType=NUMERIC}
+		WHERE 
+			User_Code = #{userCode}
+			AND STS_Code = '1'
+	</update>
+	
+	<update id="lockoutUser" parameterType="map">
+		UPDATE 
+			MST_USER
+		SET 
+			User_Status = #{userStatus},
+			Login_Err_Cnt = 0,
+			Lockout_Datetime = #{lockoutDatetime}
+		WHERE 
+			User_Code = #{userCode}
+			AND STS_Code = '1'
+	</update>
+	
+	<update id="updateLastLoginDateTime" parameterType="map">
+		UPDATE 
+			MST_USER
+		SET 
+			Login_Err_Cnt = 0,
+			Last_Login_Datetime = #{Last_Login_Datetime,jdbcType=DATE}
+		WHERE 
+			User_Code = #{userCode}
+			AND STS_Code = #{stsCode}
+	</update>
+</mapper>

@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Nyu0102d01Mapper">
+
+<!-- ******************************************************************************** -->
+<!-- *** 入金登録画面用SQL定義                                                    *** -->
+<!-- ******************************************************************************** -->
+
+	<!-- 権限区分の取得 -->
+	<select id="getAuthKbn" resultType="string" parameterType="map">
+
+<![CDATA[
+SELECT
+  Gl_Code
+FROM
+  MST_GENERAL GEN
+WHERE
+    GEN.Gl_Kb = 'Auth_Kb'
+AND GEN.Gl_Code        = #{GL_CODE}
+AND (    GEN.Target_1  = #{AUTH_CODE}
+      OR GEN.Target_2  = #{AUTH_CODE}
+	  OR GEN.Target_3  = #{AUTH_CODE}
+	  OR GEN.Target_4  = #{AUTH_CODE}
+	  OR GEN.Target_5  = #{AUTH_CODE}
+	  OR GEN.Target_6  = #{AUTH_CODE}
+	  OR GEN.Target_7  = #{AUTH_CODE}
+	  OR GEN.Target_8  = #{AUTH_CODE}
+	  OR GEN.Target_9  = #{AUTH_CODE}
+	  OR GEN.Target_10 = #{AUTH_CODE} )
+]]>
+
+	</select>
+	
+	<!-- 科目リストの取得 -->
+	<select id="getKamokuInfoList" resultType="map" parameterType="string">
+	
+SELECT
+   SJF.Fnc_Dtl_Kb  AS FUNC_SHOSAI_KBN
+  ,SJF.Sub_Code    AS KAMOKU_CD
+  ,SJF.Dc_Kb       AS TAISHAKU_KBN
+  ,SJF.Sec_Code    AS HASSEI_BASHO
+  ,SJF.Tax_Kb      AS TAX_KBN
+  ,SJF.Sup_Set_Kb  AS HOJO_KAMOKU_SETTEI_KBN
+  ,SJF.Sup_Set_Val AS HOJO_KAMOKU_KOTEICHI
+  ,SJF.Line_Title  AS GAMEN_TITLE
+  ,SJF.Sub_Sel_Kb  AS KAMOKU_SENTAKU_KAHI
+  ,SJF.Sub_Code    AS KAMOKU_MST_KAMOKU_CD
+  ,SJC.Sub_Nm      AS SEISHIKI_KAMOKU_NAME
+FROM
+-- 勘定科目マスタ（機能）
+  MST_SUBJECT_FC SJF
+-- 勘定科目マスタ（コード）
+INNER JOIN
+  MST_SUBJECT_CD SJC
+ON
+  SJF.Sub_Code = SJC.Sub_Code
+WHERE
+      SJF.Fnc_Kb      =  '2'
+  AND SJF.Fnc_Dtl_Kb  IN ('9', '10')
+<if test="kamokuCd != null">
+  AND SJF.Sub_Code = #{kamokuCd}
+</if>
+<if test="kamokuCd == null">
+  AND SJF.Def_Dsp_Flg =  '1'
+</if>
+  AND SJF.STS_Code    =  '1'
+  AND SJC.Sub_Kb      =  '01'
+  AND SJC.STS_Code    =  '1'
+ORDER BY
+  SJF.Dsp_Order
+
+	</select>
+
+	<!-- 発生場所リストの取得 -->
+	<select id="getHasseiBashoList" resultType="map">
+
+<![CDATA[
+SELECT
+   SJC.Sub_Code AS CODE
+  ,SJC.Sub_Nm   AS NAME
+FROM
+-- 勘定科目マスタ（コード）
+  MST_SUBJECT_CD SJC
+WHERE
+      SJC.Sub_Kb   = '06'
+  AND SJC.STS_Code = '1'
+ORDER BY
+  SJC.Sub_Code
+]]>
+
+	</select>
+
+	<!-- 追加科目リストの取得 -->
+	<select id="getAddKamokuList" resultType="map">
+
+<![CDATA[
+SELECT
+   SJF.Sub_Code    AS CODE
+  ,SJF.Line_Title  AS NAME
+FROM
+-- 勘定科目マスタ（機能）
+  MST_SUBJECT_FC SJF
+WHERE
+      SJF.Fnc_Kb      =  '2'
+  AND SJF.Fnc_Dtl_Kb  IN ('9', '10')
+  AND SJF.STS_Code    =  '1'
+ORDER BY
+  SJF.Dsp_Order
+]]>
+
+	</select>
+
+	<!-- 入金調整売上登録 調整額の取得 -->
+	<select id="getNyukinChoseiGaku" resultType="int" parameterType="map">
+
+<![CDATA[
+SELECT
+  SUM(WRK.CHOSEIGAKU)
+FROM
+-- UNION テーブル
+  (
+    -- 売掛WORK
+    SELECT
+      SUM(SUB.Trd_Price) AS CHOSEIGAKU
+    FROM
+    -- 売掛明細
+      TBL_SEI01_URK_BODY SUB
+    WHERE
+          SUB.Reg_Type = '2'
+      AND EXISTS ( SELECT
+                     1
+                   FROM
+                   -- 売上ヘッダ
+                     TBL_URI01_HEAD URH
+                   -- 得意先マスタ
+                   INNER JOIN
+                     MST_CUSTOMER CST
+                   ON
+                     URH.Cust_Code = CST.Cust_Code
+                   WHERE
+                       URH.Sts_Code  = '1'
+                   AND URH.Dat_Kb    = '08'
+                   AND URH.Bill_Date = #{SEIKYU_SHIMEBI}
+                   AND (
+                            ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' AND CST.Bild_Code = #{SEIKYUSAKI_CD} )
+                         OR ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '1' AND CST.Cust_Code = #{SEIKYUSAKI_CD} )
+                       )
+                   AND URH.Den_No = SUB.Den_No
+                 )
+    
+    UNION ALL
+    
+    -- 未収WORK
+    SELECT
+      SUM(SMB.Trd_Price) AS CHOSEIGAKU
+    FROM
+    -- 未収明細
+      TBL_SEI01_MSH_BODY SMB
+    WHERE
+          SMB.Reg_Type = '2'
+      AND EXISTS ( SELECT
+                     1
+                   FROM
+                   -- 売上ヘッダ
+                     TBL_URI01_HEAD URH
+                   -- 得意先マスタ
+                   INNER JOIN
+                     MST_CUSTOMER CST
+                   ON
+                     URH.Cust_Code = CST.Cust_Code
+                   WHERE
+                       URH.Sts_Code  = '1'
+                   AND URH.Dat_Kb    = '08'
+                   AND URH.Bill_Date = #{SEIKYU_SHIMEBI}
+                   AND (
+                            ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' AND CST.Bild_Code = #{SEIKYUSAKI_CD} )
+                         OR ( CST.Cust_Flg = '1' AND CST.Bild_Flg = '1' AND CST.Cust_Code = #{SEIKYUSAKI_CD} )
+                       )
+                   AND URH.Den_No = SMB.Den_No
+                 )
+  ) WRK
+]]>
+
+	</select>
+
+	<!-- 都度請求情報リストの取得 -->
+	<select id="getTsudoSeikyuInfoList" resultType="map" parameterType="string">
+
+<![CDATA[
+SELECT
+   WRK.DEN_NO
+  ,SUM(WRK.URIAGE_URIKAKE)
+  ,SUM(WRK.URIAGE_MISHU)
+  ,SUM(WRK.TAX_URIKAKE)
+  ,SUM(WRK.TAX_MISHU)
+FROM
+-- UNION テーブル
+  (
+    -- 売掛WORK
+    SELECT
+      SUB.Den_No AS DEN_NO
+      ,CASE
+         WHEN SUB.Trd_Kb IN ('01','02','03','04') THEN SUB.Trd_Price
+         ELSE                                          0
+       END       AS URIAGE_URIKAKE
+      ,0         AS URIAGE_MISHU
+      ,CASE
+         WHEN SUB.Trd_Kb IN ('01','02','03','04') THEN SUB.Trd_Tax
+         ELSE                                          0
+       END       AS TAX_URIKAKE
+      ,0         AS TAX_MISHU
+    FROM
+      TBL_SEI01_URK_BODY SUB
+    WHERE
+      SUB.Bild_Id = ''
+    
+    UNION ALL
+    
+    -- 未収WORK
+    SELECT
+      SMB.Den_No AS DEN_NO
+      ,0         AS URIAGE_URIKAKE
+      ,CASE
+         WHEN SMB.Trd_Kb IN ('01','02','03','04') THEN SMB.Trd_Price
+         ELSE                                          0
+       END       AS URIAGE_MISHU
+      ,0         AS TAX_URIKAKE
+      ,CASE
+         WHEN SMB.Trd_Kb IN ('01','02','03','04') THEN SMB.Trd_Tax
+         ELSE                                          0
+       END       AS TAX_MISHU
+    FROM
+      TBL_SEI01_MSH_BODY SMB
+    WHERE
+      SMB.Bild_Id = #{seikyuId}
+  ) WRK
+GROUP BY
+  WRK.DEN_NO
+]]>
+
+	</select>
+
+	<!-- 選択科目（一般・関係会社・G会社）情報の取得 -->
+	<select id="getSelectKamokuInfo" resultType="map" parameterType="map">
+
+SELECT
+<choose>
+  <when test="KAMOKU_KBN == 1">
+ SJF.Line_Title
+,SJF.Sub_Code
+,SJC.Sub_Nm
+  </when>
+  <when test="KAMOKU_KBN == 2">
+ SJC.Sub_Nm
+,SJF.Sub_Rel_Com_Code
+,SJC.Sub_Nm
+  </when>
+  <otherwise>
+ SJC.Sub_Nm
+,SJF.Sub_Grp_Com_Code
+,SJC.Sub_Nm
+  </otherwise>
+</choose>
+FROM
+-- 勘定科目マスタ（機能）
+  MST_SUBJECT_FC SJF
+-- 勘定科目マスタ（コード）
+INNER JOIN
+  MST_SUBJECT_CD SJC
+ON
+  SJF.Sub_Code = SJC.Sub_Code
+WHERE
+      SJF.Fnc_Kb      =  '2'
+  AND SJF.Fnc_Dtl_Kb  IN ('9', '10')
+  AND SJF.Sub_Code    =  #{KAMOKU_CD}
+  AND SJF.STS_Code    =  '1'
+  AND SJC.Sub_Kb      =  '01'
+  AND SJC.STS_Code    =  '1'
+
+	</select>
+
+	<!-- 貸方科目データ取得 -->
+	<select id="getKashikataKamokuData" parameterType="map" resultType="map">
+
+<![CDATA[
+SELECT
+   SJF.Sub_Code
+  ,SJF.Sec_Code
+  ,SJF.Tax_Kb
+  ,SJF.Sup_Set_Kb
+  ,SJF.Sup_Set_Val
+  ,SJC.Sub_Nm
+FROM
+-- 勘定科目マスタ（機能）
+  MST_SUBJECT_FC SJF
+-- 勘定科目マスタ（コード）
+INNER JOIN
+  MST_SUBJECT_CD SJC
+ON
+  SJF.Sub_Code = SJC.Sub_Code
+WHERE
+      SJF.Fnc_Kb      = '1'
+  AND SJF.Fnc_Dtl_Kb  = #{FUNC_SHOSAI_KBN}
+  AND SJF.Rel_Com_Cls = #{KAIKEI_KAISHA_CLS}
+  AND SJF.STS_Code    = '1'
+  AND SJC.Sub_Kb      = '01'
+  AND SJC.STS_Code    = '1'
+]]>
+
+	</select>
+
+	<!-- 入金データ取得 -->
+	<select id="getNyukinInfo" resultType="map" parameterType="string">
+
+<![CDATA[
+SELECT
+   NYH.Nyu_Den_No
+  ,NYH.Bild_Id
+  ,NYH.Shounin_Flg
+  ,NYH.Chain_Code
+  ,NYH.Chain_Idx
+  ,NYH.Cust_Code
+  ,CST.Cust_Nm_R
+  ,CST.Bild_Unt_Kb
+  ,CST.Cust_Cls
+  ,CST.Rel_Com_Cls
+  ,CST.Rel_Com_Sub
+  ,NYH.Office_Code
+  ,JGY.JGYMEI
+  ,NYH.Nyu_Date
+  ,SHE.Bild_Date
+  ,SHE.Nyu_Date
+  ,NYH.Nyu_Okure
+  ,NYH.Nyu_Kingaku
+  ,NYH.Sou_Kingaku
+  ,SHE.Uri_Zan + SHE.Mis_Zan
+FROM
+-- 入金ヘッダ
+  TBL_NYU01_HEAD NYH
+-- 請求ヘッダ
+INNER JOIN
+  TBL_SEI01_HEAD SHE
+ON
+  SHE.Bild_Id = NYH.Bild_Id
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  NYH.Cust_Code = CST.Cust_Code
+-- 事業所マスタ
+INNER JOIN
+  MST_S_JIGYO JGY
+ON
+  NYH.Office_Code = JGY.JGYCD
+WHERE
+      NYH.Nyu_Den_No = #{nyukinDempyoNo}
+  AND NYH.Sts_Code   = '1'
+]]>
+
+	</select>
+
+	<!-- 入金仕訳データリストの取得 -->
+	<select id="getNyukinShiwakeList" parameterType="map" resultType="map">
+
+SELECT
+   NYJ.Nyu_Shiwake_No
+  ,NYJ.Dr_Jcode
+  ,NYJ.Dr_Scode
+  ,NYJ.Dr_Asub
+  ,NYJ.Dr_Acode
+  ,NYJ.Dr_Assub
+  ,NYJ.Kingaku
+  ,NYJ.Row_Kb
+  ,NYJ.Row_No
+  ,NYJ.Kaikei_Renkei_Id
+  ,NYB.Tegata_No
+  ,NYB.Kijitu_YMD
+  ,NYJ.Sjf_Acode
+  ,NYJ.Sel_Acode_Kb
+  ,JGY.JGYMEI
+  ,SJF.Sub_Code
+  ,SJF.Line_Title
+  ,SJF.Fnc_Dtl_Kb
+  ,SJF.Sup_Set_Kb
+  ,SJF.Sup_Set_Val
+  ,SJF.Sub_Sel_Kb
+FROM
+-- 入金仕訳
+  TBL_NYU01_JOURNAL NYJ
+-- 勘定科目マスタ（機能）
+INNER JOIN
+  MST_SUBJECT_FC SJF
+ON
+      NYJ.Sjf_Acode  =  SJF.Sub_Code
+  AND SJF.Fnc_Kb     =  '2'
+  AND SJF.Fnc_Dtl_Kb IN ('9', '10')
+  AND SJF.STS_Code   =  '1'
+-- 手形管理
+LEFT JOIN
+  TBL_NYU01_BILL NYB
+ON
+  NYJ.Nyu_Shiwake_No = NYB.Nshiwake_No
+-- 事業所マスタ
+INNER JOIN
+  MST_S_JIGYO JGY
+ON
+  NYJ.Dr_Jcode = JGY.JGYCD
+WHERE
+      NYJ.Nyu_No =  #{NYUKIN_DEMPYO_NO}
+<if test="SEARCH_KBN == 1">
+  AND NYJ.Row_No =  SJF.Dsp_Order
+</if>
+<if test="SEARCH_KBN == 2">
+<![CDATA[
+  AND NYJ.Row_No <> SJF.Dsp_Order
+]]>
+</if>
+ORDER BY
+   NYJ.Row_No
+  ,NYJ.Row_Kb
+
+	</select>
+	
+	<!-- 残高理由入力データリストの取得 -->
+	<select id="getZandakaRiyuInputDataList" parameterType="string" resultType="map">
+
+<![CDATA[
+SELECT
+   NYZ.Zr_Code
+  ,NYZ.Kingaku
+FROM
+  TBL_NYU01_ZDK_REASON NYZ
+WHERE
+  NYZ.Nyu_Den_No = #{nyukinDempyoNo}
+ORDER BY
+  NYZ.Hyouji_Jun
+]]>
+
+	</select>
+	
+</mapper>

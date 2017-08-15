@@ -1,0 +1,89 @@
+﻿.mt3 {
+	margin-top: 3px;
+}
+/* Width TD Table
+  ========================================================================== */
+/* Width % */
+.td_width3per {
+	width: 3%;
+}
+.td_width4per {
+	width: 4%;
+}
+.td_width6per {
+	width: 6%;
+}
+.td_width10per {
+	width: 10%;
+}
+.td_width27per {
+	width: 27%;
+}
+.td_width33per {
+	width: 33%;
+}
+/* Width px */
+.td_width3 {
+	width: 3px;
+}
+.td_width100 {
+	width: 100px;
+}
+.td_width635{
+	width: 635px;
+}
+
+.txt_width30 {
+	width: 30px;
+}
+.txt_width100 {
+	width: 100px;
+}
+
+.data_conditions_area_cont {
+	border: 1px solid #aa72e2 !important;
+}
+.condition_title {
+	background-color: #ccc0da !important;
+}
+.condition_button {
+	background-color: #ccc0da !important;
+}
+.tbl_list th {
+	background-color: #ccc0da !important;
+	color: #000 !important;
+}
+/* Table
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 10px auto;
+	font-size: 12px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+		.tbl_data_condition td span{
+			vertical-align: middle;
+		}
+.height475 {
+	height: 465px;
+}
+.width180 {
+	width: 180px;
+}
+.bg_76933c {
+	background-color: #76933c !important;
+}
+

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0103d01Mapper">
+	<select id="getSJigyoInfo"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo"
+		parameterType="map">
+		SELECT JGY.JGYCD, JGY.JGYMEI 
+		FROM MST_S_JIGYO JGY
+		WHERE JGY.DELFLG = '0'
+		AND JGY.STRYMD &lt;= #{businessDate}
+		AND JGY.ENDYMD &gt;= #{businessDate}
+		ORDER BY JGY.JGYCD
+	</select>
+	<select id="getMstStoreInfoMst0103d01"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstStoreInfoMst0103d01"
+		parameterType="map">
+		SELECT 	${searchMax} 
+				SHP.Cust_Code AS custCode,
+				CST.Cust_Nm_R AS custNmR,
+				SHP.Shop_Code AS shopCode,
+				SHP.Shop_Nm AS shopNm,
+				SHP.Shop_Nm_Kana AS shopNmKana,
+				SHP.Shop_Nm_R AS shopNmR,
+				SHP.Zip_Code AS zipCode,
+				SHP.Adr_1 AS adr1,
+				SHP.Adr_2 AS adr2,
+				SHP.Tel_No AS telNo,
+				SHP.Fax_No AS faxNo,
+				SHP.Jigyo_Code AS jigyoCode,
+				JGY.JGYMEI AS jgymei,
+				SHP.Sum_Shop_Kb AS sumShopKb,
+				SHP.Sum_Shop_Jkn AS sumShopJkn,
+				SHP.Deli_Center_Code AS deliCenterCode,
+				SHP.Sunks_Kb AS sunksKb,
+				SHP.Sum_Shop_Code AS sumShopCode,
+				SHP.ST_Code_ST_S AS stCodeSts,
+				SHP.ST_Code_ST_C AS stCodeStc,
+				SHP.ST_Code_SP_S AS stCodeSps,
+				SHP.ST_Code_SP_C AS stCodeSpc,
+				SHP.Close_Date AS closeDate,
+				SHP.STS_Code AS stsCode,
+				SHP.INS_USERID AS insuserId,
+				SHP.INS_PGID AS inspgId,
+				SHP.INS_YMD AS insymd,
+				SHP.INS_TIME AS instime,
+				SHP.UPD_USERID AS upduserId,
+				SHP.UPD_PGID AS updpgId,
+				SHP.UPD_YMD AS updymd,
+				SHP.UPD_TIME AS updtime
+		FROM 	MST_SHOP SHP 
+				LEFT JOIN MST_S_JIGYO JGY ON (SHP.Jigyo_Code = JGY.JGYCD AND JGY.DELFLG = '0' AND JGY.STRYMD &lt;= #{businessDate} AND JGY.ENDYMD &gt;= #{businessDate})
+				LEFT JOIN MST_CUSTOMER CST ON (SHP.Cust_Code = CST.Cust_Code AND (CST.Close_Date = '' or  CST.Close_Date &gt; #{businessDate}) AND CST.STS_Code = '1')
+		WHERE 	1 = 1
+				<if test="ddlOffice != null">
+					AND SHP.Jigyo_Code = #{ddlOffice}
+				</if>
+				<if test="txtCustomerCode != null">
+					AND CST.Cust_Code = #{txtCustomerCode}
+				</if>
+				<if test="txtStoreCode != null">
+					AND SHP.Shop_Code = #{txtStoreCode}
+				</if>
+				<if test="txtCustomerName != null">
+					AND CST.Cust_Nm LIKE #{txtCustomerName}
+				</if>
+				<if test="txtStoreName != null">
+					AND SHP.Shop_Nm LIKE #{txtStoreName}
+				</if>
+				<if test="chkCancelData != null">
+					AND SHP.STS_Code　=　'1'
+				</if>
+		ORDER BY SHP.Shop_Code
+	</select>
+</mapper>

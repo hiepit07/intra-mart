@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Sei0106d01Mapper">
+	<resultMap id="RstSei0106d01" type="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.RstSei0106d01" >
+		<id column="Bild_Id" jdbcType="NUMERIC" property="bildId" />
+		<id column="User_Code" jdbcType="NCHAR" property="userCode" />
+		<result column="Chain_Code" jdbcType="NUMERIC" property="chainCode" />
+		<result column="Chain_Idx" jdbcType="NUMERIC" property="chainIdx" />
+		<result column="Cust_Code" jdbcType="NCHAR" property="custCode" />
+		<result column="Jigyo_Code" jdbcType="NCHAR" property="jigyoCode" />
+		<result column="Prev_Bild_Date" jdbcType="NCHAR" property="prevBildDate" />
+		<result column="Bild_Date" jdbcType="NCHAR" property="bildDate" />
+		<result column="Bild_sime_Kb" jdbcType="NCHAR" property="bildSimeKb" />
+		<result column="Nyu_Flag" jdbcType="NCHAR" property="nyuFlag" />
+		<result column="Nyu_Date" jdbcType="NCHAR" property="nyuDate" />
+		<result column="Sime_DateTime" jdbcType="NCHAR" property="simeDatetime" />
+		<result column="Prev_UAmt" jdbcType="NUMERIC" property="prevUamt" />
+		<result column="Prev_MAmt" jdbcType="NUMERIC" property="prevMamt" />
+		<result column="Cur_UNyu" jdbcType="NUMERIC" property="curUnyu" />
+		<result column="Cur_MNyu" jdbcType="NUMERIC" property="curMnyu" />
+		<result column="Cur_USou" jdbcType="NUMERIC" property="curUsou" />
+		<result column="Cur_MSou" jdbcType="NUMERIC" property="curMsou" />
+		<result column="Cur_UCho" jdbcType="NUMERIC" property="curUcho" />
+		<result column="Cur_MCho" jdbcType="NUMERIC" property="curMcho" />
+		<result column="Cur_UKur" jdbcType="NUMERIC" property="curUkur" />
+		<result column="Cur_MKur" jdbcType="NUMERIC" property="curMkur" />
+		<result column="Cur_UUri" jdbcType="NUMERIC" property="curUuri" />
+		<result column="Cur_Muri" jdbcType="NUMERIC" property="curMuri" />
+		<result column="Cur_Tax" jdbcType="NUMERIC" property="curTax" />
+		<result column="Cur_UTax" jdbcType="NUMERIC" property="curUtax" />
+		<result column="Cur_MTax" jdbcType="NUMERIC" property="curMtax" />
+		<result column="Cur_UAmt" jdbcType="NUMERIC" property="curUamt" />
+		<result column="Cur_MAmt" jdbcType="NUMERIC" property="curMamt" />
+		<result column="Uri_Zan" jdbcType="NUMERIC" property="uriZan" />
+		<result column="Mis_Zan" jdbcType="NUMERIC" property="misZan" />
+		<result column="Bild_Dat_Flg" jdbcType="NCHAR" property="bildDatFlg" />
+		<result column="Prev_Bild_Id" jdbcType="NUMERIC" property="prevBildId" />
+		<result column="Cust_Cls" jdbcType="NCHAR" property="custCls" />
+		<result column="Bild_New_Flg" jdbcType="NCHAR" property="bildNewFlg" />
+		<result column="Sts_Code" jdbcType="NCHAR" property="stsCode" />
+		<result column="INS_USERID" jdbcType="NVARCHAR" property="insUserid" />
+		<result column="INS_PGID" jdbcType="NVARCHAR" property="insPgid" />
+		<result column="INS_YMD" jdbcType="CHAR" property="insYmd" />
+		<result column="INS_TIME" jdbcType="CHAR" property="insTime" />
+		<result column="UPD_USERID" jdbcType="CHAR" property="updUserid" />
+		<result column="UPD_PGID" jdbcType="NVARCHAR" property="updPgid" />
+		<result column="UPD_YMD" jdbcType="NVARCHAR" property="updYmd" />
+		<result column="UPD_TIME" jdbcType="CHAR" property="updTime" />
+		
+		<result column="Tax_Amount" jdbcType="NUMERIC" property="taxAmount" />
+		<result column="Sale_Tax" jdbcType="NUMERIC" property="saleTax" />
+		<result column="Inc_Tax_Amount" jdbcType="NUMERIC" property="incTaxAmount" />
+		<result column="Bill_Amount" jdbcType="NUMERIC" property="billAmount" />
+		
+		<result column="Bild_Nm_R" jdbcType="NVARCHAR" property="bildNmR" />
+		<result column="JGYMEI" jdbcType="NVARCHAR" property="jgymei" />
+		<result column="User_Nm" jdbcType="NVARCHAR"  property="userNm"  />
+	</resultMap>
+	
+	<resultMap id="PrintSei0106d01" type="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.PrintSei0106d01" >
+		<result column="Cust_Code" jdbcType="NCHAR" property="custCode" />
+		<result column="Cust_Nm_R" jdbcType="NVARCHAR" property="custNmR" />
+		<result column="Bild_Nm_R" jdbcType="NVARCHAR" property="bildNmR" />
+		<result column="Shop_Code" jdbcType="NVARCHAR" property="shopCode" />
+		<result column="Shop_Nm_R" jdbcType="NVARCHAR" property="shopNmR" />
+		<result column="Deli_Date" jdbcType="NCHAR" property="deliDate" />
+		<result column="Den_No" jdbcType="NCHAR" property="denNo" />
+		<result column="Trd_Price" jdbcType="NUMERIC" property="trdPrice" />
+	</resultMap>
+	<!-- 表示ボタン 請求先情報取得 -->
+	<select id="getBillInfo" parameterType="map" resultMap="RstSei0106d01">
+		SELECT
+			${Search_Max}
+			SHE.Bild_Id
+			,SHE.Bild_Date
+			,SHE.Chain_Code
+			,SHE.Chain_Idx
+			,SHE.Cust_Code
+			,CST.Bild_Nm_R
+			,SHE.Cur_UUri + SHE.Cur_Muri AS Tax_Amount
+			,SHE.Cur_Tax AS Sale_Tax
+			,SHE.Cur_UUri + SHE.Cur_Muri + SHE.Cur_Tax AS Inc_Tax_Amount
+			,SHE.Cur_UAmt + SHE.Cur_MAmt AS Bill_Amount
+			,CSJ.Jigyo_Code
+			,JGY.JGYMEI
+			,USR.User_Code
+			,USR.User_Nm
+		FROM
+			TBL_SEI01_HEAD SHE
+		INNER JOIN
+			MST_CUSTOMER CST
+		ON
+			CST.Cust_Code = SHE.Cust_Code
+			AND CST.STS_Code = '1'
+			AND CST.Bild_Unt_Kb = '1'
+			AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+		INNER JOIN
+			MST_CUSTJGYO CSJ
+		ON
+			CSJ.Cust_Code  = SHE.Cust_Code
+			AND CSJ.Jigyo_Code = SHE.Jigyo_Code
+		INNER JOIN
+			MST_S_JIGYO JGY
+		ON
+			JGY.JGYCD = SHE.Jigyo_Code
+		INNER JOIN
+			MST_USER USR
+		ON
+			USR.Jigyosho_Code = CSJ.Jigyo_Code
+			AND USR.User_Code = CSJ.Jm_Tan_Code
+		WHERE
+			SHE.Sts_Code = '1'
+			AND SHE.Jigyo_Code = #{JIGYOSHO_CODE}
+		<if test="closeDateWk != '' and closeDateWk != null ">
+			AND SHE.Bild_Date = #{SEIKYU_SHIMEBI}
+		</if>
+		<if test="closeDateWk !='' and closeDateWk != null ">
+			AND SHE.Bild_Date LIKE #{SEIKYU_SHIMEBI_LIKE}
+		</if>
+		<if test="SEIKYUSAKI_CODE !='' and SEIKYUSAKI_CODE != null">
+			AND SHE.Cust_Code = #{SEIKYUSAKI_CODE}
+		</if>
+		<if test="JIMU_TANTOSHA_CODE !='' and JIMU_TANTOSHA_CODE != null">
+			AND CSJ.Jm_Tan_Code = #{JIMU_TANTOSHA_CODE}
+		</if>
+		ORDER BY
+			SHE.Bild_Date
+			,SHE.Cust_Code
+	</select>
+	
+	<!-- 事業所マスタから事業所情報を取得する。 -->
+	<select id="getSJigyoInfo" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo" parameterType="map">
+		SELECT
+			JGY.JGYCD, 
+			JGY.JGYMEI 
+		FROM 
+			MST_S_JIGYO JGY
+		WHERE
+			JGY.DELFLG = '0'
+			AND JGY.STRYMD &lt;= #{businessDate}
+			AND JGY.ENDYMD &gt;= #{businessDate}
+			ORDER BY JGY.JGYCD
+	</select>
+	
+	<!-- 帳票管理マスタからデータ取得 -->
+	<select id="getMstListForm" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstListFormMapper.BaseResultMap" parameterType="map">
+		SELECT
+			FRM.LIST_SVR_NM,
+			FRM.LIST_DIR,
+			FRM.LIST_NM
+		FROM
+			MST_LIST_FORM FRM
+		<where>
+			<if test="outFormatBillCustFlg">
+				FRM.LIST_ID = 'SEI01-06L01'
+			</if>
+			<if test="outFormatCustShopFlg">
+				AND FRM.LIST_ID = 'SEI01-06L02'
+			</if>
+			<if test="outFormatDenpyoFlg">
+				AND FRM.LIST_ID = 'SEI01-06L03'
+			</if>
+		</where>
+	</select>
+	
+	<!-- 【関数】請求一覧表（得意先・店舗毎）出力 -->
+	<select id="getCustShop" parameterType="map" resultMap="PrintSei0106d01">
+		SELECT
+			WRK.Cust_Code
+			,CST.Bild_Nm_R
+			,CST.Cust_Nm_R
+			,WRK.Shop_Code
+			,SHP.Shop_Nm_R
+			,WRK.URIAGE + WRK.TAX AS Trd_Price
+			,WRK.DEMPYO_NUM AS Den_No
+		FROM
+			(
+			SELECT
+				SEB.Chain_Code
+				,SEB.Chain_Idx
+				,SEB.Cust_Code
+				,SEB.Shop_Code
+				,SUM(SEB.Trd_Price) AS URIAGE
+				,SUM(SEB.Trd_Tax) AS TAX
+				,COUNT(SEB.Den_No) AS DEMPYO_NUM
+			FROM
+				TBL_SEI01_SEI_BODY SEB
+			WHERE
+				SEB.Bild_Id = #{SEIKYU_ID}
+			GROUP BY
+				SEB.Chain_Code
+				,SEB.Chain_Idx
+				,SEB.Cust_Code
+				,SEB.Shop_Code
+			) WRK
+		INNER JOIN
+			MST_CUSTOMER CST
+		ON
+			CST.Cust_Code = WRK.Cust_Code
+		LEFT JOIN
+			MST_SHOP SHP
+		ON
+				SHP.Cust_Code = WRK.Cust_Code
+			AND SHP.Shop_Code = WRK.Shop_Code
+		ORDER BY
+			WRK.Chain_Code
+			,WRK.Chain_Idx
+			,WRK.Cust_Code
+			,WRK.Shop_Code
+	</select>
+	
+	<!-- 【関数】請求一覧表（伝票毎）出力 -->
+	<select id="getDenpyo" parameterType="map" resultMap="PrintSei0106d01">
+		SELECT
+			WRK.Cust_Code
+			,CST.Bild_Nm_R
+			,CST.Cust_Nm_R
+			,WRK.Shop_Code
+			,SHP.Shop_Nm_R
+			,WRK.Deli_Date
+			,WRK.Den_No
+			,WRK.URIAGE + WRK.TAX AS Trd_Price
+		FROM
+			(
+			SELECT
+				SEB.Chain_Code
+				,SEB.Chain_Idx
+				,SEB.Cust_Code
+				,SEB.Shop_Code
+				,SEB.Deli_Date
+				,SEB.Den_No
+				,SUM(SEB.Trd_Price) AS URIAGE
+				,SUM(SEB.Trd_Tax) AS TAX
+			FROM
+			  TBL_SEI01_SEI_BODY SEB
+			WHERE
+				SEB.Bild_Id = #{SEIKYU_ID}
+			GROUP BY
+				SEB.Chain_Code
+				,SEB.Chain_Idx
+				,SEB.Cust_Code
+				,SEB.Shop_Code
+				,SEB.Deli_Date
+				,SEB.Den_No
+			) WRK
+		INNER JOIN
+			MST_CUSTOMER CST
+		ON
+			CST.Cust_Code = WRK.Cust_Code
+		LEFT JOIN
+		  MST_SHOP SHP
+		ON
+			SHP.Cust_Code = WRK.Cust_Code
+			AND SHP.Shop_Code = WRK.Shop_Code
+		ORDER BY
+			WRK.Chain_Code
+			,WRK.Chain_Idx
+			,WRK.Cust_Code
+			,WRK.Shop_Code
+			,WRK.Deli_Date
+			,WRK.Den_No
+	</select>
+	
+</mapper>

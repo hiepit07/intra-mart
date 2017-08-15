@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0108d01Mapper">
+	<select id="getSJigyoInfo"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo"
+		parameterType="map">
+		SELECT JGY.JGYCD,JGY.JGYMEI 
+		FROM MST_S_JIGYO JGY
+		WHERE JGY.DELFLG = '0' 
+		AND JGY.STRYMD &lt;=#{businessDate}
+		AND JGY.ENDYMD >= #{businessDate}
+		ORDER BY JGY.JGYCD
+	</select>
+	<select id="getDefautData"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0108d01Model"
+		parameterType="map">
+		SELECT	
+				TOP ${searchMax}
+				CUT.Cust_Code cstCode, 
+				MAX(CST.Cust_Nm_R) custNmR,
+				CUT.Item_Code itemCode,
+				MAX(SHN.HINRYAKU) hinRyaKu,
+				CUT.Shop_Code shopCode,
+				MAX(SHP.Shop_Nm_R) shopNmR,
+				CUT.SALES_KB salesKb,
+				MAX(GEN.Target_1) as salesNm,
+				MAX(CUT.Valid_From) validFrom,
+				CUT.Valid_To validTo,
+				MAX(CUT.Cust_Deli_Tanka) custDeliTanka,
+				MAX(CUT.Cust_Sell_Tanka) custSellTanka,
+				MAX(CUT.Cust_Bild_Tanka) custBildTanka,
+				MAX(CUT.Bunrui_Code) bunruiCode,
+				MAX(CUT.STS_Code) stsCode,
+				MAX(CUT.INS_USERID) insUserId,
+				MAX(CUT.INS_PGID) insPgId,
+				MAX(CUT.INS_YMD) insYmd,
+				MAX(CUT.INS_TIME) insTime,
+				MAX(CUT.UPD_USERID) updUserId,
+				MAX(CUT.UPD_PGID) updPgId,
+				MAX(CUT.UPD_YMD) updYmd,
+				MAX(CUT.UPD_TIME) updTime
+ 		FROM 
+				(((((MST_CUST_TANKA CUT 
+				LEFT JOIN 
+				MST_CUSTOMER CST ON (CUT.Cust_Code = CST.Cust_Code
+				AND (CST.Close_Date = '' OR CST.Close_Date > #{businessDate})
+				AND CST.STS_Code = '1'))
+				
+				LEFT JOIN 
+				
+				MST_S_SEIHN SHN ON (CUT.Item_Code = SHN.HINCD
+				AND SHN.DELFLG= '0'
+				AND SHN.STRYMD &lt;= #{businessDate}
+				AND SHN.ENDYMD >= #{businessDate}))
+				
+				LEFT JOIN 
+				
+				MST_SHOP SHP  ON( CUT.Cust_Code = SHP.Cust_Code
+				AND CUT.Shop_Code = SHP.Shop_Code
+				AND (SHP.Close_Date = '' OR SHP.Close_Date > #{businessDate})
+				AND SHP.STS_Code = '1'))
+				
+				LEFT JOIN 
+				
+				MST_GENERAL GEN ON (CUT.SALES_KB = GEN.Gl_Code AND GEN.Gl_Kb = 'Sale_Kb'))
+				
+				LEFT JOIN
+				
+				MST_CUSTJGYO CSJ ON ( CUT.Cust_Code = CSJ.Cust_Code) )
+			Where 1=1
+			<if test="loginJigyouShoCode != ''">
+			 	 AND CSJ.Jigyo_Code = #{loginJigyouShoCode}
+			</if>
+			 <if test = "custCode != ''">
+				AND CUT.Cust_Code = #{custCode}
+			</if>
+			 <if test = "itemCode != ''">
+				AND CUT.Item_Code = #{itemCode}
+			</if>
+			<if test = "shopCode != ''">
+				AND CUT.Shop_Code = #{shopCode}
+			</if>
+			<if test = "bunruiCode != ''">
+				AND CUT.Bunrui_Code = #{bunruiCode}
+			</if>
+			<if test ="salesKb != ''"> 
+				AND CUT.SALES_KB = #{salesKb}
+			</if>
+			<if test = "validFrom != ''">
+				AND CUT.Valid_From >= #{validFrom}
+			</if>
+			<if test = "validTo != ''">
+				AND CUT.Valid_To &lt;= #{validTo}
+			</if>
+			<if test = "checkUpdYmd == 1">
+				AND CUT.UPD_YMD = #{businessDate}
+			</if>
+			<if test = "checkCancelData == 0">
+				AND CUT.STS_Code = '1'
+			</if> 
+			GROUP BY CUT.Cust_Code,
+			CUT.Item_Code,
+			CUT.SALES_KB,
+			CUT.Valid_To,
+			CUT.Shop_Code
+			ORDER BY CUT.Cust_Code,CUT.Item_Code,CUT.SALES_KB,CUT.Valid_To,CUT.Shop_Code
+	</select>
+	<select id="getSearchResultCsv"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCorrectKbMst0108d01"
+		parameterType="map">
+		SELECT
+				CUT.Cust_Code cstCode, 
+				MAX(CST.Cust_Nm_R) custNmR,
+				CUT.Item_Code itemCode,
+				MAX(SHN.HINRYAKU) hinRyaKu,
+				CUT.Shop_Code shopCode,
+				MAX(SHP.Shop_Nm_R) shopNmR,
+				CUT.SALES_KB salesKb,
+				MAX(GEN.Target_1) as salesNm,
+				MAX(CUT.Valid_From) validFrom,
+				CUT.Valid_To validTo,
+				MAX(CUT.Cust_Deli_Tanka) custDeliTanka,
+				MAX(CUT.Cust_Sell_Tanka) custSellTanka,
+				MAX(CUT.Cust_Bild_Tanka) custBildTanka,
+				MAX(CUT.Bunrui_Code) bunruiCode,
+				MAX(CUT.STS_Code) stsCode,
+				MAX(CUT.INS_USERID) insUserId,
+				MAX(CUT.INS_PGID) insPgId,
+				MAX(CUT.INS_YMD) insYmd,
+				MAX(CUT.INS_TIME) insTime,
+				MAX(CUT.UPD_USERID) updUserId,
+				MAX(CUT.UPD_PGID) updPgId,
+				MAX(CUT.UPD_YMD) updYmd,
+				MAX(CUT.UPD_TIME) updTime
+		FROM
+		(((((MST_CUST_TANKA CUT
+		LEFT
+		JOIN
+		MST_CUSTOMER CST ON (CUT.Cust_Code = CST.Cust_Code
+		AND
+		(CST.Close_Date = '' OR CST.Close_Date > #{businessDate})
+		AND
+		CST.STS_Code = '1'))
+	
+		LEFT JOIN
+	
+		MST_S_SEIHN SHN ON (CUT.Item_Code =
+		SHN.HINCD
+		AND SHN.DELFLG= '0'
+		AND SHN.STRYMD &lt;= #{businessDate}
+		AND
+		SHN.ENDYMD >= #{businessDate}))
+	
+		LEFT JOIN
+	
+		MST_SHOP SHP ON(
+		CUT.Cust_Code = SHP.Cust_Code
+		AND CUT.Shop_Code = SHP.Shop_Code
+		AND
+		(SHP.Close_Date = '' OR SHP.Close_Date > #{businessDate})
+		AND
+		SHP.STS_Code = '1'))
+	
+		LEFT JOIN
+	
+		MST_GENERAL GEN ON (CUT.SALES_KB =
+		GEN.Gl_Code AND GEN.Gl_Kb = 'Sale_Kb'))
+	
+		LEFT JOIN
+	
+		MST_CUSTJGYO CSJ ON (
+		CUT.Cust_Code = CSJ.Cust_Code) )
+		WHERE 1=1
+		<if test="loginJigyouShoCode != ''">
+			AND CSJ.Jigyo_Code = #{loginJigyouShoCode}
+		</if>
+		<if test="custCode != ''">
+			AND CUT.Cust_Code = #{custCode}
+		</if>
+		<if test="itemCode != ''">
+			AND CUT.Item_Code = #{itemCode}
+		</if>
+		<if test="shopCode != ''">
+			AND CUT.Shop_Code = #{shopCode}
+		</if>
+		<if test="bunruiCode != ''">
+			AND CUT.Bunrui_Code = #{bunruiCode}
+		</if>
+		<if test="salesKb != ''">
+			AND CUT.SALES_KB = #{salesKb}
+		</if>
+		<if test = "validFrom != ''">
+			AND CUT.Valid_From >= #{validFrom}
+		</if>
+		<if test = "validTo != ''">
+			AND CUT.Valid_To &lt;= #{validTo}
+		</if>
+		<if test="checkUpdYmd == 1">
+			AND CUT.UPD_YMD = #{businessDate}
+		</if>
+		<if test="checkCancelData == 0">
+			AND CUT.STS_Code = '1'
+		</if> 		
+		GROUP BY CUT.Cust_Code,
+			CUT.Item_Code,
+			CUT.SALES_KB,
+			CUT.Valid_To,
+			CUT.Shop_Code
+			ORDER BY CUT.Cust_Code,CUT.Item_Code,CUT.SALES_KB,CUT.Valid_To,CUT.Shop_Code
+	</select>
+	<select id="getItemName"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0108d01Model"
+		parameterType="map">
+		select SHN.HINRYAKU hinRyaKu
+		from MST_S_SEIHN SHN
+		where SHN.DELFLG= '0'
+		AND SHN.STRYMD &lt;= #{businessDate}
+		AND SHN.ENDYMD >= #{businessDate}
+		AND SHN.HINCD = #{itemCode}
+		AND SHN.CHNCD = #{custCode}
+		AND SHN.CHNEDA  = #{cstNmr}
+	</select>
+	<select id="getCustName"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0108d01Model"
+		parameterType="map">
+		select CST.Cust_Nm_R custNmR
+		from MST_CUSTOMER CST
+		WHERE CST.Cust_Code = #{custCode}
+	</select>
+</mapper>

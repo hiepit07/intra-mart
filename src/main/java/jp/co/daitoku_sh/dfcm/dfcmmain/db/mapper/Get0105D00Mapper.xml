@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Get0105D00Mapper">
+		<select id="getUrikake"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.get.GetUrikakegatsudo"
+		parameterType="map">
+			SELECT 
+				SHE.Bild_Id  bildId ,
+				SHE.Jigyo_Code  jigyoCode,
+				SHE.Cust_Code  custCode,
+				CST.YG_Kb  ygkuBun,
+				CST.Cust_Nm  custNm,
+				USR.User_Nm  userNm,
+				SMS.Mon_Uriage_Ttl  monUriageTtl,
+				CST.Total_Date_1  totalDate1,
+				CST.Col_Term_Kb_1  colTermKb1,
+				CST.Col_Date_1  colDate1,
+				CST.Total_Date_2  totalDate2,
+				CST.Col_Term_Kb_2  colTermKb2 ,
+				CST.Col_Date_2  colDate2,
+				CST.Rcvm_Cls  payment,
+				SHE.Prev_Bild_Date  prevBildDate ,
+				SHE.Bild_Date   bildDate,
+				SHE.Nyu_Date  paymentPlanDate  ,
+				SHE.Cur_UAmt   bildUAmt,
+				SHE.Cur_MAmt  bildMAmt,
+				NYH.Nyu_Date  paymentDate ,
+				NYH.Nyu_Kingaku  nyuKingaku ,
+				NYH.Sou_Kingaku   souKingaku ,
+				NYH.Nyu_Den_No   nyuDen ,
+				GEN.Target_1 AS target1
+			FROM
+				TBL_NYU01_HEAD NYH
+			RIGHT JOIN 
+				TBL_SEI01_HEAD SHE 
+			ON 
+					NYH.Bild_Id  = SHE.Bild_Id 
+				AND NYH.Sts_Code = '1'
+			INNER JOIN 
+				TBL_SEI01_URK_MSH_HEAD SMS 
+			ON 
+					SMS.Jigyo_Code    = SHE.Jigyo_Code 
+				AND SMS.Chain_Code    = SHE.Chain_Code 
+				AND SMS.Chain_Idx     = SHE.Chain_Idx 
+				AND SMS.Cust_Code     = SHE.Cust_Code 
+				AND SMS.Bild_Code     = SHE.Cust_Code 
+				AND SMS.Shop_Code     = #{Shop_CodeWK} 
+				AND SMS.Account_Month = #{urikakeMonth} 
+				AND ( SMS.Close_Date = '' OR SMS.Close_Date > #{businessDateWK} )
+			INNER JOIN 
+				MST_CUSTOMER CST 
+			ON  
+					CST.Cain_Code = SHE.Chain_Code 
+				AND CST.Cain_Idx  = SHE.Chain_Idx 
+				AND CST.Cust_Code = SHE.Cust_Code 
+				AND CST.STS_Code  = '1'
+			INNER JOIN 
+				MST_CUSTJGYO CSJ 
+			ON  
+					CSJ.Jigyo_Code = SHE.Jigyo_Code 
+				AND CSJ.Cust_Code  = SHE.Cust_Code
+			<if test="tantoshaCodeWK != ''">
+				AND CSJ.Jm_Tan_Code = #{tantoshaCodeWK}
+    		</if>
+			INNER JOIN 
+				MST_USER USR 
+			ON 
+					USR.User_Code = CSJ.Eg_Tan_Code 
+				AND USR.STS_Code  = '1'
+			INNER JOIN 
+				MST_GENERAL GEN
+			ON 
+					GEN.Gl_Kb   = #{delayReason} 
+				AND GEN.Gl_Code = NYH.Nyu_Okure
+			WHERE
+					SHE.Nyu_Date LIKE #{urikakeMonthWK} 
+				AND SHE.Sts_Code = '1'
+			<if test="officeCodeWK != ''">
+				AND SHE.Jigyo_Code = #{officeCodeWK}
+			</if>
+			<if test="seikyusakiCodeWK != ''">
+				AND SHE.Cust_Code = #{seikyusakiCodeWK}
+			</if>
+			ORDER BY
+				SHE.Jigyo_Code,
+				SHE.Cust_Code,
+				SHE.Nyu_Date 
+	</select>
+	<select id="getZandaka"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.get.GetZandaka"
+		parameterType="map">
+		SELECT 
+				GEN.Target_1  target1 ,
+				NYZ.Kingaku  kinGa
+				FROM  
+					MST_GENERAL GEN
+				INNER JOIN 
+					TBL_NYU01_ZDK_REASON NYZ 
+				ON
+				 GEN.Gl_Kb = 'Balance_Reason'
+				 WHERE
+				  GEN.Gl_Code = NYZ.Zr_Code AND NYZ.Nyu_Den_No = #{nyudenNo}
+				ORDER BY NYZ.Hyouji_Jun
+	</select>
+</mapper>

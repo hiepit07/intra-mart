@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Nyu0102d03Mapper">
+
+<!-- ******************************************************************************** -->
+<!-- *** 都度請求未回収設定画面用SQL定義                                          *** -->
+<!-- ******************************************************************************** -->
+
+	<!-- 都度請求先リストの取得 -->
+	<select id="getTsudoSeikyusakiList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.nyu.NyuSeikyusakiInfo" parameterType="map">
+	
+<![CDATA[
+SELECT
+   TMP.Chain_Code         AS chainCd
+  ,TMP.Chain_Idx          AS chainIdx
+  ,TMP.Cust_Code          AS seikyusakiCd
+  ,TMP.Cust_Nm_R          AS seikyusakiName
+  ,TMP.Bild_Unt_Kb        AS seikyuTani
+  ,TMP.Cust_Cls           AS tokuisakiCls
+  ,TMP.Rel_Com_Cls        AS kankeiKaishaCls
+  ,TMP.Rel_Com_Sub        AS kankeiKaishaHojoKamoku
+  ,TMP.Jigyo_Code         AS jigyoshoCd
+  ,JGY.JGYMEI             AS jigyoshoName
+  ,TMP.Den_No             AS dempyoNo
+  ,TMP.Bild_Id            AS seikyuId
+  ,TMP.Deli_Date          AS nohinbi
+  ,TMP.Adup_Date          AS uriageKejobi
+  ,( TMP.URIAGEGAKU_URIKAKE + 
+     TMP.URIAGEGAKU_MISHU + 
+     TMP.TAX_URIKAKE + 
+     TMP.TAX_MISHU )      AS seikyuGaku
+  ,TMP.URIAGEGAKU_URIKAKE AS uriageGakuUrikake
+  ,TMP.URIAGEGAKU_MISHU   AS uriageGakuMishu
+  ,TMP.TAX_URIKAKE        AS taxUrikake
+  ,TMP.TAX_MISHU          AS taxMishu
+  ,( TMP.URIAGEGAKU_URIKAKE + 
+     TMP.URIAGEGAKU_MISHU + 
+     TMP.TAX_URIKAKE + 
+     TMP.TAX_MISHU + 
+     TMP.NYUKIN_URIKAKE + 
+     TMP.NYUKIN_MISHU )   AS mikaishuGaku
+FROM
+-- WORKテーブル
+  (
+    SELECT
+       WRK.Chain_Code
+      ,WRK.Chain_Idx
+      ,WRK.Cust_Code
+      ,WRK.Cust_Nm_R
+      ,WRK.Bild_Unt_Kb
+      ,WRK.Cust_Cls
+      ,WRK.Rel_Com_Cls
+      ,WRK.Rel_Com_Sub
+      ,WRK.Jigyo_Code
+      ,WRK.Den_No
+      ,WRK.Bild_Id
+      ,MIN(WRK.Deli_Date) AS Deli_Date
+      ,MIN(WRK.Adup_Date) AS Adup_Date
+      ,SUM(WRK.URIAGEGAKU_URIKAKE) AS URIAGEGAKU_URIKAKE
+      ,SUM(WRK.URIAGEGAKU_MISHU)   AS URIAGEGAKU_MISHU
+      ,SUM(WRK.TAX_URIKAKE)        AS TAX_URIKAKE
+      ,SUM(WRK.TAX_MISHU)          AS TAX_MISHU
+      ,SUM(WRK.NYUKIN_URIKAKE)     AS NYUKIN_URIKAKE
+      ,SUM(WRK.NYUKIN_MISHU)       AS NYUKIN_MISHU
+    FROM
+    -- UNION WORK
+      (
+        -- 売掛WORK
+        SELECT
+           SUB.Chain_Code
+          ,SUB.Chain_Idx
+          ,SUB.Cust_Code
+          ,CST.Cust_Nm_R
+          ,CST.Bild_Unt_Kb
+          ,CST.Cust_Cls
+          ,CST.Rel_Com_Cls
+          ,CST.Rel_Com_Sub
+          ,SUB.Jigyo_Code
+          ,SUB.Den_No
+          ,ISNULL(SUB.Bild_Id, 0) AS Bild_Id
+          ,URH.Deli_Date
+          ,URH.Adup_Date
+          ,CASE
+             WHEN SUB.Trd_Kb IN ('01', '02', '03', '04') THEN SUB.Trd_Price
+             ELSE                                             0
+           END AS URIAGEGAKU_URIKAKE
+          ,0   AS URIAGEGAKU_MISHU
+          ,CASE
+             WHEN SUB.Trd_Kb IN ('01', '02', '03', '04') THEN SUB.Trd_Tax
+             ELSE                                             0
+           END AS TAX_URIKAKE
+          ,0   AS TAX_MISHU
+          ,CASE
+             WHEN SUB.Trd_Kb IN ('05', '06', '07') THEN (SUB.Trd_Price + SUB.Trd_Tax)
+             ELSE                                       0
+           END AS NYUKIN_URIKAKE
+          ,0   AS NYUKIN_MISHU
+        FROM
+        -- 得意先マスタ
+          MST_CUSTOMER CST
+        -- 売掛明細情報
+        INNER JOIN
+          TBL_SEI01_URK_BODY SUB
+        ON
+          CST.Cust_Code = SUB.Cust_Code
+        -- 売上ヘッダ
+        INNER JOIN
+          TBL_URI01_HEAD URH
+        ON
+              SUB.Den_No  = URH.Den_No
+          AND SUB.Den_Idx = URH.Den_Idx
+        WHERE
+              SUB.Jigyo_Code  = #{JIGYOSHO_CD}
+          AND CST.Cust_Code   = #{SEIKYUSAKI_CD}
+          AND CST.STS_Code    = '1'
+          AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+          AND CST.Bild_Unt_Kb = '2'
+        
+        UNION ALL
+        
+        -- 未収WORK
+        SELECT
+           SMB.Chain_Code
+          ,SMB.Chain_Idx
+          ,SMB.Cust_Code
+          ,CST.Cust_Nm_R
+          ,CST.Bild_Unt_Kb
+          ,CST.Cust_Cls
+          ,CST.Rel_Com_Cls
+          ,CST.Rel_Com_Sub
+          ,SMB.Jigyo_Code
+          ,SMB.Den_No
+          ,ISNULL(SMB.Bild_Id, 0) AS Bild_Id
+          ,URH.Deli_Date
+          ,URH.Adup_Date
+          ,0   AS URIAGEGAKU_URIKAKE
+          ,CASE
+             WHEN SMB.Trd_Kb IN ('01', '02', '03', '04') THEN SMB.Trd_Price
+             ELSE                                             0
+           END AS URIAGEGAKU_MISHU
+          ,0   AS TAX_URIKAKE
+          ,CASE
+             WHEN SMB.Trd_Kb IN ('01', '02', '03', '04') THEN SMB.Trd_Tax
+             ELSE                                             0
+           END AS TAX_MISHU
+          ,0   AS NYUKIN_URIKAKE
+          ,CASE
+             WHEN SMB.Trd_Kb IN ('05', '06', '07') THEN (SMB.Trd_Price + SMB.Trd_Tax)
+             ELSE                                       0
+           END AS NYUKIN_MISHU
+        FROM
+        -- 得意先マスタ
+          MST_CUSTOMER CST
+        -- 未収明細情報
+        INNER JOIN
+          TBL_SEI01_MSH_BODY SMB
+        ON
+          CST.Cust_Code = SMB.Cust_Code
+        -- 売上ヘッダ
+        INNER JOIN
+          TBL_URI01_HEAD URH
+        ON
+              SMB.Den_No  = URH.Den_No
+          AND SMB.Den_Idx = URH.Den_Idx
+        WHERE
+              SMB.Jigyo_Code  = #{JIGYOSHO_CD}
+          AND CST.Cust_Code   = #{SEIKYUSAKI_CD}
+          AND CST.STS_Code    = '1'
+          AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+          AND CST.Bild_Unt_Kb = '2'
+          
+      ) WRK
+    GROUP BY
+       WRK.Chain_Code
+      ,WRK.Chain_Idx
+      ,WRK.Cust_Code
+      ,WRK.Cust_Nm_R
+      ,WRK.Bild_Unt_Kb
+      ,WRK.Cust_Cls
+      ,WRK.Rel_Com_Cls
+      ,WRK.Rel_Com_Sub
+      ,WRK.Jigyo_Code
+      ,WRK.Den_No
+      ,WRK.Bild_Id
+      
+  ) TMP
+-- 事業所マスタ
+INNER JOIN
+  MST_S_JIGYO JGY
+ON
+  TMP.Jigyo_Code = JGY.JGYCD
+WHERE
+  TMP.URIAGEGAKU_URIKAKE + TMP.URIAGEGAKU_MISHU + TMP.TAX_URIKAKE + TMP.TAX_MISHU + TMP.NYUKIN_URIKAKE + TMP.NYUKIN_MISHU <> 0
+ORDER BY
+   TMP.Cust_Code
+  ,TMP.Den_No
+]]>
+
+	</select>
+
+</mapper>

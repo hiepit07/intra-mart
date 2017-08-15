@@ -1,0 +1,38 @@
+/* BODY共通 */
+body {
+	font-size: 14px;
+	color: #000000;
+	/*background-color: #fef1cf;*/
+	background-color: #fff;
+	font-family: "メイリオ", "ＭＳ Ｐゴシック", "Osaka", "ヒラギノ丸ゴ Pro W4", "Lucida Grande", "Helvetica", "Arial", sans-serif;
+}
+
+/* 検索ボタン */
+.searchButton {
+	width: 80px;
+	height: 25px;
+	color: #FFFFFF;
+	text-align: center;
+	line-height: 25px;
+	cursor: pointer;
+	background: #ff5050;
+	background: -moz-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -webkit-gradient(left top, left bottom, color-stop(0%, #ff5050), color-stop(100%, #fb3e3e));
+	background: -webkit-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -o-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -ms-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: linear-gradient(to bottom, #ff5050 0%, #fb3e3e 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff5050', endColorstr='#fb3e3e', GradientType=0 );
+	border-radius: 3px;
+}
+
+/* 幅指定（20%） */
+.w20 {
+	width: 20%;
+}
+
+/* カーソルをポインターに変更 */
+.cursor_hover {
+	cursor: pointer;
+}
+

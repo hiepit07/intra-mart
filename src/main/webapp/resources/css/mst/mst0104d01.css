@@ -1,0 +1,98 @@
+﻿.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+
+.td_width50 {
+	width: 50px;
+}
+.td_width3 {
+	width: 3px;
+}
+.td_width80 {
+	width: 80px;
+}
+.td_width90 {
+	width: 90px;
+}
+.td_width150 {
+	width: 150px;
+}
+.td_width230 {
+	width: 230px;
+}
+.td_width360 {
+	width: 360px;
+}
+
+.txt_width100 {
+	width: 100px;
+}
+.txt_width30 {
+	width: 30px;
+}
+.txt_width240 {
+	width: 240px;
+}
+
+.cbx_width185 {
+	width: 185px;
+}
+
+.td_width5per {
+	width: 5%;
+}
+.td_width8per {
+	width: 8%;
+}
+.td_width68per {
+	width: 68%;
+}
+.td_width10per {
+	width: 10%;
+}
+
+.height530 {
+	height: 530px;
+}
+
+.tbl_data_condition_bot {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition_bot td {
+		border-bottom: 2px solid #fff;
+		text-align: center;
+	}
+	
+.sub-menu {
+	width: 80px;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	display: none;
+}
+	.sub-menu a {
+		color: #000;
+		padding: 3px;
+		padding-left: 15px;
+		display: block;
+	}

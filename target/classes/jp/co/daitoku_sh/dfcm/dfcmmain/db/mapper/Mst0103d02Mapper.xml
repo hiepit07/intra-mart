@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0103d02Mapper">
+	<select id="getSJigyoInfo"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo"
+		parameterType="map">
+		SELECT JGY.JGYCD, JGY.JGYMEI 
+		FROM MST_S_JIGYO JGY
+		WHERE JGY.DELFLG = '0'
+		AND JGY.STRYMD &lt;= #{businessDate}
+		AND JGY.ENDYMD &gt;= #{businessDate}
+		ORDER BY JGY.JGYCD
+	</select>
+	<select id="getStoreMaster"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstUserInfoMst0103d02"
+		parameterType="map">
+		SELECT 	SHP.Cust_Code AS custCode,
+				CST.Cust_Nm_R AS custNmR,		
+				SHP.Shop_Code AS shopCode,					
+				SHP.Shop_Nm	AS	shopNm,			
+				SHP.Shop_Nm_Kana AS	shopNmKana,			
+				SHP.Shop_Nm_R AS shopNmR,		
+				SHP.Zip_Code AS	zipCode,				
+				SHP.Adr_1 AS adr1,				
+				SHP.Adr_2 AS adr2,			
+				SHP.Tel_No AS telNo,				
+				SHP.Fax_No AS faxNo,
+				SHP.Jigyo_Code AS jigyoCode,			
+				JGY.JGYMEI AS jgymei,
+				SHP.Sum_Shop_Kb AS	sumShopKb,	
+				SHP.Sum_Shop_Jkn AS sumShopJkn,
+				SHP.Deli_Center_Code AS deliCenterCode,
+				SHP.Sunks_Kb AS	sunksKb,
+				SHP.Sum_Shop_Code AS sumShopCode,
+				SUS.Shop_Nm_R AS shopNmSus,
+				SHP.ST_Code_ST_S AS	stCodeSts,
+				SHP.ST_Code_ST_C AS	stCodeStc,
+				SHP.ST_Code_SP_S AS	stCodeSps,			
+				SHP.ST_Code_SP_C AS	stCodeSpc,			
+				SHP.Close_Date AS closeDate,
+				SHP.STS_Code AS	stsCode	
+		FROM 	MST_SHOP SHP 
+			 	LEFT JOIN MST_S_JIGYO JGY ON (SHP.Jigyo_Code = JGY.JGYCD AND JGY.DELFLG = '0' AND JGY.STRYMD &lt;= #{businessDate} AND JGY.ENDYMD &gt;= #{businessDate})
+			 	LEFT JOIN MST_CUSTOMER CST ON (SHP.Cust_Code = CST.Cust_Code AND (CST.Close_Date = '' or  CST.Close_Date &gt; #{businessDate}) AND CST.STS_Code = '1')
+			 	LEFT JOIN MST_SHOP SUS ON (SHP.Cust_Code = SUS.Cust_Code AND SHP.Sum_Shop_Code = SUS.Shop_Code AND (SUS.Close_Date  = '' or SUS.Close_Date &gt; #{businessDate}) AND SUS.STS_Code = '1')
+		WHERE 	SHP.Cust_Code = #{customerCode}
+				AND SHP.Shop_Code = #{storeCode}
+	</select>
+	<select id="getDataAccess" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSNohinMapper.BaseResultMap" parameterType="map">
+		SELECT NHN.NHSCD, NHN.NHSMEI		
+		FROM MST_S_NOHIN NHN
+		WHERE NHN.DELFLG = '0' 
+			  AND NHN.STRYMD &lt;= #{businessDate} 
+			  AND NHN.ENDYMD &gt;= #{businessDate} 
+			  AND NHN.JGYCD = #{officeCodeWK}
+			  AND NHN.CHNCD = #{chainCode}
+			  AND NHN.CHNEDA = #{chainBranch}
+		ORDER BY NHN.NHSCD
+	</select>
+	<select id="getCourseInformationLst"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCourseInfoMst0103d02"
+		parameterType="map">
+		SELECT CRS.Cos_Code AS cosCode, CRS.Cos_Nm_R AS cosNmR, CRL.Bin_Kb AS binKb, CRL.Deli_Kb AS deliKb, GEN.Target_1 AS target1
+		FROM MST_COURSE  CRS
+		INNER JOIN MST_COURSE_LIST CRL ON (CRS.Jigyo_Code = CRL.Jigyo_Code AND CRS.Cos_Code = CRL.Cos_Code AND CRS.STS_Code = '1' AND CRL.STS_Code = '1')
+		LEFT JOIN MST_GENERAL GEN ON (CRL.Deli_Kb　=　GEN.Gl_Code AND GEN.Gl_Kb　= 'Deli_Kb')
+		WHERE CRS.Jigyo_Code = #{plantCodeWK}
+			 AND CRL.Cust_Code = #{customerNumberWK}
+			 AND CRL.Shop_Code = #{storeCodeWK}
+		ORDER BY CRS.Cos_Code,CRL.Bin_Kb
+	</select>
+	<select id="getCommonSpecificationsConfirmation"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSpecificationsConfirmationMst0103d02"
+		parameterType="map">
+		SELECT CSC.OL_Center_Code AS olCenterCode, CSC.AT_Torihiki_Code AS atTorihikiCode, CSC.AT_Ten_Code AS atTenCode, CSC.Deli_Kb AS deliKb, GEN.Target_1 AS target1
+		FROM MST_CUST_CONV  CSC		
+		LEFT JOIN MST_GENERAL GEN ON (CSC.Deli_Kb　=　GEN.Gl_Code AND GEN.Gl_Kb　= 'Deli_Kb')
+		WHERE  CSC.Cust_Code = #{customerNumberWK}
+			 AND CSC.Shop_Code = #{storeCodeWK}
+		ORDER BY CSC.OL_Center_Code,CSC.AT_Torihiki_Code,CSC.AT_Ten_Code
+	</select>	
+	<select id="getMstListForm" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstListFormMapper.BaseResultMap" parameterType="map">
+		SELECT FRM.Den_Cls		
+		FROM MST_LIST_FORM FRM
+		WHERE FRM.List_Id　=　#{chohyoID}
+			  AND FRM.Den_Kb = '2'
+	</select>
+	<select id="getMstShop" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstShopMapper.BaseResultMap" parameterType="map">
+		SELECT TOP 1 SHP.Shop_Code	
+		FROM MST_SHOP SHP
+		WHERE SHP.Cust_Code =　#{custCode}
+			  AND SHP.Shop_Code =　#{shopCode}
+	</select>
+		<select id="getMstDatIdx" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstDatIdxMapper.BaseResultMap" parameterType="map">
+		SELECT TOP 1 DAT.Shop_Code	
+		FROM MST_DAT_IDX DAT
+		WHERE DAT.Cust_Code =　#{custCode}
+			  AND DAT.Shop_Code =　#{shopCode}
+	</select>
+</mapper>

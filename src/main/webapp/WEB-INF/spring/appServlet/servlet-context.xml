@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<beans:bean id="sessionExpirationFilter" class="jp.co.daitoku_sh.dfcm.common.controller.impl.SessionExpirationFilter">
+		<beans:property name="customSessionExpiredErrorCode" value="901"/>
+	</beans:bean>
+	<!-- sec:http auto-config="true" access-denied-page="/common/403.jsp">
+		<sec:custom-filter ref="sessionExpirationFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+	</sec:http> -->
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+
+
+	<context:component-scan base-package="jp.co.daitoku_sh.dfcm" />
+
+	<!-- AOPを使用するため以下を追加 -->
+	<aop:aspectj-autoproxy/>
+	<!-- aop:aspectj-autoproxy proxy-target-class="true">
+  		<aop:include name="MethodProgressLogAspect"/>
+	</aop:aspectj-autoproxy>
+	<context:component-scan base-package="jp.co.daitoku_sh.dfcm">
+		<context:include-filter type="annotation" expression="org.aspectj.lang.annotation.Aspect" />
+	</context:component-scan -->
+	<beans:bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+		<beans:property name="definitions">
+			<beans:list>
+				<beans:value>/WEB-INF/tiles/tiles-definitions.xml</beans:value>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    	<beans:property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+		<beans:property name="url" value="jdbc:sqlserver://172.16.0.159:1433;DatabaseName=DFCMDB_NEW" />
+		<beans:property name="username" value="sa" />
+		<beans:property name="password" value="actbrainWin2012" />
+	</beans:bean>
+
+	<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<beans:property name="dataSource" ref="dataSource" />
+		<beans:property name="typeAliasesPackage" value="jp.co.daitoku_sh.dfcm.*.db.model" />
+		<beans:property name="mapperLocations"
+			value="classpath:jp/co/daitoku_sh/dfcm/*/db/mapper/**/*.xml" />
+	</beans:bean>
+
+	<beans:bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<beans:constructor-arg index="0" ref="sqlSessionFactory" />
+	</beans:bean>
+
+	<beans:bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<beans:property name="basePackage" value="jp.co.daitoku_sh.dfcm.*.db.mapper" />
+	</beans:bean>
+	<beans:bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<beans:property name="basename" value="classpath:/msg/ValidationMessages" />
+		<beans:property name="defaultEncoding" value="UTF-8" />
+	</beans:bean>
+	<beans:bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+	<!-- トランザクションマネージャ -->
+	<beans:bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<beans:property name="dataSource" ref="dataSource"/>
+	</beans:bean>
+
+	<beans:bean id="applicationProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <beans:property name="locations">
+            <beans:list>
+                <beans:value>classpath:msg/message_ja.properties</beans:value>
+            </beans:list>
+        </beans:property>
+        <beans:property name="fileEncoding" value="UTF-8" />
+    </beans:bean>
+
+    <beans:bean id="systemProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<beans:property name="locations">
+			<beans:list>
+				<beans:value>classpath:system/dfcm_settings_ja.properties</beans:value>
+			</beans:list>
+		</beans:property>
+		<beans:property name="fileEncoding" value="UTF-8" />
+	</beans:bean>
+
+    <!-- 共通例外クラス -->
+    <beans:bean class="jp.co.daitoku_sh.dfcm.common.controller.DaitokuExceptionResolver"/>
+
+</beans:beans>

@@ -1,0 +1,39 @@
+.td_width3 {
+	width: 3px;
+}
+
+.cbx_width170 {
+	width: 170px;
+}
+.cbx_width185 {
+	width:185px;
+}
+.bg_lightgreen_ccffcc {
+	background-color: #ccffcc !important;
+}
+
+/* Table éñã∆èäåééüämíË
+  ========================================================================== */
+.tbl_office_monthly_fixed {
+	width: 1000px;
+	margin: 30px auto 50px;
+}
+
+.tbl_office_monthly_fixed td:nth-child(1), .tbl_office_monthly_fixed td:nth-child(4),
+	.tbl_office_monthly_fixed td:nth-child(7) {
+	padding-right: 10px;
+	width: 100px;
+}
+
+.tbl_office_monthly_fixed td:nth-child(3), .tbl_office_monthly_fixed td:nth-child(6),
+	.tbl_office_monthly_fixed td:nth-child(9) {
+	padding-left: 3px;
+}
+
+.tbl_office_monthly_fixed td:nth-child(3) {
+	width: 260px;
+}
+
+.tbl_office_monthly_fixed td:nth-child(6) {
+	width: 260px;
+}

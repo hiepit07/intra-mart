@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Sei0105d01Mapper">
+
+<!-- ******************************************************************************** -->
+<!-- *** 取り纏め請求画面用SQL定義                                                *** -->
+<!-- ******************************************************************************** -->
+
+	<!-- 請求先情報リストの取得 -->
+	<select id="getSeikyusakiInfoList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.sei.SeikyusakiInfo" parameterType="map">
+
+<![CDATA[
+SELECT
+   CST.Cain_Code				AS chainCode
+  ,CST.Cain_Idx					AS chainIdx
+  ,CST.Cust_Code				AS seikyusakiCd
+  ,CST.Bild_Nm_R				AS seikyusakiNameR
+  ,CST.Sum_Bild_Jgyo			AS torimatomeJigyoshoCd
+  ,CST.Bild_Typ_Cls				AS seikyushoCls
+  ,CST.Tax_Unt_Kb				AS taxKeisanTani
+  ,CST.Tax_Frc_Kb				AS taxHasuShori
+  ,CSJ.Jigyo_Code				AS jigyoshoCd
+  ,JGY.JGYMEI					AS jigyoshoName
+  ,USR.User_Code				AS tantoshaCd
+  ,USR.User_Nm					AS tantoshaName
+  -- 前回請求額
+  ,ISNULL(SHE2.Cur_UAmt, 0)		AS zenkaiSeikyuGakuUrikake
+  ,ISNULL(SHE2.Cur_MAmt, 0)		AS zenkaiSeikyuGakuMishu
+  -- 今回売上
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_UUri
+     ELSE                                     WRK.KONKAI_URIAGE_URIKAKE
+   END							AS konkaiUriageUrikake
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_MUri
+     ELSE                                     WRK.KONKAI_URIAGE_MISHU
+   END							AS konkaiUriageMishu
+  -- 今回入金
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_UNyu
+     ELSE                                     WRK.KONKAI_NYUKIN_URIKAKE
+   END							AS konkaiNyukinUrikake
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_MNyu
+     ELSE                                     WRK.KONKAI_NYUKIN_MISHU
+   END							AS konkaiNyukinMishu
+  -- 今回相殺
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_USou
+     ELSE                                     WRK.KONKAI_SOSAI_URIKAKE
+   END							AS konkaiSosaiUrikake
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_MSou
+     ELSE                                     WRK.KONKAI_SOSAI_MISHU
+   END							AS konkaiSosaiMishu
+  -- 今回調整
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_UCho
+     ELSE                                     WRK.KONKAI_CHOSEI_URIKAKE
+   END							AS konkaiChoseiUrikake
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_MCho
+     ELSE                                     WRK.KONKAI_CHOSEI_MISHU
+   END							AS konkaiChoseiMishu
+  -- 繰越額
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_UKur
+     WHEN WRK.ZENKAI_Bild_Id IS NULL     THEN 0
+     ELSE                                     SHE2.Cur_UAmt - WRK.KONKAI_NYUKIN_URIKAKE - WRK.KONKAI_SOSAI_URIKAKE - WRK.KONKAI_CHOSEI_URIKAKE
+   END							AS kurikoshiGakuUrikake
+  ,CASE
+     WHEN WRK.KONKAI_Bild_Id IS NOT NULL THEN SHE1.Cur_MKur
+     WHEN WRK.ZENKAI_Bild_Id IS NULL     THEN 0
+     ELSE                                     SHE2.Cur_MAmt - WRK.KONKAI_NYUKIN_MISHU   - WRK.KONKAI_SOSAI_MISHU   - WRK.KONKAI_CHOSEI_MISHU
+   END							AS kurikoshiGakuMishu
+  ,WRK.KONKAI_Bild_Id			AS konkaiSeikyuId
+  ,SHE1.Sime_DateTime			AS konkaiSeikyuShimeNichiji
+  ,SHE1.Nyu_Flag				AS nyukinKakuninFlag
+  ,SHE1.Bild_sime_Kb			AS konkaiSeikyuShimeKbn
+  ,WRK.ZENKAI_Bild_Id			AS zenkaiSeikyuId
+FROM
+-- 得意先マスタ
+  MST_CUSTOMER CST
+-- 得意先事業所マスタ
+INNER JOIN
+  MST_CUSTJGYO CSJ
+ON
+  CSJ.Cust_Code  = CST.Cust_Code
+-- 事業所マスタ
+INNER JOIN
+  MST_S_JIGYO JGY
+ON
+  JGY.JGYCD = CSJ.Jigyo_Code
+-- 担当者マスタ
+INNER JOIN
+  MST_USER USR
+ON
+      USR.Sts_Code      = '1'
+  AND USR.User_Code     = CSJ.Jm_Tan_Code
+  AND USR.Jigyosho_Code = CSJ.Jigyo_Code
+-- 請求先WORK
+INNER JOIN
+  (
+    SELECT
+       CST.Cust_Code  AS Bild_Code
+      ,CSJ.Jigyo_Code 
+      ,SHE1.Bild_Id   AS KONKAI_Bild_Id
+      ,SHE2.Bild_Id   AS ZENKAI_Bild_Id
+      -- 今回売上
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL THEN 0
+              ELSE                               UWK.KONKAI_URIAGE_URIKAKE
+            END
+          ) AS KONKAI_URIAGE_URIKAKE
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL THEN 0
+              ELSE                               UWK.KONKAI_URIAGE_MISHU
+            END
+          ) AS KONKAI_URIAGE_MISHU
+      -- 今回入金
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL                                           THEN 0
+              WHEN SHE2.Bild_Id IS NULL                                               THEN UWK.KONKAI_NYUKIN_URIKAKE
+              WHEN SHE2.Bild_Id IS NOT NULL AND SHE2.Bild_Date < UWK.TRD_DATE_URIKAKE THEN UWK.KONKAI_NYUKIN_URIKAKE
+              ELSE                                                                         0
+            END
+          ) AS KONKAI_NYUKIN_URIKAKE
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL                                         THEN 0
+              WHEN SHE2.Bild_Id IS NULL                                             THEN UWK.KONKAI_NYUKIN_MISHU
+              WHEN SHE2.Bild_Id IS NOT NULL AND SHE2.Bild_Date < UWK.TRD_DATE_MISHU THEN UWK.KONKAI_NYUKIN_MISHU
+              ELSE                                                                       0
+            END
+          ) AS KONKAI_NYUKIN_MISHU
+      -- 今回相殺
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL                                           THEN 0
+              WHEN SHE2.Bild_Id IS NULL                                               THEN UWK.KONKAI_SOSAI_URIKAKE
+              WHEN SHE2.Bild_Id IS NOT NULL AND SHE2.Bild_Date < UWK.TRD_DATE_URIKAKE THEN UWK.KONKAI_SOSAI_URIKAKE
+              ELSE                                                                         0
+            END
+          ) AS KONKAI_SOSAI_URIKAKE
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL                                         THEN 0
+              WHEN SHE2.Bild_Id IS NULL                                             THEN UWK.KONKAI_SOSAI_MISHU
+              WHEN SHE2.Bild_Id IS NOT NULL AND SHE2.Bild_Date < UWK.TRD_DATE_MISHU THEN UWK.KONKAI_SOSAI_MISHU
+              ELSE                                                                       0
+            END
+          ) AS KONKAI_SOSAI_MISHU
+      -- 今回調整
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL                                           THEN 0
+              WHEN SHE2.Bild_Id IS NULL                                               THEN UWK.KONKAI_CHOSEI_URIKAKE
+              WHEN SHE2.Bild_Id IS NOT NULL AND SHE2.Bild_Date < UWK.TRD_DATE_URIKAKE THEN UWK.KONKAI_CHOSEI_URIKAKE
+              ELSE                                                                         0
+            END
+          ) AS KONKAI_CHOSEI_URIKAKE
+      ,SUM( CASE
+              WHEN SHE1.Bild_Id IS NOT NULL                                         THEN 0
+              WHEN SHE2.Bild_Id IS NULL                                             THEN UWK.KONKAI_CHOSEI_MISHU
+              WHEN SHE2.Bild_Id IS NOT NULL AND SHE2.Bild_Date < UWK.TRD_DATE_MISHU THEN UWK.KONKAI_CHOSEI_MISHU
+              ELSE                                                                       0
+            END
+          ) AS KONKAI_CHOSEI_MISHU
+    FROM
+    -- 得意先マスタ
+      MST_CUSTOMER CST
+    -- 得意先事業所マスタ
+    INNER JOIN
+      MST_CUSTJGYO CSJ
+    ON
+      CSJ.Cust_Code = CST.Cust_Code
+    -- 請求ヘッダ
+    LEFT JOIN
+      TBL_SEI01_HEAD SHE1
+    ON
+          SHE1.Sts_Code     =  '1'
+      AND SHE1.Cust_Code    =  CST.Cust_Code
+      AND SHE1.Jigyo_Code   =  CSJ.Jigyo_Code
+      AND SHE1.Bild_Date    =  #{SEIKYU_SHIMEBI}
+      AND SHE1.Bild_sime_Kb <> '4'
+    -- 請求ヘッダ
+    LEFT JOIN
+      TBL_SEI01_HEAD SHE2
+    ON
+          SHE2.Sts_Code     =  '1'
+      AND SHE2.Cust_Code    =  CST.Cust_Code
+      AND SHE2.Jigyo_Code   =  CSJ.Jigyo_Code
+      AND SHE2.Bild_Date    <  #{SEIKYU_SHIMEBI}
+      AND SHE2.Bild_sime_Kb <> '4'
+      AND SHE2.Bild_Id      =  (
+                                 SELECT
+                                   MAX(SHE.Bild_Id)
+                                 FROM
+                                   TBL_SEI01_HEAD SHE
+                                 WHERE
+                                       SHE.Sts_Code     =  '1'
+                                   AND SHE.Cust_Code    =  CST.Cust_Code
+                                   AND SHE.Jigyo_Code   =  CSJ.Jigyo_Code
+                                   AND SHE.Bild_Date    <  #{SEIKYU_SHIMEBI}
+                                   AND SHE.Bild_sime_Kb <> '4'
+                               )
+    -- UNION WORK
+    LEFT JOIN
+      (
+        -- 売掛WORK
+        SELECT
+           CASE
+             WHEN CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' THEN CST.Bild_Code
+             ELSE                                                CST.Cust_Code
+           END AS Bild_Code
+          ,SUB.Jigyo_Code
+          -- 売上
+          ,CASE
+             WHEN SUB.Trd_Kb IN ('01', '02', '03', '04') AND SUB.Reg_Type NOT IN ('2', '3') THEN SUB.Trd_Price
+             ELSE                                                                                0
+           END AS KONKAI_URIAGE_URIKAKE
+          -- 入金
+          ,CASE
+             WHEN SUB.Trd_Kb = '05' THEN SUB.Trd_Price
+             ELSE                        0
+           END AS KONKAI_NYUKIN_URIKAKE
+          -- 相殺
+          ,CASE
+             WHEN SUB.Trd_Kb = '06' THEN SUB.Trd_Price
+             ELSE                        0
+           END AS KONKAI_SOSAI_URIKAKE
+          -- 調整
+          ,CASE
+             WHEN SUB.Trd_Kb IN ('01', '02', '03', '04') AND SUB.Reg_Type = '2' THEN SUB.Trd_Price
+             ELSE                                                                    0
+           END AS KONKAI_CHOSEI_URIKAKE
+           
+          ,SUB.Trd_Date AS TRD_DATE_URIKAKE
+          
+          ,null AS KONKAI_URIAGE_MISHU
+          ,null AS KONKAI_NYUKIN_MISHU
+          ,null AS KONKAI_SOSAI_MISHU
+          ,null AS KONKAI_CHOSEI_MISHU
+          ,null AS TRD_DATE_MISHU
+          
+        FROM
+        -- 得意先マスタ
+          MST_CUSTOMER CST
+        -- 売掛明細
+        INNER JOIN
+          TBL_SEI01_URK_BODY SUB
+        ON
+              SUB.Cust_Code  =  CST.Cust_Code
+          AND SUB.Trd_Date   <= #{SEIKYU_SHIMEBI}
+          AND (
+                ( -- 売上
+                      SUB.Trd_Kb   IN ('01', '02', '03', '04')
+                  AND ( SUB.Bild_Id IS NULL OR SUB.Bild_Id = 0 )
+                )
+                OR
+                ( -- 入金 or 相殺
+                  SUB.Trd_Kb IN ('05', '06')
+                )
+              )
+        WHERE
+              CST.Sts_Code    = '1'
+          AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+          AND CST.Bild_Unt_Kb = '1'
+    
+        UNION ALL
+        
+        -- 未収WORK
+        SELECT
+           CASE
+             WHEN CST.Cust_Flg = '1' AND CST.Bild_Flg = '0' THEN CST.Bild_Code
+             ELSE                                                CST.Cust_Code
+           END AS Bild_Code
+          ,SMB.Jigyo_Code
+          
+          ,null AS KONKAI_URIAGE_URIKAKE
+          ,null AS KONKAI_NYUKIN_URIKAKE
+          ,null AS KONKAI_SOSAI_URIKAKE
+          ,null AS KONKAI_CHOSEI_URIKAKE
+          ,null AS TRD_DATE_URIKAKE
+          
+          -- 売上
+          ,CASE
+             WHEN SMB.Trd_Kb IN ('01', '02', '03', '04') AND SMB.Reg_Type NOT IN ('2', '3') THEN SMB.Trd_Price
+             ELSE                                                                                0
+           END AS KONKAI_URIAGE_MISHU
+          -- 入金
+          ,CASE
+             WHEN SMB.Trd_Kb = '05' THEN SMB.Trd_Price
+             ELSE                        0
+           END AS KONKAI_NYUKIN_MISHU
+          -- 相殺
+          ,CASE
+             WHEN SMB.Trd_Kb = '06' THEN SMB.Trd_Price
+             ELSE                        0
+           END AS KONKAI_SOSAI_MISHU
+          -- 調整
+          ,CASE
+             WHEN SMB.Trd_Kb IN ('01', '02', '03', '04') AND SMB.Reg_Type = '2' THEN SMB.Trd_Price
+             ELSE                                                                    0
+           END AS KONKAI_CHOSEI_MISHU
+
+          ,SMB.Trd_Date AS TRD_DATE_MISHU
+
+        FROM
+          MST_CUSTOMER CST
+        INNER JOIN
+          TBL_SEI01_MSH_BODY SMB
+        ON
+              SMB.Cust_Code  =  CST.Cust_Code
+          AND SMB.Trd_Date   <= #{SEIKYU_SHIMEBI}
+          AND (
+                ( -- 売上
+                      SMB.Trd_Kb   IN ('01', '02', '03', '04')
+                  AND ( SMB.Bild_Id IS NULL OR SMB.Bild_Id = 0 )
+                )
+                OR
+                ( -- 入金 or 相殺
+                  SMB.Trd_Kb IN ('05', '06')
+                )
+              )
+        WHERE
+              CST.Sts_Code    = '1'
+          AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+          AND CST.Bild_Unt_Kb = '1'
+      ) UWK
+    ON
+          UWK.Bild_Code  = CST.Cust_Code
+      AND UWK.Jigyo_Code = CSJ.Jigyo_Code
+    WHERE
+          CST.STS_Code      = '1'
+      AND ( CST.Close_Date IS NULL OR CST.Close_Date = '' OR CST.Close_Date > #{BIZ_DATE} )
+      AND CST.Bild_Flg      = '1'
+      AND CST.Bild_Unt_Kb   = '1'
+      AND ( CST.Total_Date_1 = #{SHIMEBI_WK} OR CST.Total_Date_2 = #{SHIMEBI_WK} )
+      AND CST.Cust_Code     = #{SEIKYUSAKI_CD}
+      AND CST.Sum_Bild_Jgyo = #{JIGYOSHO_CD}
+      AND CST.Sum_Bild_Kb   = '2'
+    GROUP BY
+       CST.Cust_Code
+      ,CSJ.Jigyo_Code
+      ,SHE1.Bild_Id
+      ,SHE2.Bild_Id
+  ) WRK
+ON
+      WRK.Bild_Code  = CST.Cust_Code
+  AND WRK.Jigyo_Code = CSJ.Jigyo_Code
+-- 請求ヘッダ
+LEFT JOIN
+  TBL_SEI01_HEAD SHE1
+ON
+  SHE1.Bild_Id = WRK.KONKAI_Bild_Id
+-- 請求ヘッダ
+LEFT JOIN
+  TBL_SEI01_HEAD SHE2
+ON
+  SHE2.Bild_Id = WRK.ZENKAI_Bild_Id
+ORDER BY
+  CSJ.Jigyo_Code
+]]>
+
+	</select>
+	
+	<!-- 取り纏め請求ヘッダの取得 -->
+	<select id="getTorimatomeSeikyuHeader" resultType="map" parameterType="map">
+	
+<![CDATA[	
+SELECT
+   SHE.Bild_Id       AS SEIKYU_ID
+  ,SHE.Bild_Date     AS SEIKYU_SHIMEBI
+  ,SHE.Sime_DateTime AS SEIKYU_SHIME_NICHIJI
+FROM
+  TBL_SEI01_HEAD SHE
+WHERE
+    SHE.Sts_Code     = '1'
+AND SHE.Cust_Code    = #{SEIKYUSAKI_CD}
+AND SHE.Jigyo_Code   = #{JIGYOSHO_CD}
+AND SHE.Bild_sime_Kb = '4'
+AND SHE.Bild_Date    = #{SEIKYU_SHIMEBI}
+]]>
+	
+	</select>
+
+	<!-- 取り纏め排他件数の取得 -->
+	<select id="getTorimatomeHaitaCount" resultType="int" parameterType="map">
+	
+<![CDATA[
+SELECT
+  COUNT(SHE.Bild_Id) AS RECORD_COUNT
+FROM
+  TBL_SEI01_HEAD SHE
+WHERE
+    SHE.Sts_Code     = '1'
+AND SHE.Cust_Code    = #{SEIKYUSAKI_CD}
+AND SHE.Bild_Date    = #{SEIKYU_SHIMEBI}
+AND SHE.Bild_sime_Kb = '1'	
+]]>
+	
+	</select>
+	
+	<!-- ■■■■■■ 実行 ■■■■■■ -->
+	
+	<!-- 請求明細の登録  -->
+	<insert id="insertTorimatomeSeikyuMeisai" parameterType="map">
+
+<![CDATA[
+INSERT INTO
+  TBL_SEI01_SEI_BODY
+SELECT
+   #{SEIKYU_ID}
+  ,ROW_NUMBER() OVER(ORDER BY SEB.Deli_Date, SEB.Cust_Den_No)
+  ,SEB.Chain_Code
+  ,SEB.Chain_Idx
+  ,SEB.Bild_Code
+  ,SEB.Cust_Code
+  ,SEB.Shop_Code
+  ,#{JIGYOSHO_CD}
+  ,SEB.Deli_Date
+  ,SEB.Bild_Date
+  ,SEB.Trd_Price
+  ,SEB.Trd_Tax
+  ,SEB.Sale_Amt
+  ,SEB.Cust_Den_No
+  ,SEB.Tax_Kb
+  ,SEB.Tax_Rate
+  ,SEB.Sale_Kb
+  ,SEB.BN_Code
+  ,SEB.Dat_Kb
+  ,SEB.Den_No
+  ,SEB.Den_Idx
+  ,#{USER_ID}
+  ,#{PROGRAM_ID}
+  ,#{CURRENT_DATE}
+  ,#{CURRENT_TIME}
+  ,#{USER_ID}
+  ,#{PROGRAM_ID}
+  ,#{CURRENT_DATE}
+  ,#{CURRENT_TIME}
+FROM
+-- 請求明細
+  TBL_SEI01_SEI_BODY SEB
+INNER JOIN
+-- 請求ヘッダ
+  TBL_SEI01_HEAD SHE
+ON
+  SEB.Bild_Id = SHE.Bild_Id
+WHERE
+      SHE.Cust_Code    = #{SEIKYUSAKI_CD}
+  AND SHE.Bild_Date    = #{SEIKYU_SHIMEBI}
+  AND SHE.Sts_Code     = '1'
+  AND SHE.Bild_sime_Kb = '1'
+ORDER BY
+  SEB.Deli_Date
+ ,SEB.Cust_Den_No
+]]>
+
+	</insert>
+	
+	<!-- 請求ヘッダの登録  -->
+	<insert id="insertTorimatomeSeikyuHeader" parameterType="map">
+
+<![CDATA[
+INSERT INTO
+  TBL_SEI01_HEAD
+SELECT
+   #{SEIKYU_ID}
+  ,MIN( SHE.Chain_Code )
+  ,MIN( SHE.Chain_Idx )
+  ,MIN( SHE.Cust_Code )
+  ,#{JIGYOSHO_CD}
+  ,MAX( SHE.Prev_Bild_Date )
+  ,MIN( SHE.Bild_Date )
+  ,'4'
+  ,'0'
+  ,MIN( SHE.Nyu_Date )
+  ,#{SEIKYU_SHIME_NICHIJI}
+  ,SUM( SHE.Prev_UAmt )
+  ,SUM( SHE.Prev_MAmt )
+  ,SUM( SHE.Cur_UNyu )
+  ,SUM( SHE.Cur_MNyu )
+  ,SUM( SHE.Cur_USou )
+  ,SUM( SHE.Cur_MSou )
+  ,SUM( SHE.Cur_UCho )
+  ,SUM( SHE.Cur_MCho )
+  ,SUM( SHE.Cur_UKur )
+  ,SUM( SHE.Cur_MKur )
+  ,SUM( SHE.Cur_UUri )
+  ,SUM( SHE.Cur_Muri )
+  ,SUM( SHE.Cur_Tax )
+  ,SUM( SHE.Cur_UTax )
+  ,SUM( SHE.Cur_MTax )
+  ,SUM( SHE.Cur_UAmt )
+  ,SUM( SHE.Cur_MAmt )
+  ,SUM( SHE.Uri_Zan )
+  ,SUM( SHE.Mis_Zan )
+  ,'0'
+  ,0
+  ,MIN( SHE.Cust_Cls )
+  ,'0'
+  ,'1'
+  ,#{USER_ID}
+  ,#{PROGRAM_ID}
+  ,#{CURRENT_DATE}
+  ,#{CURRENT_TIME}
+  ,#{USER_ID}
+  ,#{PROGRAM_ID}
+  ,#{CURRENT_DATE}
+  ,#{CURRENT_TIME}
+FROM
+-- 請求ヘッダ
+  TBL_SEI01_HEAD SHE
+WHERE
+      SHE.Cust_Code    = #{SEIKYUSAKI_CD}
+  AND SHE.Bild_Date    = #{SEIKYU_SHIMEBI}
+  AND SHE.Sts_Code     = '1'
+  AND SHE.Bild_sime_Kb = '1'
+]]>
+
+	</insert>
+	
+	<!--  消費税の取得 消費税計算単位 = 請求先 -->
+	<select id="getTaxTorimatomeHeader"  resultType="int" parameterType="map">
+
+SELECT
+  <choose>
+    <when test="TAX_HASU_SHORI == 1">
+      -- 四捨五入
+      FLOOR( ROUND((SHE.Cur_UUri + SHE.Cur_Muri) * #{TAX_RATE} / 100, 0) )
+    </when>
+    <when test="TAX_HASU_SHORI == 2">
+      -- 切捨て
+      FLOOR((SHE.Cur_UUri + SHE.Cur_Muri) * #{TAX_RATE} / 100)
+    </when>
+    <otherwise>
+      -- 切り上げ
+      CEILING((SHE.Cur_UUri + SHE.Cur_Muri) * #{TAX_RATE} / 100)
+    </otherwise>
+  </choose>
+FROM
+-- 請求ヘッダ
+  TBL_SEI01_HEAD SHE
+WHERE
+  SHE.Bild_Id = #{SEIKYU_ID}
+
+	</select>
+	
+	<!-- 売上明細の更新 -->
+	<update id="updateUriageMeisaiToTorimatome" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URB
+SET
+   URB.Bill_Flg   = '3'
+  ,URB.UPD_USERID = #{USER_ID}
+  ,URB.UPD_PGID   = #{PROGRAM_ID}
+  ,URB.UPD_YMD    = #{CURRENT_DATE}
+  ,URB.UPD_TIME   = #{CURRENT_TIME}
+FROM
+-- 売上明細
+  TBL_URI01_BODY URB
+-- 請求明細
+INNER JOIN
+  TBL_SEI01_SEI_BODY SEB
+ON
+      URB.Den_No  = SEB.Den_No
+  AND URB.Den_Idx = SEB.Den_Idx
+-- 請求ヘッダ
+INNER JOIN
+  TBL_SEI01_HEAD SHE
+ON
+  SHE.Bild_Id = SEB.Bild_Id
+WHERE
+      SHE.Cust_Code    = #{SEIKYUSAKI_CD}
+  AND SHE.Bild_Date    = #{SEIKYU_SHIMEBI}
+  AND SHE.Sts_Code     = '1'
+  AND SHE.Bild_sime_Kb = '1'
+]]>
+
+	</update>
+
+	<!-- 売上ヘッダの更新 -->
+	<update id="updateUriageHeaderToTorimatome" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URH
+SET
+   URH.Bill_Flg   = '3'
+  ,URH.UPD_USERID = #{USER_ID}
+  ,URH.UPD_PGID   = #{PROGRAM_ID}
+  ,URH.UPD_YMD    = #{CURRENT_DATE}
+  ,URH.UPD_TIME   = #{CURRENT_TIME}
+FROM
+-- 売上ヘッダ
+  TBL_URI01_HEAD URH
+-- 請求明細
+INNER JOIN
+  TBL_SEI01_SEI_BODY SEB
+ON
+      URH.Den_No  = SEB.Den_No
+  AND URH.Den_Idx = SEB.Den_Idx
+-- 請求ヘッダ
+INNER JOIN
+  TBL_SEI01_HEAD SHE
+ON
+  SHE.Bild_Id = SEB.Bild_Id
+WHERE
+      SHE.Cust_Code    = #{SEIKYUSAKI_CD}
+  AND SHE.Bild_Date    = #{SEIKYU_SHIMEBI}
+  AND SHE.Sts_Code     = '1'
+  AND SHE.Bild_sime_Kb = '1'
+]]>
+
+	</update>
+
+	<!-- 個別請求データの更新 -->
+	<update id="updateKobetsuSeikyuHeader" parameterType="map">
+
+<![CDATA[
+UPDATE
+  TBL_SEI01_HEAD
+SET
+   Bild_sime_Kb = '3'
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+WHERE
+    Cust_Code          = #{SEIKYUSAKI_CD}
+AND Bild_Date          = #{SEIKYU_SHIMEBI}
+AND Sts_Code           = '1'
+AND Bild_sime_Kb       = '1'
+AND Bild_New_Flg       = '1'
+AND UPD_YMD + UPD_TIME < #{HAITA_CHECK_NICHIJI}
+]]>
+
+	</update>
+	
+	<!-- ■■■■■■ 取消 ■■■■■■ -->
+	
+	<!-- 請求ヘッダの更新 -->
+	<update id="updateTorimatomeSeikyuHeaderToTorikeshi" parameterType="map">
+
+<![CDATA[
+UPDATE
+  TBL_SEI01_HEAD
+SET
+   Sts_Code   = '9'
+  ,UPD_USERID = #{USER_ID}
+  ,UPD_PGID   = #{PROGRAM_ID}
+  ,UPD_YMD    = #{CURRENT_DATE}
+  ,UPD_TIME   = #{CURRENT_TIME}
+WHERE
+    Bild_Id            = #{SEIKYU_ID}
+AND Sts_Code           = '1'
+AND Bild_sime_Kb       = '4'
+AND UPD_YMD + UPD_TIME < #{HAITA_CHECK_NICHIJI}
+]]>
+
+	</update>
+	
+	<!-- 売上明細の更新 -->
+	<update id="updateUriageMeisaiToTorimatomeTorikeshi" parameterType="map">
+
+<![CDATA[
+UPDATE
+  URB
+SET
+   URB.Bill_Flg   = '1'
+  ,URB.UPD_USERID = #{USER_ID}
+  ,URB.UPD_PGID   = #{PROGRAM_ID}
+  ,URB.UPD_YMD    = #{CURRENT_DATE}
+  ,URB.UPD_TIME   = #{CURRENT_TIME}
+FROM
+-- 売上明細
+  TBL_URI01_BODY URB
+-- 請求明細
+INNER JOIN
+  TBL_SEI01_SEI_BODY SEB
+ON
+      URB.Den_No  = SEB.Den_No
+  AND URB.Den_Idx = SEB.Den_Idx
+WHERE
+  SEB.Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+
+	<!-- 売上ヘッダの更新 -->
+	<update id="updateUriageHeaderToTorimatomeTorikeshi" parameterType="map">
+	
+<![CDATA[
+UPDATE
+  URH
+SET
+   URH.Bill_Flg   = '1'
+  ,URH.UPD_USERID = #{USER_ID}
+  ,URH.UPD_PGID   = #{PROGRAM_ID}
+  ,URH.UPD_YMD    = #{CURRENT_DATE}
+  ,URH.UPD_TIME   = #{CURRENT_TIME}
+FROM
+-- 売上ヘッダ
+  TBL_URI01_HEAD URH
+-- 請求明細
+INNER JOIN
+  TBL_SEI01_SEI_BODY SEB
+ON
+      URH.Den_No  = SEB.Den_No
+  AND URH.Den_Idx = SEB.Den_Idx
+WHERE
+  SEB.Bild_Id = #{SEIKYU_ID}
+]]>
+	
+	</update>
+
+	<!-- 個別請求データの更新 -->
+	<update id="updateKobetsuSeikyuHeaderReturn" parameterType="map">
+
+<![CDATA[
+UPDATE
+  TBL_SEI01_HEAD
+SET
+   Bild_sime_Kb = '1'
+  ,UPD_USERID   = #{USER_ID}
+  ,UPD_PGID     = #{PROGRAM_ID}
+  ,UPD_YMD      = #{CURRENT_DATE}
+  ,UPD_TIME     = #{CURRENT_TIME}
+WHERE
+  Bild_Id = #{SEIKYU_ID}
+]]>
+
+	</update>
+
+</mapper>

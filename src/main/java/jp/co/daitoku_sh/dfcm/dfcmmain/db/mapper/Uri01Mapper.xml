@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Uri01Mapper">
+
+    <!-- ***************************** -->
+    <!-- *** 売上サブシステム共通SQL定義 *** -->
+    <!-- ***************************** -->
+
+    <!-- 勘定科目情報の取得 -->
+    <select id="getSubjectData"
+        resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.uri.SubjectData"
+        parameterType="map">
+<![CDATA[
+        SELECT
+             SJF.Sub_Code     AS subCode    -- 科目コード
+            ,SJF.Sec_Code     AS secCode    -- 発生場所
+            ,SJF.Tax_Kb       AS taxKb      -- 税区分
+            ,SJF.Sup_Set_Kb   AS supSetKb   -- 補助科目設定区分
+            ,SJF.Sup_Set_Val  AS supSetVal  -- 補助科目固定値
+            ,SJC.Sub_Nm       AS subNm      -- 科目名称
+        FROM MST_SUBJECT_FC SJF
+        INNER JOIN MST_SUBJECT_CD SJC
+            ON  SJC.Sub_Kb = #{subKb}
+            AND SJC.Sub_Code = SJF.Sub_Code
+            AND SJC.STS_Code = '1'
+        WHERE   SJF.Fnc_Kb = #{fncKb}
+            AND SJF.Fnc_Dtl_Kb = #{fncDtlKb}
+            AND SJF.Rel_Com_Cls = #{relComCls}
+            AND SJF.STS_Code = '1'
+]]>
+    </select>
+
+    <!-- 売掛・未収ヘッダ情報の取得 -->
+    <select id="getUrkMshHead"
+        resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.TblSei01UrkMshHeadMapper.BaseResultMap"
+        parameterType="map">
+<![CDATA[
+        SELECT
+             SMS.Jigyo_Code         -- 事業所コード
+            ,SMS.Chain_Code         -- チェーンコード
+            ,SMS.Chain_Idx          -- チェーン枝番
+            ,SMS.Cust_Code          -- 得意先コード
+            ,SMS.Shop_Code          -- 店舗コード
+            ,SMS.Bild_Code          -- 請求先
+            ,SMS.Account_Month      -- 会計年月
+            ,SMS.Sum_Shop_Code      -- 集約先店舗コード
+            ,SMS.Sum_Shop_Kb        -- 集約先店舗区分
+            ,SMS.Sum_Shop_Jkn       -- 店舗集約条件
+            ,SMS.Cur_Urikake_Ttl    -- 現売掛金残高
+            ,SMS.Cur_Urikake_Tax    -- 現売掛金消費税残高
+            ,SMS.Cur_Mishu_Ttl      -- 現未収金残高
+            ,SMS.Cur_Mishu_Tax      -- 現未収金消費税残高
+            ,SMS.Bgn_Urikake_Ttl    -- 月初売掛金残高
+            ,SMS.Bgn_Urikake_Tax    -- 月初売掛金消費税残高
+            ,SMS.Bgn_Mishu_Ttl      -- 月初未収金残高
+            ,SMS.Bgn_Mishu_Tax      -- 月初未収金消費税残高
+            ,SMS.Mon_Uriage_Ttl     -- 当月売上額
+            ,SMS.Mon_Uriage_Tax     -- 当月売上額消費税
+            ,SMS.Mon_Henpin_Ttl     -- 当月返品額
+            ,SMS.Mon_Henpin_Tax     -- 当月返品額消費税
+            ,SMS.Mon_Tax_Adj        -- 当月消費税調整額
+            ,SMS.Mon_Shikiri_Ttl    -- 当月総売上額
+            ,SMS.Mon_UNyukin_Ttl    -- 当月売掛入金額
+            ,SMS.Mon_Shohin_Ttl     -- 当月商品売上額
+            ,SMS.Mon_Shohin_Dsc     -- 当月商品値引額
+            ,SMS.Mon_Mishu_Ttl      -- 当月未収金額
+            ,SMS.Mon_MNyukin_Tax    -- 当月未収入金額
+            ,SMS.Cust_Cls           -- 得意先種別
+            ,SMS.Close_Date         -- 使用中止日
+            ,SMS.INS_USERID         -- 登録ユーザID
+            ,SMS.INS_PGID           -- 登録プログラムID
+            ,SMS.INS_YMD            -- 登録年月日
+            ,SMS.INS_TIME           -- 登録時刻
+            ,SMS.UPD_USERID         -- 修正ユーザID
+            ,SMS.UPD_PGID           -- 修正プログラムID
+            ,SMS.UPD_YMD            -- 修正年月日
+            ,SMS.UPD_TIME           -- 修正時刻
+        FROM TBL_SEI01_URK_MSH_HEAD SMS
+        WHERE   SMS.Jigyo_Code = #{jigyoCode}
+            AND SMS.Chain_Code = #{chainCode}
+            AND SMS.Chain_Idx = #{chainIdx}
+            AND SMS.Cust_Code = #{custCode}
+            AND SMS.Shop_Code = #{shopCode}
+            AND SMS.Account_Month = #{accountMonth}
+            AND (LTRIM(RTRIM(SMS.Close_Date)) = ''
+                OR SMS.Close_Date < #{closeDate})
+]]>
+    </select>
+</mapper>

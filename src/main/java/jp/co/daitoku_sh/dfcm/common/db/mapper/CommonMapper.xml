@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.common.db.mapper.CommonMapper">
+
+	<select id="getCustomerData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map" >
+		SELECT
+			CST.Cain_Code, CST.Cain_Idx, CST.Cust_Code, CST.Cust_Flg, CST.Bild_Flg, CST.Bild_Code, CST.Cust_Nm, CST.Cust_Nm_Kana, 
+		    CST.Cust_Nm_R, CST.Zip_Code, CST.Adr_1, CST.Adr_2, CST.Tel_No, CST.Fax_No, CST.Cust_Tan, CST.Cust_Tan_Mail, CST.Manager_Jigyo_Code, 
+		    CST.Cust_Cls, CST.Gyotai_Kb, CST.Deli_Center_Code, CST.Rel_Com_Cls, CST.Rel_Com_Sub, CST.DatIdx_Kb, CST.Shop_Kb, 
+		    CST.YG_Kb, CST.Tax_Inc_Kb, CST.Tax_Inc_Frc_Kb, CST.Col_Mon_Kb, CST.Col_Mmrk_Kb, CST.Sums_Flg, CST.Ships_Kb, CST.Ships_Typ_ID, 
+		    CST.Ships_Typ_Cls, CST.Ships_rud_Kb, CST.Ships_Code_Kb, CST.Bild_Nm, CST.Bild_Nm_Kana, CST.Bild_Nm_R, CST.Bild_Zip_Code, 
+		    CST.Bild_Adr_1, CST.Bild_Adr_2, CST.Bild_Tel_No, CST.Bild_Fax_No, CST.Bild_Unt_Kb, CST.Bild_Tanka, CST.Bild_Typ_ID, 
+		    CST.Bild_Typ_Cls, CST.Sum_Bild_Kb, CST.Sum_Bild_Jgyo, CST.Bild_Ptn, CST.Bild_Adr_Out_Kb, CST.Bild_Sum_Kb, 
+		    CST.Tax_Unt_Kb, CST.Tax_Frc_Kb, CST.Bild_Chk_Kb, CST.Bild_Chk_Srt, CST.Total_Date_1, CST.Col_Term_Kb_1, CST.Col_Date_1, 
+		    CST.Total_Date_2, CST.Col_Term_Kb_2, CST.Col_Date_2, CST.Rcvm_Cls, CST.Rcvm_Acc, CST.Rece_Note_Site, CST.Rcv_Dat_Kb, 
+		    CST.Bild_Dat_Kb, CST.Mod_Dat_Kb, CST.Mod_kb_Hpn, CST.Mod_kb_Kpn, CST.Mod_kb_Ssi, CST.Pay_Dat_Kb, CST.TR_Code, 
+		    CST.BN_Code_ST_S, CST.DN_Kb_ST_S, CST.BN_Code_ST_C, CST.DN_Kb_ST_C, CST.BN_Code_SP_S, CST.DN_Kb_SP_S, CST.BN_Code_SP_C, 
+		    CST.DN_Kb_SP_C, CST.Sum_Code_1, CST.Sum_Code_2, CST.Close_Date, CST.STS_Code, CST.Snd_Flg, CST.INS_USERID, CST.INS_PGID, 
+		    CST.INS_YMD, CST.INS_TIME, CST.UPD_USERID, CST.UPD_PGID, CST.UPD_YMD, CST.UPD_TIME
+	    FROM MST_CUSTOMER CST
+    	<if test="jigyoCode != null">
+		    INNER JOIN MST_CUSTJGYO CSJ
+			    ON CSJ.Cust_Code = CST.Cust_Code 
+			    AND CSJ.Jigyo_Code = #{jigyoCode}
+		    
+	    </if>
+	    WHERE CST.Cust_Code = #{custCode}
+	    <if test="chkType == 0">
+	    	AND (LTRIM(RTRIM(CST.Close_Date)) = '' OR CAST(CST.Close_Date AS INT) > #{businessDate})
+	    	AND CST.STS_Code = #{stsCode}
+	    </if>
+	    <if test="chkType == 1">
+	    	AND CST.Cust_Flg = #{cstFlg}
+	    	AND (LTRIM(RTRIM(CST.Close_Date)) = '' OR CAST(CST.Close_Date AS INT) > #{businessDate})
+	    	AND CST.STS_Code = #{stsCode}
+	    </if>
+	    <if test="chkType == 2">
+	    	AND CST.Bild_Flg = #{billFlg}
+	    	AND (LTRIM(RTRIM(CST.Close_Date)) = '' OR CAST(CST.Close_Date AS INT) > #{businessDate})
+	    	AND CST.STS_Code = #{stsCode}
+	    </if>
+	    <if test="chkType == 3">
+	    	AND CST.Bild_Flg = #{billFlg}
+	    	AND CST.Sum_Bild_Kb = #{billSumFlg}
+	    	AND (LTRIM(RTRIM(CST.Close_Date)) = '' OR CAST(CST.Close_Date AS INT) > #{businessDate})
+	    	AND CST.STS_Code = #{stsCode}
+	    </if>
+	</select>
+
+  	<select id="getShopData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstShopMapper.BaseResultMap" parameterType="map" >
+	    SELECT 
+		    SHP.Cust_Code, SHP.Shop_Code, SHP.Shop_Nm, SHP.Shop_Nm_Kana, SHP.Shop_Nm_R, SHP.Zip_Code, SHP.Adr_1, SHP.Adr_2, SHP.Tel_No, 
+		    SHP.Fax_No, SHP.Jigyo_Code, SHP.Sum_Shop_Kb, SHP.Sum_Shop_Jkn, SHP.Deli_Center_Code, SHP.Sunks_Kb, SHP.Sum_Shop_Code, 
+		    SHP.ST_Code_ST_S, SHP.ST_Code_ST_C, SHP.ST_Code_SP_S, SHP.ST_Code_SP_C, SHP.Close_Date, SHP.STS_Code, SHP.Snd_Flg, 
+		    SHP.INS_USERID, SHP.INS_PGID, SHP.INS_YMD, SHP.INS_TIME, SHP.UPD_USERID, SHP.UPD_PGID, SHP.UPD_YMD, SHP.UPD_TIME
+	    FROM MST_SHOP SHP
+	    WHERE SHP.Cust_Code = #{custCode}
+	      	AND SHP.Shop_Code = #{shopCode}
+	      	AND (LTRIM(RTRIM(SHP.Close_Date)) = '' OR CAST(SHP.Close_Date AS INT) > #{businessDate})
+	     	AND SHP.STS_Code = #{stsCode}
+  	</select>
+
+	<select id="getItemCode" resultType="java.lang.String" parameterType="map" >
+		SELECT SCV.SHNCD
+		FROM MST_S_SHOCV SCV
+		WHERE SCV.HINCD = #{itemCd}
+			AND SCV.CHNCD = #{chncd}
+			AND SCV.CHNEDA = #{chneda}
+			AND SCV.TKSCD = #{custCode}
+			AND (LTRIM(RTRIM(SCV.STRYMD)) = '' OR SCV.STRYMD &lt;= #{deliveryYmd})
+			AND (LTRIM(RTRIM(SCV.STRBIN)) = '' OR SCV.STRBIN &lt;= #{binKbn})
+			AND (LTRIM(RTRIM(SCV.ENDYMD)) = '' OR SCV.ENDYMD >= #{deliveryYmd})
+			AND (LTRIM(RTRIM(SCV.ENDBIN)) = '' OR SCV.ENDBIN >= #{binKbn})
+			AND SCV.DELFLG = #{delFlg}
+	</select>
+
+	<select id="getCustomerItemCode" resultType="java.lang.String" parameterType="map" >
+		SELECT JJJ.Item_Code_Cust
+		FROM TBL_JUC01_ITEM_JSK JJJ
+		INNER JOIN MST_CUSTOMER CST
+			ON CST.Cust_Code = JJJ.Cust_Code
+			AND CST.STS_Code = #{stsCode}
+		WHERE JJJ.Chain_Code = #{chncd}
+			AND JJJ.Chain_Idx = #{chneda}
+			AND JJJ.Cust_Code = #{custCode}
+			AND JJJ.Bin = #{binKbn}
+			AND JJJ.Item_Code = #{itemCd}
+	</select>
+
+	<select id="getShipCode" resultType="java.lang.String" parameterType="map" >
+		SELECT CST.Ships_Code_Kb
+		FROM MST_CUSTOMER CST
+		WHERE CST.Cust_Code = #{custCode}
+			AND (LTRIM(RTRIM(CST.Close_Date)) = '' OR CAST(CST.Close_Date AS INT) > #{businessDate})
+			AND CST.STS_Code = #{stsCode}
+	</select>
+
+	<select id="getPartNumber" resultType="java.lang.String" parameterType="map" >
+		SELECT SCV.HINCD
+		FROM MST_S_SHOCV SCV
+		WHERE SCV.SHNCD = #{itemCd}
+			AND SCV.CHNCD = #{chncd}
+			AND SCV.CHNEDA = #{chneda}
+			AND (LTRIM(RTRIM(SCV.STRYMD)) = '' OR SCV.STRYMD &lt;= #{deliveryYmd})
+			AND (LTRIM(RTRIM(SCV.STRBIN)) = '' OR SCV.STRBIN &lt;= #{binKbn})
+			AND (LTRIM(RTRIM(SCV.ENDYMD)) = '' OR SCV.ENDYMD >= #{deliveryYmd})
+			AND (LTRIM(RTRIM(SCV.ENDBIN)) = '' OR SCV.ENDBIN >= #{binKbn})
+			AND SCV.DELFLG = #{delFlg}
+	</select>
+
+	<select id="getProductData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSSeihnMapper.BaseResultMap" parameterType="map" >
+	    SELECT 
+		    SHN.HINMEI, SHN.HINKANA, SHN.HINRYAKU, SHN.BMNCD, SHN.SEIKEICD, SHN.ONDOCD, SHN.SIKIRIKA
+	    FROM MST_S_SEIHN SHN
+	    WHERE SHN.HINCD = #{companyItemCd}
+    		AND SHN.CHNCD = #{chncd}
+    		AND SHN.CHNEDA = #{chneda}
+    		AND (LTRIM(RTRIM(SHN.STRYMD)) = '' OR SHN.STRYMD &lt;= #{deliveryYmd})
+    		AND (LTRIM(RTRIM(SHN.STRBIN)) = '' OR SHN.STRBIN &lt;= #{binKbn})
+    		AND (LTRIM(RTRIM(SHN.ENDYMD)) = '' OR SHN.ENDYMD >= #{deliveryYmd})
+    		AND (LTRIM(RTRIM(SHN.ENDBIN)) = '' OR SHN.ENDBIN >= #{binKbn})
+    		AND SHN.DELFLG = #{delFlg}
+  	</select>
+
+  	<select id="getCourseData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCourseMapper.BaseResultMap" parameterType="map" >
+  		SELECT 
+  			CRS.Cos_Code, CRS.Cos_Nm, CRS.Cos_Nm_R
+  		FROM MST_COURSE CRS
+  		INNER JOIN MST_COURSE_LIST CRL 
+  			ON CRS.Jigyo_Code = CRL.Jigyo_Code
+  			AND CRS.Cos_Code = CRL.Cos_Code
+  		WHERE CRL.Jigyo_Code = #{jigyoCode}
+  			AND CRL.Cust_Code = #{custCode}
+  			AND CRL.Shop_Code = #{shopCode}
+  			AND CRL.Deli_Kb = #{deliKb}
+  			AND CRL.Bin_Kb = #{binKb}
+  			AND CRL.STS_Code = #{stsCode}
+  	</select>
+  	
+  	<select id="getCustTankaData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustTankaMapper.BaseResultMap" parameterType="map" >
+  		SELECT
+  			CUT.Cust_Deli_Tanka, CUT.Cust_Sell_Tanka, CUT.Cust_Bild_Tanka, CUT.Bunrui_Code
+  		FROM MST_CUST_TANKA CUT
+  		WHERE CUT.Cust_Code = #{custCode}
+  			AND CUT.Item_Code = #{itemCode}
+  			AND CUT.SALES_KB = #{salesKb}
+  			AND CAST(CUT.Valid_From AS INT) &lt;= #{deliveryYmd}
+  			AND CAST(CUT.Valid_To AS INT) >= #{deliveryYmd}
+  			AND CUT.STS_Code = #{stsCode}
+  			<if test="case == 1">
+  				AND CUT.Shop_Code = #{shopCode}
+  			</if>
+  	</select>
+
+  	<select id="getDeliveryData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSNohinMapper.BaseResultMap" parameterType="map" >
+  		SELECT
+  			NHN.NHSCD, NHN.NHSMEI, NHN.NHSKANA, NHN.ENTYMDKBN1, NHN.ENTYMDKBN2, NHN.ENTYMDKBN3
+  		FROM MST_S_NOHIN NHN
+  		WHERE NHN.CHNCD = #{chncd}
+  			AND NHN.CHNEDA = #{chneda}
+  			AND NHN.NHSCD = #{nhscd}
+  			AND NHN.JGYCD = #{jgycd}
+  			AND (LTRIM(RTRIM(NHN.STRYMD)) = '' OR LTRIM(RTRIM(NHN.STRBIN)) = '' OR (NHN.STRYMD + NHN.STRBIN) &lt;= (#{deliveryYmd} + #{binKbn}))
+  			AND (LTRIM(RTRIM(NHN.ENDYMD)) = '' OR LTRIM(RTRIM(NHN.ENDBIN)) = '' OR (NHN.ENDYMD + NHN.ENDBIN) >= (#{deliveryYmd} + #{binKbn}))
+  			AND NHN.DELFLG = #{delFlg}
+  	</select>
+  	
+	<select id="getCustomerName" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstCustomerMapper.BaseResultMap" parameterType="map" >
+		SELECT CST.Cust_Nm
+		FROM MST_CUSTOMER CST
+		WHERE CST.Cust_Code = #{custCode}
+			AND (CST.Close_Date = NULL OR CST.Close_Date = '' OR CST.Close_Date &gt; #{businessDate})
+			AND CST.STS_Code = '1'
+	</select>
+	
+</mapper>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0104d01Mapper">
+	<select id="getSearchResultCsv"
+			resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCSVMst0104d01"
+			parameterType="map">
+		SELECT
+			CRS.Jigyo_Code AS jigyoCode,
+			JGY.JGYMEI AS jgyMei,
+			CRS.Cos_Code AS cosCode,
+			CRS.Cos_Nm AS cosNm,
+			CRS.Cos_Nm_R AS cosNmR,
+			CRS.Haiso_Time AS haisoTime,
+			CRS.Ship_Updt_Time AS shipUpdtTime,
+			CRS.Haiso_Kb AS haisoKb,
+			GEN.Target_1 AS shippingTypeName,
+			CRS.STS_Code AS stsCode,
+			CRL.Cust_Code AS custCode,
+			CST.Cust_Nm AS custNm,
+			CRL.Shop_Code AS shopCode,
+			SHP.Shop_Nm AS shopNm,
+			CRL.Bin_Kb AS binKb,
+			CRL.Deli_Kb AS deliKb,
+			GEN1.Target_1 AS deliveryDivisionName
+		FROM MST_COURSE CRS
+		LEFT JOIN MST_COURSE_LIST CRL
+			ON (CRS.Jigyo_Code = CRL.Jigyo_Code
+			AND CRS.Cos_Code = CRL.Cos_Code)
+		LEFT JOIN MST_S_JIGYO JGY
+			ON (CRS.Jigyo_Code = JGY.JGYCD AND JGY.DELFLG = '0'
+			AND JGY.STRYMD &lt;= #{businessDate}
+			AND JGY.ENDYMD >= #{businessDate})
+		LEFT JOIN MST_CUSTOMER CST
+			ON (CRL.Cust_Code = CST.Cust_Code 
+			AND ((LTRIM(RTRIM(CST.Close_Date))) = '' or CST.Close_Date > #{businessDate})
+			AND CST.STS_Code = '1')
+		LEFT JOIN MST_SHOP SHP
+			ON (CRL.Cust_Code = SHP.Cust_Code
+			AND CRL.Shop_Code = SHP.Shop_Code
+			AND ((LTRIM(RTRIM(SHP.Close_Date))) = '' or SHP.Close_Date > #{businessDate})
+			AND SHP.STS_Code = '1')
+		LEFT JOIN MST_GENERAL GEN
+			ON (CRS.Haiso_Kb = GEN.Gl_Code
+			AND GEN.Gl_Kb = 'Haiso_Kb')
+		LEFT JOIN MST_GENERAL GEN1
+			ON (CRL.Deli_Kb = GEN1.Gl_Code
+			AND GEN1.Gl_Kb = 'Deli_Kb')
+		<where>
+			<if test="jigyoCode != '' and jigyoCode != null">	
+				CRS.Jigyo_Code = #{jigyoCode}
+			</if>
+			<if test="courseCode != '' and courseCode != null">
+				AND CRS.Cos_Code = #{courseCode}
+			</if>
+			<if test="courseName != '' and courseName != null">
+				AND CRS.Cos_Nm LIKE #{courseName}
+			</if>
+			<if test="haisoKb != '' and haisoKb != null">
+				AND CRS.Haiso_Kb = #{haisoKb}
+			</if>
+			<if test="chkCancellationData == false">
+				AND CRS.STS_Code = '1'
+			</if>
+		</where>
+		ORDER BY CRS.Cos_Code, CRL.Cust_Code, CRL.Shop_Code, CRL.Bin_Kb
+	</select>
+	<select id="searchCourseList"
+			resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCourseInfoMst0104d01"
+			parameterType="map">
+		SELECT 
+			${searchMax}
+			CRS.Jigyo_Code AS jigyoCode,
+			JGY.JGYMEI AS jgyMei,
+			CRS.Cos_Code AS cosCode,
+			CRS.Cos_Nm AS cosNm,
+			CRS.Cos_Nm_R AS cosNmR,
+			CRS.Haiso_Time AS haisoTime,
+			CRS.Ship_Updt_Time AS shipUpdtTime,
+			CRS.Haiso_Kb AS haisoKb,
+			GEN.Target_1 AS shippingTypeName,
+			CRS.STS_Code AS stsCode
+		FROM MST_COURSE CRS LEFT JOIN MST_S_JIGYO JGY ON (CRS.Jigyo_Code = JGY.JGYCD AND JGY.DELFLG = '0'
+			AND JGY.STRYMD &lt;= #{businessDate} AND JGY.ENDYMD &gt;= #{businessDate})
+		LEFT JOIN MST_GENERAL GEN ON (CRS.Haiso_Kb = GEN.Gl_Code AND GEN.Gl_Kb = 'Haiso_Kb')
+		<where>
+			<if test="jigyoCode != '' and jigyoCode != null">	
+				CRS.Jigyo_Code = #{jigyoCode}
+			</if>
+			<if test="courseCode != '' and courseCode != null">
+				AND CRS.Cos_Code = #{courseCode}
+			</if>
+			<if test="courseName != '' and courseName != null">
+				AND CRS.Cos_Nm LIKE #{courseName}
+			</if>
+			<if test="haisoKb != '' and haisoKb != null">
+				AND CRS.Haiso_Kb = #{haisoKb}
+			</if>
+			<if test="chkCancellationData == false">
+				AND CRS.STS_Code = '1'
+			</if>
+		</where>
+		ORDER BY CRS.Cos_Code
+	</select>
+</mapper>

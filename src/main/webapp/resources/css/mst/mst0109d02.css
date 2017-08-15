@@ -1,0 +1,132 @@
+@charset "UTF-8";
+
+input.txtCustCode {	
+	width: 100px;
+	margin: 0;
+	ime-mode: disabled;
+	text-align: right;
+}
+
+input.txtCorrectKb {	
+	width: 40px;
+	margin: 0;
+	ime-mode: disabled;
+	text-align: right;
+}
+
+input.txtCorrectCause {	
+	width: 300px;
+	margin: 0;
+	ime-mode: active;
+}
+
+input.txtZeroDlvdatFlg {	
+	width: 40px;
+	margin: 0;
+	ime-mode: disabled;
+	text-align: right;
+}
+
+input.txtBikou {
+	width: 360px;
+	margin: 0;
+	ime-mode: active;
+}
+
+input.txtStsCode {	
+	width: 40px;
+	margin: 0;
+	ime-mode: disabled;
+	text-align: right;
+}
+
+
+/* Table 新規登録
+  ========================================================================== */
+.tbl_new_registration {
+	width: 1200px;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_new_registration td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_new_registration td:nth-child(1),
+	.tbl_new_registration td:nth-child(4) {
+		padding-right: 10px;
+	}
+	.tbl_new_registration td:nth-child(1)
+	{
+		padding-right: 10px;
+		width: 180px !important;
+	}
+	.tbl_new_registration td:nth-child(3),
+	.tbl_new_registration td:nth-child(6){
+		padding-left: 3px;
+	}
+
+/* Table Info Table
+  ========================================================================== */
+.tbl_new_registration td .tbl_info_table th {
+	height:20px;
+	background-color: #ccc0da;
+	border: 1px solid #808080;
+	text-align: center;
+	font-weight: normal;
+}
+.tbl_new_registration td .tbl_info_table td{
+	border: 1px solid #808080;
+	padding: 0 2px;
+	word-break: break-all;
+}
+.tbl_new_registration td .tbl_classification th{
+	background-color: #d9d9d9;
+	border: 1px solid #808080;
+	text-align: center;
+	font-weight: normal;
+}
+.tbl_new_registration td .tbl_classification td{
+	border: 1px solid #808080;
+	padding: 0 2px;
+	word-break: break-all;
+}
+.option_condition_area {
+	width: 750px;
+	margin: 0 auto;
+}
+.divOption {
+	width: 450px;
+	margin-bottom:20px;
+	margin-left: 77px;
+	padding-left: 47px;
+	border: 1px solid #000000;
+}
+.divOption_cont {
+	padding: 15px 0;
+}
+	.divOption_cont label {
+		vertical-align: top;
+	}
+/*------------------------------*/
+.color_orange {
+	color: #ff6600 !important;
+}
+.txt_width40{
+	width: 40px;
+}
+.txt_width80{
+	width: 80px;
+}
+.txt_width130{
+	width: 130px;
+}
+.txt_width400{
+	width: 400px;
+}
+.td_width3 {
+	width: 3px;
+}
+.tbl_width750 {
+	width: 750px !important;
+}

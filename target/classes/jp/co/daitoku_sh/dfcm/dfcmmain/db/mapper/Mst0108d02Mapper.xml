@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0108d02Mapper">
+	<select id="getDefautData"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0108d02Model"
+		parameterType="map">
+	select
+		CUT.Cust_Code cstCode,
+		CST.Cust_Nm_R custNmR,
+		CUT.Item_Code
+		itemCode,
+		SHN.HINRYAKU hinRyaKu,
+		CUT.Shop_Code shopCode,
+		SHP.Shop_Nm_R shopNmR,
+		CUT.SALES_KB salesKb,
+		GEN.Target_1 as
+		salesNm,
+		CUT.Valid_From validFrom,
+		CUT.Valid_To validTo,
+		CUT.Cust_Deli_Tanka custDeliTanka,
+		CUT.Cust_Sell_Tanka custSellTanka,
+		CUT.Cust_Bild_Tanka custBildTanka,
+		CUT.Bunrui_Code bunruiCode,
+		CUT.STS_Code stsCode,
+		CUT.INS_USERID insUserId,
+		CUT.INS_PGID insPgId,
+		CUT.INS_YMD insYmd,
+		CUT.INS_TIME insTime,
+		CUT.UPD_USERID updUserId,
+		CUT.UPD_PGID updPgId,
+		CUT.UPD_YMD updYmd,
+		CUT.UPD_TIME updTime
+
+	FROM
+		MST_CUST_TANKA CUT
+		LEFT JOIN MST_CUSTOMER CST ON
+	
+		CUT.Cust_Code =
+		CST.Cust_Code
+		AND
+		(CST.Close_Date = '' OR CST.Close_Date >#{businessDate})
+		AND CST.STS_CODE = '1'
+	LEFT JOIN MST_S_SEIHN SHN ON
+
+	CUT.Item_Code = SHN.HINCD
+	AND SHN.DELFLG = '0'
+	AND SHN.STRYMD &lt;= #{businessDate}
+	AND SHN.ENDYMD >= #{businessDate}
+	AND CST.Cain_Code = SHN.CHNCD
+	AND CST.Cain_Idx = SHN.CHNEDA
+	
+	LEFT JOIN MST_SHOP SHP ON
+	
+	CUT.Cust_Code = SHP.Cust_Code
+	AND CUT.Shop_Code = SHP.Shop_Code
+	AND (SHP.Close_Date = '' OR SHP.Close_Date > #{businessDate})
+	AND SHP.STS_Code = '1'
+	LEFT JOIN MST_GENERAL GEN ON
+	CUT.SALES_KB = GEN.Gl_Code
+	AND GEN.Gl_Kb = 'Sale_Kb'
+	WHERE
+	CUT.Cust_Code = #{custCode}
+	AND CUT.Shop_Code = #{shopCode}
+	AND CUT.Item_Code = #{itemCode}
+	AND CUT.SALES_KB = #{salesKb}
+	AND CUT.Valid_To = #{endTime}
+				
+	</select>
+	<select id="getItemName"
+		resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0108d02Model"
+		parameterType="map">
+	SELECT SHN.HINRYAKU hinRyaKu
+	FROM MST_S_SEIHN SHN
+	WHERE 
+		SHN.HINCD = #{itemCode}
+		AND SHN.CHNCD = #{cainCode}
+		AND SHN.CHNEDA = #{cainIdx}
+		AND SHN.DELFLG = '0'
+		AND SHN.STRYMD &lt;= #{bussinessDate}
+		AND SHN.ENDYMD >= #{bussinessDate}
+	</select>
+	<select id="searchInforCustTanka"
+		resultType="jp.co.daitoku_sh.dfcm.common.db.model.MstCustTanka"
+		parameterType="map">
+		select
+		CUT.Cust_Code custCode,
+		CUT.Item_Code itemCode,
+		CUT.Shop_Code shopCode,
+		CUT.SALES_KB salesKb,
+		CUT.Valid_From validFrom,
+		CUT.Valid_To validTo,
+		CUT.Cust_Deli_Tanka custDeliTanka,
+		CUT.Cust_Sell_Tanka custSellTanka,
+		CUT.Cust_Bild_Tanka custBildTanka,
+		CUT.Bunrui_Code bunruiCode,
+		CUT.STS_Code stsCode
+		from MST_CUST_TANKA CUT
+		WHERE 
+		CUT.Cust_Code = #{custCode}
+		AND CUT.Item_Code = #{itemCode}
+		AND CUT.SALES_KB = #{salesKb}
+		AND CUT.Valid_From &lt;= #{validTo}
+		AND CUT.Valid_To >= #{validFrom}
+		<if test = "shopCode != ''" >
+		AND CUT.Shop_Code = #{shopCode}
+		</if>
+		ORDER BY CUT.Valid_From ASC, CUT.Valid_To ASC
+	</select>
+	
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0104d02Mapper">
+	<select id="searchDeliveryList"
+			resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstDeliveryMst0104d02"
+			parameterType="map">
+		SELECT 
+			CRL.Cust_Code custCode,
+			CST.Cust_Nm_R custNmR,
+			CRL.Shop_Code shopCode,
+			SHP.Shop_Nm_R shopNmR,
+			CRL.Bin_Kb binKb,
+			CRL.Deli_Kb deliKb,
+			GEN.Target_1 deliveryDivisionName,
+			CRL.STS_Code stsCode
+		FROM MST_COURSE_LIST CRL
+		LEFT JOIN MST_CUSTOMER CST
+			ON (CRL.Cust_Code = CST.Cust_Code
+			AND ((LTRIM(RTRIM(CST.Close_Date)))='' OR CST.Close_Date > #{businessDate})
+			AND CST.STS_Code = '1')
+		LEFT JOIN MST_SHOP SHP
+			ON (CRL.Cust_Code = SHP.Cust_Code
+			AND CRL.Shop_Code = SHP.Shop_Code
+			AND ((LTRIM(RTRIM(SHP.Close_Date))) = '' or SHP.Close_Date > #{businessDate})
+			AND SHP.STS_Code = '1')
+		LEFT JOIN MST_GENERAL GEN
+			ON (CRL.Deli_Kb = GEN.Gl_Code AND GEN.Gl_Kb = 'Deli_Kb')
+		WHERE CRL.Jigyo_Code = #{jigyoCode}
+		AND CRL.Cos_Code = #{cosCode}
+		ORDER BY CRL.Cust_Code, CRL.Shop_Code, CRL.Bin_Kb
+	</select>
+	
+	<select id="searchCustomer"
+			resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCusJgyo0104d02"
+			parameterType="map">
+		SELECT
+			CST.Cust_Nm_R as custNmR,
+			CST.Shop_Kb as shopKb,
+			CSJ.Jigyo_Code as jigyoCode
+		FROM MST_CUSTOMER CST LEFT JOIN MST_CUSTJGYO CSJ ON (CST.Cust_Code = CSJ.Cust_Code)
+		WHERE 
+			CST.Cust_Code = #{customerCode}
+		AND 
+			CSJ.Jigyo_Code = #{jigyoCode}
+	</select>
+</mapper>

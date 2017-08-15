@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0199d00Mapper">
+	<resultMap id="CsvMst0199d01" type="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.CsvMst0199d01" >
+		<id column="Gl_Kb" property="glKb" jdbcType="NVARCHAR" />
+		<id column="Gl_Code" property="glCode" jdbcType="NVARCHAR" />
+		<result column="Code_Attr" property="codeAttr" jdbcType="NVARCHAR" />
+		<result column="Code_Digit" property="codeDigit" jdbcType="NUMERIC" />
+		<result column="Kb_Nm" property="kbNm" jdbcType="NVARCHAR" />
+		<result column="Code_Nm" property="codeNm" jdbcType="NVARCHAR" />
+		<result column="Target_1" property="target1" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_1" property="targetAttr1" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_1" property="targetDigit1" jdbcType="NUMERIC" />
+		<result column="Target_Exp_1" property="targetExp1" jdbcType="NVARCHAR" />
+		<result column="Target_2" property="target2" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_2" property="targetAttr2" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_2" property="targetDigit2" jdbcType="NUMERIC" />
+		<result column="Target_Exp_2" property="targetExp2" jdbcType="NVARCHAR" />
+		<result column="Target_3" property="target3" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_3" property="targetAttr3" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_3" property="targetDigit3" jdbcType="NUMERIC" />
+		<result column="Target_Exp_3" property="targetExp3" jdbcType="NVARCHAR" />
+		<result column="Target_4" property="target4" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_4" property="targetAttr4" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_4" property="targetDigit4" jdbcType="NUMERIC" />
+		<result column="Target_Exp_4" property="targetExp4" jdbcType="NVARCHAR" />
+		<result column="Target_5" property="target5" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_5" property="targetAttr5" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_5" property="targetDigit5" jdbcType="NUMERIC" />
+		<result column="Target_Exp_5" property="targetExp5" jdbcType="NVARCHAR" />
+		<result column="Target_6" property="target6" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_6" property="targetAttr6" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_6" property="targetDigit6" jdbcType="NUMERIC" />
+		<result column="Target_Exp_6" property="targetExp6" jdbcType="NVARCHAR" />
+		<result column="Target_7" property="target7" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_7" property="targetAttr7" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_7" property="targetDigit7" jdbcType="NUMERIC" />
+		<result column="Target_Exp_7" property="targetExp7" jdbcType="NVARCHAR" />
+		<result column="Target_8" property="target8" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_8" property="targetAttr8" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_8" property="targetDigit8" jdbcType="NUMERIC" />
+		<result column="Target_Exp_8" property="targetExp8" jdbcType="NVARCHAR" />
+		<result column="Target_9" property="target9" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_9" property="targetAttr9" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_9" property="targetDigit9" jdbcType="NUMERIC" />
+		<result column="Target_Exp_9" property="targetExp9" jdbcType="NVARCHAR" />
+		<result column="Target_10" property="target10" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_10" property="targetAttr10" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_10" property="targetDigit10" jdbcType="NUMERIC" />
+		<result column="Target_Exp_10" property="targetExp10" jdbcType="NVARCHAR" />
+		<result column="Category" property="category" jdbcType="NVARCHAR" />
+		<result column="Disp_Numeric" property="dispNumeric" jdbcType="NUMERIC" />
+		<result column="Ins_Permit_Flg" property="insPermitFlg" jdbcType="NVARCHAR" />
+		<result column="Upd_Permit_Flg" property="updPermitFlg" jdbcType="NVARCHAR" />
+		<result column="Del_Permit_Flg" property="delPermitFlg" jdbcType="NVARCHAR" />
+		<result column="INS_USERID" property="insUserid" jdbcType="NCHAR" />
+		<result column="INS_PGID" property="insPgid" jdbcType="NVARCHAR" />
+		<result column="INS_YMD" property="insYmd" jdbcType="NCHAR" />
+		<result column="INS_TIME" property="insTime" jdbcType="NCHAR" />
+		<result column="UPD_USERID" property="updUserid" jdbcType="NCHAR" />
+		<result column="UPD_PGID" property="updPgid" jdbcType="NVARCHAR" />
+		<result column="UPD_YMD" property="updYmd" jdbcType="NCHAR" />
+		<result column="UPD_TIME" property="updTime" jdbcType="NCHAR" />
+		<result column="classificationName" property="classificationName" jdbcType="NVARCHAR" />
+		<result column="User_Nm" property="userNm" jdbcType="NVARCHAR" />
+	</resultMap>
+	
+	<resultMap id="RstMst0199d02" type="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.RstMst0199d02" >
+		<id column="Gl_Kb" property="glKb" jdbcType="NVARCHAR" />
+		<id column="Gl_Code" property="glCode" jdbcType="NVARCHAR" />
+		<result column="Code_Attr" property="codeAttr" jdbcType="NVARCHAR" />
+		<result column="Code_Digit" property="codeDigit" jdbcType="NUMERIC" />
+		<result column="Kb_Nm" property="kbNm" jdbcType="NVARCHAR" />
+		<result column="Code_Nm" property="codeNm" jdbcType="NVARCHAR" />
+		<result column="Target_1" property="target1" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_1" property="targetAttr1" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_1" property="targetDigit1" jdbcType="NUMERIC" />
+		<result column="Target_Exp_1" property="targetExp1" jdbcType="NVARCHAR" />
+		<result column="Target_2" property="target2" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_2" property="targetAttr2" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_2" property="targetDigit2" jdbcType="NUMERIC" />
+		<result column="Target_Exp_2" property="targetExp2" jdbcType="NVARCHAR" />
+		<result column="Target_3" property="target3" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_3" property="targetAttr3" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_3" property="targetDigit3" jdbcType="NUMERIC" />
+		<result column="Target_Exp_3" property="targetExp3" jdbcType="NVARCHAR" />
+		<result column="Target_4" property="target4" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_4" property="targetAttr4" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_4" property="targetDigit4" jdbcType="NUMERIC" />
+		<result column="Target_Exp_4" property="targetExp4" jdbcType="NVARCHAR" />
+		<result column="Target_5" property="target5" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_5" property="targetAttr5" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_5" property="targetDigit5" jdbcType="NUMERIC" />
+		<result column="Target_Exp_5" property="targetExp5" jdbcType="NVARCHAR" />
+		<result column="Target_6" property="target6" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_6" property="targetAttr6" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_6" property="targetDigit6" jdbcType="NUMERIC" />
+		<result column="Target_Exp_6" property="targetExp6" jdbcType="NVARCHAR" />
+		<result column="Target_7" property="target7" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_7" property="targetAttr7" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_7" property="targetDigit7" jdbcType="NUMERIC" />
+		<result column="Target_Exp_7" property="targetExp7" jdbcType="NVARCHAR" />
+		<result column="Target_8" property="target8" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_8" property="targetAttr8" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_8" property="targetDigit8" jdbcType="NUMERIC" />
+		<result column="Target_Exp_8" property="targetExp8" jdbcType="NVARCHAR" />
+		<result column="Target_9" property="target9" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_9" property="targetAttr9" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_9" property="targetDigit9" jdbcType="NUMERIC" />
+		<result column="Target_Exp_9" property="targetExp9" jdbcType="NVARCHAR" />
+		<result column="Target_10" property="target10" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_10" property="targetAttr10" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_10" property="targetDigit10" jdbcType="NUMERIC" />
+		<result column="Target_Exp_10" property="targetExp10" jdbcType="NVARCHAR" />
+		<result column="Category" property="category" jdbcType="NVARCHAR" />
+		<result column="Disp_Numeric" property="dispNumeric" jdbcType="NUMERIC" />
+		<result column="Ins_Permit_Flg" property="insPermitFlg" jdbcType="NVARCHAR" />
+		<result column="Upd_Permit_Flg" property="updPermitFlg" jdbcType="NVARCHAR" />
+		<result column="Del_Permit_Flg" property="delPermitFlg" jdbcType="NVARCHAR" />
+		<result column="INS_USERID" property="insUserid" jdbcType="NCHAR" />
+		<result column="INS_PGID" property="insPgid" jdbcType="NVARCHAR" />
+		<result column="INS_YMD" property="insYmd" jdbcType="NCHAR" />
+		<result column="INS_TIME" property="insTime" jdbcType="NCHAR" />
+		<result column="UPD_USERID" property="updUserid" jdbcType="NCHAR" />
+		<result column="UPD_PGID" property="updPgid" jdbcType="NVARCHAR" />
+		<result column="UPD_YMD" property="updYmd" jdbcType="NCHAR" />
+		<result column="UPD_TIME" property="updTime" jdbcType="NCHAR" />
+		<result column="categoryName" property="categoryName" jdbcType="NVARCHAR" />
+	</resultMap>
+	
+	<resultMap type="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.Gen0199d02Data" id="Gen0199d02Data">
+		<id column="Gl_Kb" property="glKb" jdbcType="NVARCHAR" />
+		<id column="Gl_Code" property="glCode" jdbcType="NVARCHAR" />
+		<result column="Code_Attr" property="codeAttr" jdbcType="NVARCHAR" />
+		<result column="Code_Digit" property="codeDigit" jdbcType="NUMERIC" />
+		<result column="Kb_Nm" property="kbNm" jdbcType="NVARCHAR" />
+		<result column="Code_Nm" property="codeNm" jdbcType="NVARCHAR" />
+		<result column="Target_1" property="target1" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_1" property="targetAttr1" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_1" property="targetDigit1" jdbcType="NUMERIC" />
+		<result column="Target_Exp_1" property="targetExp1" jdbcType="NVARCHAR" />
+		<result column="Target_2" property="target2" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_2" property="targetAttr2" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_2" property="targetDigit2" jdbcType="NUMERIC" />
+		<result column="Target_Exp_2" property="targetExp2" jdbcType="NVARCHAR" />
+		<result column="Target_3" property="target3" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_3" property="targetAttr3" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_3" property="targetDigit3" jdbcType="NUMERIC" />
+		<result column="Target_Exp_3" property="targetExp3" jdbcType="NVARCHAR" />
+		<result column="Target_4" property="target4" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_4" property="targetAttr4" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_4" property="targetDigit4" jdbcType="NUMERIC" />
+		<result column="Target_Exp_4" property="targetExp4" jdbcType="NVARCHAR" />
+		<result column="Target_5" property="target5" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_5" property="targetAttr5" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_5" property="targetDigit5" jdbcType="NUMERIC" />
+		<result column="Target_Exp_5" property="targetExp5" jdbcType="NVARCHAR" />
+		<result column="Target_6" property="target6" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_6" property="targetAttr6" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_6" property="targetDigit6" jdbcType="NUMERIC" />
+		<result column="Target_Exp_6" property="targetExp6" jdbcType="NVARCHAR" />
+		<result column="Target_7" property="target7" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_7" property="targetAttr7" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_7" property="targetDigit7" jdbcType="NUMERIC" />
+		<result column="Target_Exp_7" property="targetExp7" jdbcType="NVARCHAR" />
+		<result column="Target_8" property="target8" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_8" property="targetAttr8" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_8" property="targetDigit8" jdbcType="NUMERIC" />
+		<result column="Target_Exp_8" property="targetExp8" jdbcType="NVARCHAR" />
+		<result column="Target_9" property="target9" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_9" property="targetAttr9" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_9" property="targetDigit9" jdbcType="NUMERIC" />
+		<result column="Target_Exp_9" property="targetExp9" jdbcType="NVARCHAR" />
+		<result column="Target_10" property="target10" jdbcType="NVARCHAR" />
+		<result column="Target_Attr_10" property="targetAttr10" jdbcType="NVARCHAR" />
+		<result column="Target_Digit_10" property="targetDigit10" jdbcType="NUMERIC" />
+		<result column="Target_Exp_10" property="targetExp10" jdbcType="NVARCHAR" />
+		<result column="Category" property="category" jdbcType="NVARCHAR" />
+		<result column="Disp_Numeric" property="dispNumeric" jdbcType="NUMERIC" />
+		<result column="Ins_Permit_Flg" property="insPermitFlg" jdbcType="NVARCHAR" />
+		<result column="Upd_Permit_Flg" property="updPermitFlg" jdbcType="NVARCHAR" />
+		<result column="Del_Permit_Flg" property="delPermitFlg" jdbcType="NVARCHAR" />
+		<result column="INS_USERID" property="insUserid" jdbcType="NCHAR" />
+		<result column="INS_PGID" property="insPgid" jdbcType="NVARCHAR" />
+		<result column="INS_YMD" property="insYmd" jdbcType="NCHAR" />
+		<result column="INS_TIME" property="insTime" jdbcType="NCHAR" />
+		<result column="UPD_USERID" property="updUserid" jdbcType="NCHAR" />
+		<result column="UPD_PGID" property="updPgid" jdbcType="NVARCHAR" />
+		<result column="UPD_YMD" property="updYmd" jdbcType="NCHAR" />
+		<result column="UPD_TIME" property="updTime" jdbcType="NCHAR" />
+	</resultMap>
+	
+	<!-- 汎用マスタデータ取得 -->
+	<select id="getCategoryList" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstGeneralMapper.BaseResultMap">
+		SELECT
+			GEN.Category,
+			MAX(GEN2.Target_1) Target_1
+		FROM 
+			MST_GENERAL GEN
+		LEFT JOIN 
+			MST_GENERAL GEN2
+		ON 
+			GEN.Category = GEN2.Gl_Code
+			AND GEN2.Gl_Kb = 'Gen_Category'
+		WHERE
+			GEN.Gl_Kb = '00000000'
+		GROUP BY
+			GEN.Category
+		ORDER BY
+			GEN.Category
+	</select>
+	
+	<!-- 管理区分一覧データを取得する -->
+	<select id="getDivisionList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.db.model.RstMst0199d01" parameterType="map">
+		SELECT
+			${Search_Max}
+			GEN.Gl_Code glCode,
+			GEN.Kb_Nm kbNm,
+			GEN.Category category,
+			GEN2.Target_1 target1,
+			GEN.UPD_USERID updUserid,
+			USR.User_Nm userNm,
+			GEN.UPD_YMD updYmd,
+			GEN.UPD_TIME updTime,
+			GEN.Disp_Numeric dispNumeric
+		FROM 
+			MST_GENERAL GEN
+		LEFT JOIN 
+			MST_GENERAL GEN2
+		ON
+			GEN.Category = GEN2.Gl_Code
+			AND GEN2.Gl_Kb = 'Gen_Category'
+		LEFT JOIN 
+			MST_USER USR
+		ON
+			GEN.UPD_USERID = USR.User_Code
+		WHERE
+			GEN.Gl_Kb = '00000000'
+		<if test="Category != ''">
+			AND GEN.Category = #{Category}
+		</if>
+		<if test="Kb_Nm != ''">
+			AND GEN.Kb_Nm LIKE #{Kb_Nm}
+		</if>
+		ORDER BY
+			GEN.Disp_Numeric
+	</select>
+	
+	<!-- 管理区分一覧データを取得する -->
+	<select id="getCsvMst0199d01Data" resultMap="CsvMst0199d01" parameterType="map">
+		SELECT
+			GEN.*,
+			GEN2.Target_1 classificationName,
+			USR.User_Nm
+		FROM
+			MST_GENERAL GEN
+		LEFT JOIN
+			MST_GENERAL GEN2
+		ON
+			GEN.Category = GEN2.GL_Code
+			AND GEN2.Gl_Kb = 'Gen_Category'
+		LEFT JOIN 
+			MST_USER USR
+		ON
+			GEN.UPD_USERID = USR.User_Code
+		WHERE
+			1 = 1
+		<if test="Category != ''">
+			AND GEN.Category = #{Category}
+		</if>
+		<if test="Kb_Nm != ''">
+			AND GEN.Kb_Nm LIKE #{Kb_Nm}
+		</if>
+		ORDER BY
+			GEN.Disp_Numeric,
+			Gl_Code
+	</select>
+	<!-- 汎用マスタから管理レコード情報を取得する -->
+	<select id="getRstMst0199d02Data" resultMap="RstMst0199d02" parameterType="map">
+		SELECT
+			GEN.*,
+			GEN2.Target_1 categoryName
+		FROM 
+			MST_GENERAL GEN
+		LEFT JOIN 
+			MST_GENERAL GEN2
+		ON 
+			GEN.Category = GEN2.Gl_Code
+			AND GEN2.Gl_Kb = 'Gen_Category'
+		WHERE
+			GEN.Gl_Kb = '00000000'
+			AND GEN.Gl_Code = #{Gl_Code}
+	</select>
+	
+	<select id="getDataList" resultMap="Gen0199d02Data" parameterType="map">
+		SELECT GEN.*,
+			'0' AS addFlg,
+			'0' AS updateFlg,
+			'0' AS deleteFlg
+		FROM 
+			MST_GENERAL GEN
+		WHERE
+			GEN.Gl_Kb = #{Gl_Code}
+		ORDER BY
+			Gl_Code
+	</select>
+	
+	<select id="searchGeneralData" parameterType="map" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstGeneralMapper.BaseResultMap">
+		SELECT 
+			top 1 * 
+		FROM 
+			MST_GENERAL GEN 
+		WHERE
+			GEN.Gl_Kb = #{Gl_Kb} 
+			AND  GEN.Gl_Code = #{Gl_Code}
+	</select>
+	
+	<delete id="deleteCode" parameterType="map">
+		DELETE FROM MST_GENERAL 
+		WHERE
+			Gl_Kb = #{Gl_Kb}
+		AND
+			Gl_Code IN
+		<foreach item="item" index="index" collection="deleteCodeList"
+			open="(" separator="," close=")">
+					#{item}
+		</foreach>
+	</delete>
+</mapper>

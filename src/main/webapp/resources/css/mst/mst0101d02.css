@@ -1,0 +1,51 @@
+@charset "UTF-8";
+
+.td_width3 {
+	width: 3px;
+}
+
+.txt_width20 {
+	width: 20px;
+}
+
+.txt_width45 {
+	width: 45px;
+}
+
+.txt_width80 {
+	width: 80px;
+}
+
+.txt_width160 {
+	width: 160px;
+}
+
+.txt_width200 {
+	width: 200px
+}
+
+.cbx_width185 {
+	width: 185px;
+}
+/* Table 新規登録
+  ========================================================================== */
+.tbl_new_registration {
+	width: 1200px;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+
+.tbl_new_registration td {
+	border-bottom: 2px solid #fff;
+}
+
+.tbl_new_registration td:nth-child(1), .tbl_new_registration td:nth-child(4)
+	{
+	padding-right: 10px;
+}
+
+.tbl_new_registration td:nth-child(3), .tbl_new_registration td:nth-child(6)
+	{
+	padding-left: 3px;
+}

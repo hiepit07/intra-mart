@@ -1,0 +1,113 @@
+﻿/* Width % */
+
+.cbx_width115 {
+	width: 115px;
+}
+.td_width3 {
+	width: 3px;
+}
+.td_width50 {
+	width: 50px;
+}
+.td_width100 {
+	width: 100px;
+}
+.txt_width400 {
+	width: 400px;
+}
+.td_width4per {
+	width: 4%;
+}
+.td_width6per {
+	width: 6%;
+}
+.td_width12per {
+	width: 12%;
+}
+.td_width13per {
+	width: 13%;
+}
+.td_width14per {
+	width: 14%;
+}
+.td_width45per {
+	width: 45%;
+}
+
+/* Table データ呼び出し条件
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(4){
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+	.tbl_data_condition td:nth-child(6) {
+		width: 340px !important;
+	}
+	.tbl_data_condition td:nth-child(9) {
+	}
+	.tbl_data_condition span {
+		vertical-align: middle;
+	}
+
+.tbl_data_condition_bot {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition_bot td {
+		border-bottom: 2px solid #fff;
+		text-align: center;
+	}
+
+.height470 {
+	height: 470px;
+}
+
+.sub-menu {
+	width: 80px;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	display: none;
+}
+
+.sub-menu a {
+	color: #000;
+	padding: 3px;
+	padding-left: 15px;
+	display: block;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

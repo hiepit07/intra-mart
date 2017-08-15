@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Com0102d02Mapper">
+
+<select id="getSJigyoInfo" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstSJigyoInfo" parameterType="map">
+SELECT JGY.JGYCD, JGY.JGYMEI FROM MST_S_JIGYO JGY
+WHERE
+JGY.DELFLG = '0'
+AND JGY.STRYMD &lt;= #{businessDate}
+AND JGY.ENDYMD
+&gt;= #{businessDate}
+ORDER BY JGY.JGYCD
+</select>
+
+<select id="getSearchResult" resultType="jp.co.daitoku_sh.dfcm.common.db.model.MstCustomer" parameterType="map">
+SELECT
+TOP ${Search_Max}
+CUS.CUST_CODE AS custCode,
+CUS.CUST_NM_R AS custNmR
+FROM MST_CUSTOMER CUS
+<if test="Jigyosho_Code != ''">
+LEFT JOIN MST_CUSTJGYO CSJ
+ON CUS.CUST_CODE = CSJ.CUST_CODE
+</if>
+WHERE
+CUS.STS_CODE = '1'
+AND
+(CUS.CLOSE_DATE IS NULL OR RTrim(LTrim(CUS.CLOSE_DATE)) = '' OR CUS.CLOSE_DATE > CONVERT(VARCHAR,#{Business_Date},112))
+<if test="Jigyosho_Code != ''">
+AND
+CSJ.JIGYO_CODE = #{Jigyosho_Code}
+</if>
+<if test="Cust_Code != ''">
+AND
+CUS.CUST_CODE LIKE #{Cust_Code}
+</if>
+<if test="Cust_Nm != ''">
+AND
+CUS.CUST_NM LIKE #{Cust_Nm}
+</if>
+<if test="Shop_Kb != ''">
+AND
+CUS.SHOP_KB = #{Shop_Kb}
+</if>
+<if test="Cust_Flg != ''">
+AND
+CUS.CUST_FLG = #{Cust_Flg}
+</if>
+<if test="Bild_Flg != ''">
+AND
+CUS.BILD_FLG = #{Bild_Flg}
+</if>
+ORDER BY CUS.CUST_CODE
+</select>
+
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<!-- Appenders -->
+	<appender name="Appender1" class="org.apache.log4j.ConsoleAppender">
+       <layout class="org.apache.log4j.PatternLayout">
+          <param name="ConversionPattern" value="%-7p %d [%t] %c %x - %m%n"/>
+       </layout>
+    </appender>
+  
+    <appender name="Appender2" class="org.apache.log4j.FileAppender">
+       <param name="File" value="D:/DFCM/debug.log" />
+       <param name="Encoding" value="Shift_JIS" />
+       <layout class="org.apache.log4j.PatternLayout">
+          <param name="ConversionPattern" value="%-7p %d [%t] %c %x - %m%n"/>
+       </layout>
+    </appender>
+	
+	<!-- Application Loggers -->
+	<logger name="jp.co.daitoku_sh.dfcm">
+		<level value="debug" />
+	</logger>
+	
+	<!-- 3rdparty Loggers -->
+	<logger name="org.springframework.core">
+		<level value="info" />
+	</logger>
+	
+	<logger name="org.springframework.beans">
+		<level value="info" />
+	</logger>
+	
+	<logger name="org.springframework.context">
+		<level value="info" />
+	</logger>
+
+	<logger name="org.springframework.web">
+		<level value="info" />
+	</logger>
+
+	<logger name="org.springframework.transaction">
+		<level value="info" />
+	</logger>
+
+	<!-- Root Logger-->
+	<root>
+		<priority value="debug"/>
+        <appender-ref ref="Appender1" />
+        <appender-ref ref="Appender2" />
+  	</root>
+	
+</log4j:configuration>

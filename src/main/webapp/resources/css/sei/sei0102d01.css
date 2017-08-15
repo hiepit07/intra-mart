@@ -1,0 +1,147 @@
+.mt3 {
+	margin-top: 3px;
+}
+
+/* 請求一覧テーブルの幅指定
+ ========================================================================== */
+
+div#divHead {
+	/* width: 1260px; */
+	width: 100%;
+}
+
+div#divBody {
+	/* width: 1260px; */
+	width: 100%;
+}
+
+table#tblHead {
+	/* width: 1246px; */
+	width: 100%;
+}
+
+table#tblBody {
+	/* width: 1246px; */
+	width: 100%;
+}
+
+/* Width TD Table
+  ========================================================================== */
+/* Width % */
+.td_width3per {
+	width: 3%;
+}
+.td_width4per {
+	width: 4%;
+}
+.td_width6per {
+	width: 6%;
+}
+.td_width7per{
+	width: 7%;
+}
+.td_width10per {
+	width: 10%;
+}
+.td_width12per {
+	width: 12%;
+}
+.td_width16per {
+	width: 16%;
+}
+.td_width22per {
+	width: 22%;
+}
+/* Width px */
+.td_width3 {
+	width: 3px;
+}
+.td_width90 {
+	width: 90px;
+}
+.td_width100 {
+	width: 100px;
+}
+.td_width150 {
+	width: 150px;
+}
+.td_width160 {
+	width: 160px;
+}
+.td_width200 {
+	width: 200px;
+}
+.td_width250 {
+	width: 250px;
+}
+/* Width TEXTBOX
+  ========================================================================== */
+.txt_width100{
+	width: 100px;
+}
+
+/* Table データ呼び出し条件
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 10px auto;
+	font-size: 12px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+
+	.btn_billing_submit {
+		width: 80px;
+		height: 25px;
+		background-color: #d9d9d9;
+		border: 2px solid #a6a6a6;
+		border-radius: 3px;
+		color: #fff;
+		padding-bottom:2px;
+	}
+
+.height440 {
+	height: 440px;
+}
+.width100 {
+	width: 100px;
+}
+.span_width40 {
+	width: 40px;
+	display: inline-block;
+}
+
+.bg_pink_ff0066 {
+	background-color: #ff0066 !important;
+}
+.bg_yellow_ffc000 {
+	background-color: #ffc000 !important;
+}
+
+.btn_width120 {
+	width: 120px !important;
+}
+
+/* datepicker  */
+.ui-datepicker-trigger {
+     margin-left:5px;
+     margin-top: 5px;
+     margin-bottom: -3px;
+}
+
+
+
+
+

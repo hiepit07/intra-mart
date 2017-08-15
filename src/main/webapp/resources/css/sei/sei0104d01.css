@@ -1,0 +1,129 @@
+/* Width % */
+.td_width4per {
+	width: 4%;
+}
+.td_width6per {
+	width: 6%;
+}
+.td_width7per {
+	width: 7%;
+}
+.td_width9per {
+	width: 9%;
+}
+.td_width10per {
+	width: 10%;
+}
+.td_width21per {
+	width: 21%;
+}
+.td_width27per {
+	width: 27%;
+}
+/* Width px */
+.td_width3 {
+	width: 3px;
+}
+
+.txt_width100 {
+	width: 100px;
+}
+/* span width
+  ========================================================================== */
+.span_width40 {
+	width: 40px;
+	display: inline-block;
+}
+/* text_request
+  ========================================================================== */
+.text_request {
+	padding-bottom: 5px;
+}
+/* title
+  ========================================================================== */
+.title {
+	background-color: #CCC0DA !important;
+}
+.title_cont {
+	background-color: #AA72E2!important;
+}
+/* tbl_list
+  ========================================================================== */
+.tbl_list th {
+	background-color: #ccc0da!important;
+	color: #000!important;
+}
+/* data_condition_area
+  ========================================================================== */
+.data_conditions_area {
+	padding-top: 3px;
+}
+.data_conditions_area_cont {
+	background-color: #fef1cf !important;
+	border: 1px solid #AA72E2 !important;
+}
+.condition_title {
+	background-color: #ccc0da!important;
+}
+.div_zentai_title {
+	color: #000!important;
+}
+.condition_button {
+	background-color: #ccc0da!important;
+}
+/* Table
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}	
+/* Table tbl_data_condition
+  ========================================================================== */	
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+		width: 105px !important;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+	.tbl_data_condition td:nth-child(3) {
+		width: 300px !important;
+	}
+	.tbl_data_condition td:nth-child(6) {
+		width: 340px !important;
+	}
+	.tbl_data_condition td:nth-child(9) {
+	}
+	.tbl_data_condition span {
+		vertical-align: middle;
+	}
+	.td_left {
+		margin-left:50px;
+	}
+.height530 {
+	height: 520px;
+}
+/* Table button
+  ========================================================================== */	
+.button_out {
+	
+	position:absolute;
+	right:0px;
+}
+
+/* datepicker  */
+.ui-datepicker-trigger {
+     margin-left:5px;
+     margin-top: 5px;
+     margin-bottom: -3px;
+}

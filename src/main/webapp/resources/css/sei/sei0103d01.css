@@ -1,0 +1,118 @@
+/* Width % */
+.td_width6per {
+	width: 6%;
+}
+.td_width7per {
+	width: 7%;
+}
+.td_width9per {
+	width: 9%;
+}
+.td_width10per {
+	width: 10%;
+}
+.td_width27per {
+	width: 27%;
+}
+.td_width33per {
+	width: 33%;
+}
+
+/* Width px */
+.td_width3 {
+	width: 3px;
+}
+
+.txt_width100 {
+	width: 100px;
+}
+.span_width40 {
+	width: 40px;
+	display: inline-block;
+}
+.text_request {
+	padding-bottom: 5px;
+}
+
+.title {
+	background-color: #d8e4bc !important;
+}
+.title_cont {
+	background-color: #c4d79b!important;
+}
+.tbl_list th {
+	background-color: #d8e4bc!important;
+	color: #000!important;
+}
+.data_conditions_area_cont {
+	background-color: #fef1cf !important;
+	border: 1px solid #d8e4bc !important;
+}
+.condition_title {
+	background-color: #ebf1de!important;
+}
+.condition_button {
+	background-color: #ebf1de!important;
+}
+/* Table
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+		width: 115px !important;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+	.tbl_data_condition td:nth-child(3) {
+		width: 300px !important;
+	}
+	.tbl_data_condition td:nth-child(6) {
+		width: 340px !important;
+	}
+	.tbl_data_condition td:nth-child(9) {
+	}
+	.tbl_data_condition span {
+		vertical-align: middle;
+	}
+
+.height450 {
+	height: 450px;
+}
+
+.btn_billing_submit {
+	background-color: #d9d9d9;
+	border: 2px solid #a6a6a6;
+	border-radius: 3px;
+	color: #fff;
+	height: 25px;
+	padding-bottom: 2px;
+	width: 80px;
+}
+
+.bg_pink_ff0066 {
+	background-color: #ff0066 !important;
+}
+.bg_yellow_ffc000 {
+	background-color: #ffc000 !important;
+}
+
+/* datepicker  */
+.ui-datepicker-trigger {
+     margin-left:5px;
+     margin-top: 5px;
+     margin-bottom: -3px;
+}

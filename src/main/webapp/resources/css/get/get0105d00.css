@@ -1,0 +1,77 @@
+/**
+ * ファイル名: get0105d00.css
+ * 
+ * <p>
+ * 作成者:TuanNguyen
+ * 作成日:2015/10/21
+ * 
+ * <p>
+ * 履歴
+ * -------------------------------------------------------------------------
+ * 日付 指示者 担当 内容
+ * -------------------------------------------------------------------------
+ * 2015/10/21 1.00 ABV)TuanNguyen
+ * -------------------------------------------------------------------------
+ * 
+ * <p>
+ * ALL RIGHTS RESERVED COPYRIGHT (C)2015 TSUZUKI DENKI CO.,LTD.
+ */
+.condition_cont {
+	padding-top:30px  !important;
+}
+/*
+  Table
+================================================================*/
+
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+/*
+cbx_width
+=======================================================================*/
+.cbx_width104 {
+	width:104px;
+}
+.cbx_width185 {
+	width:185px;
+}
+
+/*
+td_width
+=======================================================================*/
+.td_width3 {
+	width:3px;
+}
+.td_width100 {
+	width:100px;
+}
+.td_width550 {
+	width: 550px;
+}
+/*
+txt_width
+=======================================================================*/
+.txt_width3 {
+	width:3px;
+}
+.txt_width60 {
+	width:60px;
+}
+ 

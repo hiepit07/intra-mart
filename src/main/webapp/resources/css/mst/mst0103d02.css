@@ -1,0 +1,119 @@
+/* Table êVãKìoò^
+  ========================================================================== */
+.tbl_new_registration {
+	width: 1200px;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_new_registration td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_new_registration td:nth-child(1),
+	.tbl_new_registration td:nth-child(4) {
+		padding-right: 10px;
+	}
+	.tbl_new_registration td:nth-child(3),
+	.tbl_new_registration td:nth-child(6){
+		padding-left: 3px;
+	}
+	.tbl_new_registration img {
+		vertical-align:middle;
+	}
+
+/* Table Info Table
+  ========================================================================== */
+.tbl_new_registration td .tbl_info_table th {
+	height:20px;
+	background-color: #ccc0da;
+	border: 1px solid #808080;
+	text-align: center;
+	font-weight: normal;
+}
+.tbl_new_registration td .tbl_info_table td{
+	border: 1px solid #808080;
+	padding: 0 2px;
+	word-break: break-all;
+}
+.tbl_new_registration td .tbl_classification th{
+	background-color: #d9d9d9;
+	border: 1px solid #808080;
+	text-align: center;
+	font-weight: normal;
+}
+.tbl_new_registration td .tbl_classification td{
+	border: 1px solid #808080;
+	padding: 0 2px;
+	word-break: break-all;
+}
+/*------------------------------*/
+.color_orange {
+	color: #ff6600 !important;
+}
+
+.txt_width96{
+	width: 96px;
+}
+/* Span Width
+/*	 ========================================================================== */
+.span_width27 {
+	width: 27px;
+	display: block;
+}
+.color_darkred {
+	color: #c00000 !important;
+}
+ .td_width3 {
+	width: 3px;
+}
+.td_width40 {
+	width: 40px;
+}
+.td_width65 {
+	width: 65px;
+}
+.td_width100 {
+	width: 100px;
+}
+.td_width110 {
+	width: 110px;
+}
+.td_width120 {
+	width: 120px;
+}
+.td_width250 {
+	width: 250px;
+}
+.td_width550 {
+	width: 550px;
+}
+.cbx_width100 {
+	width: 100px;
+}
+.cbx_width185 {
+	width: 185px;
+}
+.cbx_width374 {
+	width: 374px;
+}
+.txt_width35{
+	width: 35px;
+}
+.txt_width44{
+	width: 44px;
+}
+.txt_width45{
+	width: 45px;
+}
+.txt_width60{
+	width: 60px;
+}
+.txt_width96{
+	width: 96px;
+}
+.txt_width130{
+	width: 130px;
+}
+.txt_width370{
+	width: 370px;
+}

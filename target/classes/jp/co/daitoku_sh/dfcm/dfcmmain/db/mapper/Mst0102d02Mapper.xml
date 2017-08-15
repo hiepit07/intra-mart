@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Mst0102d02Mapper">
+
+	<select id="getCustomerData" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0102d02CustomerData" parameterType="map" >
+		SELECT CST.Cust_Code custCode,
+			CST.Cain_Code cainCode,
+			CST.Cain_Idx cainIdx,
+			CST.Cust_Flg custFlg,
+			CST.Bild_Flg bildFlg,
+			CST.Bild_Code bildCode,
+			CST.Cust_Nm custNm,
+			CST.Cust_Nm_Kana custNmKana,
+			CST.Cust_Nm_R custNmR,
+			CST.Zip_Code zipCode,
+			CST.Adr_1 adr1,
+			CST.Adr_2 adr2,
+			CST.Tel_No telNo,
+			CST.Fax_No faxNo,
+			CST.Cust_Tan custTan,
+			CST.Cust_Tan_Mail custTanMail,
+			CST.Manager_Jigyo_Code managerJigyoCode,
+			CST.Cust_Cls custCls,
+			CST.Gyotai_Kb gyotaiKb,
+			CST.Deli_Center_Code deliCenterCode,
+			CST.Rel_Com_Cls relComCls,
+			CST.Rel_Com_Sub relComSub,
+			CST.DatIdx_Kb datidxKb,
+			CST.Shop_Kb shopKb,
+			CST.YG_Kb ygKb,
+			CST.Tax_Inc_Kb taxIncKb,
+			CST.Tax_Inc_Frc_Kb taxIncFrcKb,
+			CST.Col_Mon_Kb colMonKb,
+			CST.Col_Mmrk_Kb colMmrkKb,
+			CST.Sums_Flg sumsFlg,
+			CST.Ships_Kb shipsKb,
+			CST.Ships_Typ_ID shipsTypId,
+			CST.Ships_Typ_Cls shipsTypCls,
+			CST.Ships_rud_Kb shipsRudKb,
+			CST.Ships_Code_Kb shipsCodeKb,
+			CST.Bild_Nm bildNm,
+			CST.Bild_Nm_Kana bildNmKana,
+			CST.Bild_Nm_R bildNmR,
+			CST.Bild_Zip_Code bildZipCode,
+			CST.Bild_Adr_1 bildAdr1,
+			CST.Bild_Adr_2 bildAdr2,
+			CST.Bild_Tel_No bildTelNo,
+			CST.Bild_Fax_No bildFaxNo,
+			CST.Bild_Unt_Kb bildUntKb,
+			CST.Bild_Tanka bildTanka,
+			CST.Bild_Typ_ID bildTypId,
+			CST.Bild_Typ_Cls bildTypCls,
+			CST.Sum_Bild_Kb sumBildKb,
+			CST.Sum_Bild_Jgyo sumBildJgyo,
+			CST.Bild_Ptn bildPtn,
+			CST.Bild_Adr_Out_Kb bildAdrOutKb,
+			CST.Bild_Sum_Kb bildSumKb,
+			CST.Tax_Unt_Kb taxUntKb,
+			CST.Tax_Frc_Kb taxFrcKb,
+			CST.Bild_Chk_Kb bildChkKb,
+			CST.Bild_Chk_Srt bildChkSrt,
+			CST.Total_Date_1 totalDate1,
+			CST.Col_Term_Kb_1 colTermKb1,
+			CST.Col_Date_1 colDate1,
+			CST.Total_Date_2 totalDate2,
+			CST.Col_Term_Kb_2 colTermKb2,
+			CST.Col_Date_2 colDate2,
+			CST.Rcvm_Cls rcvmCls,
+			CST.Rcvm_Acc rcvmAcc,
+			CST.Rece_Note_Site receNoteSite,
+			CST.Rcv_Dat_Kb rcvDatKb,
+			CST.Bild_Dat_Kb bildDatKb,
+			CST.Mod_Dat_Kb modDatKb,
+			CST.Mod_kb_Hpn modKbHpn,
+			CST.Mod_kb_Kpn modKbKpn,
+			CST.Mod_kb_Ssi modKbSsi,
+			CST.Pay_Dat_Kb payDatKb,
+			CST.TR_Code trCode,
+			CST.BN_Code_ST_S bnCodeStS,
+			CST.DN_Kb_ST_S dnKbStS,
+			CST.BN_Code_ST_C bnCodeStC,
+			CST.DN_Kb_ST_C dnKbStC,
+			CST.BN_Code_SP_S bnCodeSpS,
+			CST.DN_Kb_SP_S dnKbSpS,
+			CST.BN_Code_SP_C bnCodeSpC,
+			CST.DN_Kb_SP_C dnKbSpC,
+			CST.Bild_Dat_ID bildDatId,
+			CST.Sum_Code_1 sumCode1,
+			CST.Sum_Code_2 sumCode2,
+			CST.Close_Date closeDate,
+			CST.STS_Code stsCode,
+			CST.Snd_Flg sndFlg,
+			BILL.Cust_Nm_R bildSearchNm
+	    FROM MST_CUSTOMER CST
+	    LEFT JOIN MST_CUSTOMER BILL
+	    	ON CST.Bild_Code = BILL.Cust_Code
+	    LEFT JOIN MST_S_CHAIN CHN
+	    	ON CST.Cain_Code = CHN.CHNCD
+	    	AND CST.Cain_Idx = CHN.CHNEDA
+	    WHERE CST.Cain_Code = #{chainCode}
+	    	AND CST.Cain_Idx = #{chainEda}
+	    	AND CST.Cust_Code = #{userCode}
+	</select>
+
+	<select id="getCustomerJigyouData" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0102d02CustomerJigyo" parameterType="map" >
+		SELECT CSJ.Cust_Code customerCode,
+				CSJ.Jigyo_Code jigyouShoCode,
+				JGY.JGYMEI jigyouShoName,
+				CSJ.Eg_Tan_Code eigyouTantoushaCode,
+				USR1.User_Nm eigyouTantoushaName,
+				CSJ.Jm_Tan_Code jimuTantoushaCode,
+				USR2.User_Nm jimuTantoushaName
+		FROM MST_CUSTJGYO CSJ
+		LEFT JOIN MST_S_JIGYO JGY
+			ON CSJ.Jigyo_Code = JGY.JGYCD
+			AND JGY.DELFLG = #{delFlg}
+			AND JGY.STRYMD &lt;= #{businessDate}
+			AND JGY.ENDYMD >= #{businessDate}
+		LEFT JOIN MST_USER USR1
+			ON CSJ.Eg_Tan_Code = USR1.User_Code
+			AND USR1.STS_Code = #{stsCode}
+		LEFT JOIN MST_USER USR2
+			ON CSJ.Jm_Tan_Code = USR2.User_Code
+			AND USR2.STS_Code = #{stsCode}
+		WHERE CSJ.Cust_Code = #{userCode}
+		ORDER BY CSJ.Jigyo_Code
+	</select>
+
+	<select id="getJigyouData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSJigyoMapper.BaseResultMap" parameterType="map" >
+		SELECT JGY.JGYCD, JGY.JGYMEI
+		FROM MST_S_JIGYO JGY
+		WHERE JGY.DELFLG = #{delFlg}
+			AND JGY.STRYMD &lt;= #{businessDate}
+			AND JGY.ENDYMD >= #{businessDate}
+			<if test="jigyouCdIncluded == true">
+				AND JGY.JGYCD = #{jigyouCd}
+			</if>
+		ORDER BY JGY.JGYCD
+	</select>
+
+	<select id="getDeliveryData" resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstSNohinMapper.BaseResultMap" parameterType="map" >
+		SELECT NHN.NHSCD,
+				NHN.NHSMEI
+		FROM MST_S_NOHIN NHN
+		WHERE NHN.DELFLG = #{delFlg}
+			AND NHN.STRYMD &lt;= #{businessDate}
+			AND NHN.ENDYMD >= #{businessDate}
+			AND NHN.JGYCD = #{jigyouCd}
+			AND NHN.CHNCD = #{chainCode}
+			AND NHN.CHNEDA = #{chainEda}
+		ORDER BY NHN.NHSCD
+	</select>
+
+	<select id="getListFormData" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.Mst0102d02ListForm" parameterType="map" >
+		SELECT FRM.List_Id listId,
+				FRM.List_Nm listName,
+				FRM.Den_Cls denCls,
+				GEN.Target_2 targetName
+		FROM MST_LIST_FORM FRM
+		LEFT JOIN MST_GENERAL GEN
+			ON FRM.List_Id = GEN.Target_1
+			AND GEN.Gl_Kb = #{glKb}
+		WHERE FRM.Den_Kb = #{denKb}
+		<if test="listIdIncluded == true">
+			AND FRM.List_Id = #{listId}
+		</if>
+		ORDER BY FRM.List_Id
+	</select>
+
+	<select id="getChainName" resultType="java.lang.String" parameterType="map" >
+		SELECT CHN.CHNMEI
+		FROM MST_S_CHAIN CHN
+		WHERE CHN.CHNCD = #{chainCode}
+	    	AND CHN.CHNEDA = #{chainEda}
+	    	AND CHN.DELFLG = #{delFlg}
+	    	AND (LTRIM(RTRIM(CHN.STRYMD)) = '' OR CHN.STRYMD &lt;= #{businessDate})
+    		AND (LTRIM(RTRIM(CHN.ENDYMD)) = '' OR CHN.ENDYMD >= #{businessDate})
+	</select>
+
+	<select id="getCourseData" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.mst.MstCourseInformation" parameterType="map" >
+		SELECT CRS.Jigyo_Code txtJigyouShoCode,
+				JGY.JGYMEI txtJigyouShoName,
+				CRS.Cos_Code txtCourseCode,
+				CRS.Cos_Nm_R txtCourseName,
+				CRL.Bin_Kb txtBinKubun,
+				CRL.Deli_Kb txtDeliveryKubun,
+				GEN.Target_1 txtDeliveryKubunName
+		FROM MST_COURSE CRS
+		INNER JOIN MST_COURSE_LIST CRL
+			ON CRS.Jigyo_Code = CRL.Jigyo_Code
+			AND CRS.Cos_Code = CRL.Cos_Code
+			AND CRS.STS_Code = #{stsCode}
+			AND CRL.STS_Code = #{stsCode}
+		LEFT JOIN MST_S_JIGYO JGY
+			ON JGY.JGYCD = CRS.Jigyo_Code
+			AND JGY.DELFLG = #{delFlg}
+			AND JGY.STRYMD &lt;= #{businessDate}
+			AND JGY.ENDYMD >= #{businessDate}
+		LEFT JOIN MST_GENERAL GEN
+			ON CRL.Deli_Kb　=　GEN.Gl_Code
+			AND GEN.Gl_Kb　=　#{glKb}
+		WHERE CRL.Cust_Code = #{customerCode}
+		ORDER BY CRS.Jigyo_Code, CRS.Cos_Code, CRL.Bin_Kb
+	</select>
+
+	<select id="checkDenpyouSaibanData" resultType="java.lang.String" parameterType="map" >
+		SELECT TOP 1 DAT.Cust_Code
+		FROM MST_DAT_IDX DAT
+		WHERE DAT.Cust_Code = #{customerCode}
+	</select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Com0102d05Mapper">
+
+	<select id="getMstUserData"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstUserMapper.BaseResultMap"
+		parameterType="map">
+		SELECT TOP ${searchMax}
+		USR.User_Code,
+		USR.User_Nm
+		FROM MST_USER USR
+		WHERE USR.STS_Code ='1'
+		<if test="userCodeWk != '' ">
+		AND USR.User_Code = #{userCodeWk}
+		</if>
+		<if test="userRodeWk != '' ">
+		AND USR.Auth_Code = #{userRodeWk}
+		</if>
+		<if test="myOfficeWk != '' ">
+		AND USR.Jigyosho_Code = #{myOfficeWk}
+		</if>
+		ORDER BY USR.User_Code
+	</select>
+	<select id="getSearchResult"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstUserMapper.BaseResultMap"
+		parameterType="map">
+		SELECT 
+		TOP ${searchMax}
+		USR.User_Code,
+		USR.User_Nm
+		FROM MST_USER USR
+		WHERE USR.STS_Code ='1'
+		<if test="userCodeWk != '' ">
+		AND USR.User_Code = #{userCodeWk}
+		</if>
+		<if test="userNameWk != '' ">
+		AND USR.User_Nm like #{userNameWk}
+		</if>
+		ORDER BY USR.User_Code
+	</select>
+	<select id="getMstUserInfo"
+		resultMap="jp.co.daitoku_sh.dfcm.common.db.mapper.MstUserMapper.BaseResultMap"
+		parameterType="map">
+		SELECT 
+		USR.User_Code,
+		USR.User_Nm,
+		USR.User_Nm_Kana,
+		USR.Jigyosho_Code,
+		USR.Auth_Code,
+		USR.User_Post,
+		USR.Mail_Adr,
+		USR.Tel_No,
+		USR.Fax_No,
+		USR.Password,
+		USR.User_Status,
+		USR.Login_Err_Cnt,
+		USR.Lockout_Datetime,
+		USR.Last_Login_Datetime,
+		USR.STS_Code,
+		USR.INS_USERID,
+		USR.INS_PGID,
+		USR.INS_YMD,
+		USR.INS_TIME,
+		USR.UPD_USERID,
+		USR.UPD_PGID,
+		USR.UPD_YMD,
+		USR.UPD_TIME
+		FROM MST_USER USR
+		WHERE
+		USR.User_Code = #{userCodeWk}
+	</select>
+</mapper>

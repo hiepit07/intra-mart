@@ -1,0 +1,126 @@
+/* Width per
+  ========================================================================== */
+.td_width3per {
+	width: 3%;
+}
+.td_width5per {
+	width: 5%;
+}
+
+.td_width6per {
+	width: 6%;
+}
+
+.td_width7per {
+	width: 7%;
+}
+
+.td_width9per {
+	width: 9%;
+}
+.td_width11per {
+	width: 11%;
+}
+.td_width27per {
+	width: 27%;
+}
+
+/* Width px
+  ========================================================================== */
+.td_width3 {
+	width: 3px;
+}
+.td_width100 {
+	width: 100px;
+}
+.txt_width100 {
+	width: 100px;
+}
+.cbx_width80 {
+	width:80px !important;
+}
+.cbx_width104 {
+	width:104px !important;
+}
+.cbx_width185 {
+	width:185px !important;
+}
+/* text_request
+  ========================================================================== */
+.text_request {
+	padding-bottom: 5px;
+}
+/* title
+  ========================================================================== */
+.title {
+	background-color: #FAC090 !important;
+}
+
+.title_cont {
+	background-color: #F79646 !important;
+}
+/* data_conditions_area
+  ========================================================================== */
+.data_conditions_area {
+	padding-top: 3px;
+}
+
+.div_zentai_title {
+	color: #000 !important;
+}
+
+/* Table
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+
+/* Table tbl_data_condition
+  ========================================================================== */
+.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(5)	{
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+	.tbl_data_condition span {
+		vertical-align: middle;
+	}
+	.tbl_data_condition img {
+		vertical-align:middle;
+	}
+
+.tbl_data_condition span {
+	vertical-align: middle;
+}
+/* Table button
+  ========================================================================== */
+.div_option {
+	height: 20px;
+	padding: 4px 0 0px 0px;
+	border: 1px solid #000000;
+}
+.width550 {
+	width: 550px;
+}
+
+.height500 {
+	height: 500px;
+}
+.mt5 {
+	margin-top: 5px !important;
+}
+.button_out {
+	position: absolute;
+	right: 0px;
+}

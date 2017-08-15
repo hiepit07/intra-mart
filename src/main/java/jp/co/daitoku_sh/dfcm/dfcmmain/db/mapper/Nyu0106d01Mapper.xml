@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.daitoku_sh.dfcm.dfcmmain.db.mapper.Nyu0106d01Mapper">
+
+<!-- ******************************************************************************** -->
+<!-- *** 会計入金実績作成用SQL定義                                                *** -->
+<!-- ******************************************************************************** -->
+
+	<!-- 仕訳作成履歴リストの取得 -->
+	<select id="getShiwakeSakuseiRirekiList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.nyu.Nyu0106d01ShiwakeSakuseiRirekiInfo">
+	
+<![CDATA[
+SELECT
+   KAI.Kaikei_Renkei_Id AS renkeiId
+  ,KAI.Create_Date      AS createDate
+  ,KAI.Create_Time      AS createTime
+  ,KAI.Nyu_Uri_Cls      AS shubetsu
+  ,KAI.Nyu_Uri_Count    AS dempyoCount
+  ,KAI.Shiwake_Count    AS shiwakeCount
+  ,KAI.Output_Count     AS outputCount
+FROM
+-- 会計連携履歴
+  TBL_NYU01_KAIKEI_RENKEI_RIREKI KAI
+WHERE
+  KAI.Sts_Code = '1'
+ORDER BY
+   KAI.Create_Date DESC
+  ,KAI.Create_Time DESC
+]]>
+
+	</select>
+
+	<!-- 今回作成件数の取得 -->
+	<select id="getKonkaiNyukinShiwakeSakuseiCount" resultType="map">
+
+<![CDATA[
+SELECT
+   COUNT( DISTINCT NYH.Nyu_Den_No ) AS NYUKIN_KENSU
+  ,COUNT( NYJ.Nyu_Shiwake_No )      AS SHIWAKE_KENSU
+FROM
+-- 入金ヘッダ
+  TBL_NYU01_HEAD NYH
+-- 入金仕訳
+INNER JOIN
+  TBL_NYU01_JOURNAL NYJ
+ON
+  NYH.Nyu_Den_No = NYJ.Nyu_No
+WHERE
+      NYH.Shounin_Flg      =  '1'
+  AND NYJ.Kaikei_Renkei_Id IS NULL
+]]>
+
+	</select>
+
+	<!-- 入金仕訳リストの取得（逐次処理） -->
+	<select id="getNyukinShiwakeList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.nyu.Nyu0106d01ShiwakeInfo" parameterType="string">
+
+SELECT
+   NYJ.Deli_Date AS nyukinKeijobi
+  ,CST.Cust_Nm   AS tokuisakiName
+  ,NYJ.Dr_Jcode  AS drJigyoshoCd
+  ,NYJ.Dr_Scode  AS drHasseiBasho
+  ,NYJ.Dr_Asub   AS drKanjoKamoku
+  ,NYJ.Dr_Acode  AS drKanjoKamokuCd
+  ,NYJ.Dr_Assub  AS drHojoKamoku
+  ,NYJ.Dr_Taxkb  AS drTaxKbn
+  ,GEN1.Target_1 AS drTaxKbnName
+  ,NYJ.Cr_Jcode  AS crJigyoshoCd
+  ,NYJ.Cr_Scode  AS crHasseiBasho
+  ,NYJ.Cr_Asub   AS crKanjoKamoku
+  ,NYJ.Cr_Acode  AS crKanjoKamokuCd
+  ,NYJ.Cr_Assub  AS crHojoKamoku
+  ,NYJ.Cr_Taxkb  AS crTaxKbn
+  ,GEN2.Target_1 AS crTaxKbnName
+  ,NYJ.Kingaku   AS kingaku
+FROM
+-- 入金ヘッダ
+  TBL_NYU01_HEAD NYH
+-- 入金仕訳
+INNER JOIN
+  TBL_NYU01_JOURNAL NYJ
+ON
+  NYH.Nyu_Den_No = NYJ.Nyu_No
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  CST.Cust_Code = NYH.Cust_Code
+-- 汎用マスタ（借方税区分）
+INNER JOIN
+  MST_GENERAL GEN1
+ON
+      GEN1.Gl_Kb   = 'Shiwake_Tax_Kb'
+  AND GEN1.Gl_Code = NYJ.Dr_Taxkb
+-- 汎用マスタ（貸方税区分）
+INNER JOIN
+  MST_GENERAL GEN2
+ON
+      GEN2.Gl_Kb   = 'Shiwake_Tax_Kb'
+  AND GEN2.Gl_Code = NYJ.Cr_Taxkb
+WHERE
+      NYH.Shounin_Flg = '1'
+<if test="_parameter != null">
+  AND NYJ.Kaikei_Renkei_Id = #{renkeiId}
+</if>
+<if test="_parameter == null">
+  AND NYJ.Kaikei_Renkei_Id IS NULL
+</if>
+ORDER BY
+   NYJ.Deli_Date
+  ,NYJ.UPD_YMD
+  ,NYJ.UPD_TIME
+
+	</select>
+
+	<!-- 売上仕訳リストの取得（逐次処理） -->
+	<select id="getUriageShiwakeList" resultType="jp.co.daitoku_sh.dfcm.dfcmmain.component.nyu.Nyu0106d01ShiwakeInfo" parameterType="string">
+
+SELECT
+   CST.Cust_Nm        AS tokuisakiName
+  ,URJ.Dr_Jcode       AS drJigyoshoCd
+  ,URJ.Dr_Scode       AS drHasseiBasho
+  ,URJ.Dr_Asub        AS drKanjoKamoku
+  ,URJ.Dr_Acode       AS drKanjoKamokuCd
+  ,URJ.Dr_Assub       AS drHojoKamoku
+  ,URJ.Dr_Taxkb       AS drTaxKbn
+  ,GEN1.Target_1      AS drTaxKbnName
+  ,URJ.Cr_Jcode       AS crJigyoshoCd
+  ,URJ.Cr_Scode       AS crHasseiBasho
+  ,URJ.Cr_Asub        AS crKanjoKamoku
+  ,URJ.Cr_Acode       AS crKanjoKamokuCd
+  ,URJ.Cr_Assub       AS crHojoKamoku
+  ,URJ.Cr_Taxkb       AS crTaxKbn
+  ,GEN2.Target_1      AS crTaxKbnName
+  ,SUM( URJ.Kingaku ) AS kingaku
+FROM
+-- 売上ヘッダ
+  TBL_URI01_HEAD URH
+-- 売上仕訳
+INNER JOIN
+  TBL_URI01_JOURNAL URJ
+ON
+      URH.Den_No = URJ.Den_No
+  AND URH.Den_Idx = URJ.Den_Idx
+-- 得意先マスタ
+INNER JOIN
+  MST_CUSTOMER CST
+ON
+  URH.Cust_Code = CST.Cust_Code
+-- 汎用マスタ（借方税区分）
+INNER JOIN
+  MST_GENERAL GEN1
+ON
+      GEN1.Gl_Kb   = 'Shiwake_Tax_Kb'
+  AND GEN1.Gl_Code = URJ.Dr_Taxkb
+-- 汎用マスタ（貸方税区分）
+INNER JOIN
+  MST_GENERAL GEN2
+ON
+      GEN2.Gl_Kb   = 'Shiwake_Tax_Kb'
+  AND GEN2.Gl_Code = URJ.Cr_Taxkb
+WHERE
+  URJ.Kaikei_Renkei_Id = #{renkeiId}
+GROUP BY
+   CST.Cust_Nm
+  ,URJ.Dr_Jcode
+  ,URJ.Dr_Scode
+  ,URJ.Dr_Asub
+  ,URJ.Dr_Acode
+  ,URJ.Dr_Assub
+  ,URJ.Dr_Taxkb
+  ,GEN1.Target_1
+  ,URJ.Cr_Jcode
+  ,URJ.Cr_Scode
+  ,URJ.Cr_Asub
+  ,URJ.Cr_Acode
+  ,URJ.Cr_Assub
+  ,URJ.Cr_Taxkb
+  ,GEN2.Target_1
+ORDER BY
+   CST.Cust_Nm
+  ,URJ.Dr_Jcode
+  ,URJ.Dr_Scode
+  ,URJ.Dr_Asub
+  ,URJ.Dr_Acode
+  ,URJ.Dr_Assub
+  ,URJ.Dr_Taxkb
+  ,GEN1.Target_1
+
+	</select>
+
+	<!-- 入金仕訳テーブルの更新 -->
+	<update id="updateRenkeiSumiOnNyukinShiwake" parameterType="string">
+
+UPDATE
+  NYJ
+SET
+  NYJ.Kaikei_Renkei_Id = #{renkeiId}
+FROM
+  TBL_NYU01_JOURNAL NYJ
+INNER JOIN
+  TBL_NYU01_HEAD NYH
+ON
+  NYJ.Nyu_No = NYH.Nyu_Den_No
+WHERE
+      NYH.Shounin_Flg      =  '1'
+  AND NYJ.Kaikei_Renkei_Id IS NULL
+
+	</update>
+
+	<!-- 会計連携履歴テーブルの更新（出力回数） -->
+	<update id="updateOutputCountOnKaikeiRenkeiRireki" parameterType="string">
+
+UPDATE
+  TBL_NYU01_KAIKEI_RENKEI_RIREKI
+SET
+  Output_Count = Output_Count + 1
+WHERE
+  Kaikei_Renkei_Id = #{renkeiId}
+
+	</update>
+
+</mapper>

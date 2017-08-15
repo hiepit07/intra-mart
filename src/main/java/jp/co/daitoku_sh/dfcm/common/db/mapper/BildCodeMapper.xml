@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="jp.co.daitoku_sh.dfcm.common.db.mapper.BildCodeMapper">
+
+	<select id="getBildCode" resultType="String" parameterType="map">
+		SELECT CST.BILD_CODE
+		FROM MST_CUSTOMER CST
+		WHERE
+		CST.CUST_CODE = #{Cust_Code}
+		AND (LTRIM(RTRIM(CST.CLOSE_DATE)) &lt;&gt; '' OR CST.CLOSE_DATE &gt; #{businessDate})
+	</select>
+
+</mapper>

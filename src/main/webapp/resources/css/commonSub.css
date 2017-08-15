@@ -1,0 +1,103 @@
+/*---------------------------------------------------------
+ 検索子画面　共通設定
+-----------------------------------------------------------*/
+/* 全体マージン設定 */
+.searchSubArea {
+	min-width: 500px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-top: 20px;
+}
+
+/* 閉じるボタン */
+.close {
+	color: #0066cc;
+	cursor: pointer;
+}
+
+/* 検索画面タイトル */
+.d_title {
+	width: 100%;
+	height: 25px;
+	margin-top: 5px;
+	color: #FFFFFF;
+	background-color: #F79646;
+}
+	.d_title p{
+		width: 150px;
+		height: 25px;
+		display: block;
+		line-height: 25px;
+		vertical-align: middle;
+		padding-left: 20px;
+		font-size: 16px;
+		margin:0;
+	}
+
+/* 検索条件エリア */
+.divSubCondition {
+	background-color: #fff;
+	padding: 10px 15px;
+	margin: 10px 0;
+}
+
+/* 検索条件テーブル設定 */
+.tblSubSearch {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 12px;
+	min-width: 500px;
+}
+	.tblSubSearch td {
+		padding-left: 5px;
+	}
+
+	.tblSubSearch tr {
+		border-bottom: 3px solid #fff;
+	}
+
+	.tblSubSearch tr:last-child {
+		border-bottom: none;
+	}
+
+/* 検索結果エリア */
+.divSearchResult{
+	border-top: none;
+	margin-top: 10px;
+}
+
+/* 検索結果ヘッダエリア */
+.divSearchResult_head {
+	float: left;
+}
+
+/* 検索結果ボディエリア */
+.divSearchResult_body {
+	height: 250px;
+	clear: both;
+	float: left;
+	overflow-x: hidden; /* 横スクロール非表示 */
+	overflow-y: auto; /* 縦スクロール */
+}
+
+/* メッセージ表示エリア */
+#noteOutput {
+    width: 100%;
+	height: 25px;
+	margin-top: 5px;
+	position: relative;
+	top: 5px;
+	background-color: #FFCCF8;
+	line-height: 25px;
+	vertical-align: middle;
+	font-size: 14px;
+	color: red;
+}
+
+/* 検索結果０件時メッセージ用 */
+.text_size_js {
+	font-size: 12px!important;
+	padding-left:110px!important;
+	padding-top:2px;
+}

@@ -1,0 +1,108 @@
+
+/* Width % */
+.td_width3per {
+	width: 3%;
+}
+.td_width7per {
+	width: 7%;
+}
+.td_width14per {
+	width: 14%;
+}
+.td_width16per {
+	width: 16%;
+}
+.td_width100per {
+	width: 100%;
+}
+/* Width px */
+.td_width3 {
+	width: 3px;
+}
+.txt_width100 {
+	width: 100px;
+}
+
+.border_bottom {
+	border-bottom: 1px solid #7F7F7F;
+}
+/* Table
+  ========================================================================== */
+.mb5 {
+	margin-bottom: 5px;
+}
+.mb10 {
+	margin-bottom: 10px;
+}
+.pb5 {
+	padding-bottom: 5px;
+}
+
+.data_conditions_area {
+	padding-top: 3px;
+}
+
+/* Table
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1000px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+		height: 35px;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(3) {
+		width: 265px !important;
+		padding-right: 10px;
+	}
+	.tbl_data_condition td:nth-child(2) {
+		width:150px!important;
+	}
+
+.tbl_data_condition span {
+	vertical-align: middle;
+}
+.btn_billing_submit {
+	width: 80px;
+	height: 25px;
+	background-color: #F5C49A;
+	border: 2px solid #DD6A15;
+	border-radius: 3px;
+	color: #000;
+	padding-bottom:2px;
+	background: #fef9f4; /* Old browsers */
+	background: -moz-linear-gradient(top, #fef9f4 0%, #f7c59c 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fef9f4), color-stop(100%,#f7c59c)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #fef9f4 0%,#f7c59c 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #fef9f4 0%,#f7c59c 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #fef9f4 0%,#f7c59c 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #fef9f4 0%,#f7c59c 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fef9f4', endColorstr='#f7c59c',GradientType=0 ); /* IE6-9 */
+}
+/* Span
+  ========================================================================== */
+ .span_width10 {
+	  width: 10px;
+	  display: inline-block;
+}
+
+.height105 {
+	height: 105px;
+}
+.height290 {
+	height: 290px;
+}
+/* divhead 1
+  ========================================================================== */
+.divhead1 {
+	  width: 40% !important;
+}
+.divBody1 {
+	width: 40%;
+	overflow-x: hidden;
+}

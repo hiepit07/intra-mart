@@ -1,0 +1,157 @@
+﻿/* Table データ呼び出し条件
+  ========================================================================== */
+.tbl_data_condition_cont {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition_cont td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition_cont td:nth-child(1),
+	.tbl_data_condition_cont td:nth-child(4),
+	.tbl_data_condition_cont td:nth-child(7),
+	.tbl_data_condition_cont td:nth-child(10){
+		padding-right: 10px;
+	}
+	.tbl_data_condition_cont td:nth-child(3),
+	.tbl_data_condition_cont td:nth-child(6),
+	.tbl_data_condition_cont td:nth-child(9),
+	.tbl_data_condition_cont td:nth-child(12){
+		padding-left: 3px;
+	}
+
+.tbl_data_condition_search {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition_search td {
+		border-bottom: 2px solid #f2f2f2 !important;
+	}
+
+.data_conditions_input_cont {
+	position: relative;
+	border: 2px solid #ffc68d
+}
+.mr_ml20 {
+	margin: 0 20px;
+}
+
+.pr10 {
+	padding-right: 10px !important;
+}
+
+.pl3 {
+	padding-left: 3px !important;
+}
+
+.input_area {
+	width: 100%;
+	margin: 0 auto;
+	padding-top: 10px;
+	padding-bottom: 24px;
+	background: #f2f2f2;
+	border-radius: 0;
+	clear: both;
+}
+.td_width3 {
+	width: 3px;
+}
+.td_width25 {
+	width: 35px;
+}
+.td_width35 {
+	width: 35px;
+}
+.td_width80 {
+	width: 80px;
+}
+.td_width110 {
+	width: 110px;
+}
+.td_width120 {
+	width: 120px;
+}
+.td_width250 {
+	width: 250px;
+}
+.td_width300 {
+	width: 300px;
+}
+.txt_width100 {
+	width: 100px;
+}
+.txt_width420 {
+	width: 420px;
+}
+.txt_width95per {
+ width: 95%;
+}
+.td_width3per {
+	width: 3%;
+}
+.td_width7per {
+	width: 7%;
+}
+.td_width8per {
+	width: 8%;
+}
+.td_width17per {
+	width: 17%;
+}
+.td_width90per {
+	width: 90%;
+}
+.height70 {
+	height: 70px;
+}
+.height160 {
+	height: 160px;
+}
+.height250 {
+	height: 220px;
+}
+.height280 {
+	height: 280px;
+}
+
+.button_area {
+	height: 22px;
+	width: 100%;
+	position: absolute;
+	bottom: 2px;
+}
+
+.tbl_data_condition_bot {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}
+	.tbl_data_condition_bot td {
+		border-bottom: 2px solid #fff;
+		text-align: center;
+	}
+.bg_faf9e5 {
+ background-color: #faf9e5 !important;
+}
+
+.sub-menu {
+	width: 80px;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	display: none;
+}
+
+.sub-menu a {
+	color: #000;
+	padding: 3px;
+	padding-left: 15px;
+	display: block;
+}

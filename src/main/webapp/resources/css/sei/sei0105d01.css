@@ -1,0 +1,142 @@
+/* Body
+  ========================================================================== */
+
+/* Width % */
+.td_width6per {
+	width: 6%;
+}
+.td_width7per {
+	width: 7%;
+}
+.td_width9per {
+	width: 9%;
+}
+.td_width10per {
+	width: 10%;
+}
+.td_width17per {
+	width: 17%;
+}
+.td_width21per {
+	width: 21%;
+}
+.td_width27per {
+	width: 27%;
+}
+.td_width33per {
+	width: 33%;
+}
+
+/* Width px */
+.td_width3 {
+	width: 3px;
+}
+
+.txt_width100 {
+	width: 100px;
+}
+.span_width40 {
+	width: 40px;
+	display: inline-block;
+}
+.text_request {
+	padding-bottom: 5px;
+}
+
+.title {
+	background-color: #d8e4bc !important;
+}
+.title_cont {
+	background-color: #c4d79b!important;
+}
+.tbl_list th {
+	background-color: #d8e4bc!important;
+	color: #000!important;
+}
+.data_conditions_area {
+	padding-top: 3px;
+}
+.data_conditions_area_cont {
+	background-color: #fef1cf !important;
+	border: 1px solid #d8e4bc !important;
+}
+.condition_title {
+	background-color: #fff!important;
+}
+.div_zentai_title {
+	color: #000!important;
+}
+.condition_button {
+	background-color: #ebf1de!important;
+}
+.condition_bg {
+	background-color:#EBF1DE !important;
+}
+/* Table
+  ========================================================================== */
+.tbl_data_condition {
+	width: 1200px;
+	clear: both;
+	margin: 0px auto;
+	font-size: 12px;
+	padding-top: 10px;
+}	
+	
+/* Table tbl_data_condition
+  ========================================================================== */	
+	.tbl_data_condition td {
+		border-bottom: 2px solid #fff;
+	}
+	.tbl_data_condition td:nth-child(1),
+	.tbl_data_condition td:nth-child(4),
+	.tbl_data_condition td:nth-child(7){
+		padding-right: 10px;
+		width: 105px !important;
+	}
+	.tbl_data_condition td:nth-child(3),
+	.tbl_data_condition td:nth-child(6),
+	.tbl_data_condition td:nth-child(9){
+		padding-left: 3px;
+	}
+	.tbl_data_condition td:nth-child(3) {
+		width: 300px !important;
+	}
+	.tbl_data_condition td:nth-child(6) {
+		width: 340px !important;
+	}
+	.tbl_data_condition td:nth-child(9) {
+	}
+	.tbl_data_condition span {
+		vertical-align: middle;
+	}
+.height250 {
+	height: 250px;
+}
+
+.height100 {
+	height: 100px;
+}
+
+
+/* Table button
+  ========================================================================== */	
+#div_button {
+	width:95%;
+	padding-left:10px;
+	bottom:30px;
+	position:absolute;
+	
+}
+.button_out {
+	
+	position:absolute;
+	right:0px;
+}
+
+/* datepicker  */
+.ui-datepicker-trigger {
+     margin-left:5px;
+     margin-top: 5px;
+     margin-bottom: -3px;
+}
+

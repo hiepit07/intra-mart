@@ -1,0 +1,99 @@
+body {
+	font-size: 14px;
+	color: #000000;
+	/*background-color: #fef1cf;*/
+	background-color: #fff;
+	font-family: "メイリオ", "ＭＳ Ｐゴシック", "Osaka", "ヒラギノ丸ゴ Pro W4", "Lucida Grande", "Helvetica", "Arial", sans-serif;
+}
+
+/* カーソルをポインターに変更 */
+.cursor_hover {
+	cursor: pointer;
+}
+
+/* 全体マージン設定 */
+.delModeArea {
+	min-width: 360px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-top: 20px;
+}
+
+/* タイトル */
+.d_title {
+	width: 100%;
+	height: 25px;
+	/* margin-top: 5px; */
+	color: #FFFFFF;
+	background-color: #F79646;
+}
+	.d_title p{
+		width: 100%;
+		height: 25px;
+		display: block;
+		line-height: 25px;
+		vertical-align: middle;
+		padding-left: 20px;
+		font-size: 16px;
+		margin:0;
+	}
+
+/* 処理選択エリア */
+.divSubCondition {
+	background-color: #fff;
+	padding: 10px 15px;
+	margin: 10px 0;
+}
+
+/* フッダーエリア */
+.d_footer {
+	width: 100%;
+	height: 25px;
+	margin-top: 5px;
+	color: #FFFFFF;
+	background-color: #F79646;
+	position: relative;
+}
+
+/* OKボタン */
+.okButton {
+	width: 80px;
+	height: 20px;
+	color: #FFFFFF;
+	text-align: center;
+	line-height: 20px;
+	cursor: pointer;
+	background: #ff5050;
+	background: -moz-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -webkit-gradient(left top, left bottom, color-stop(0%, #ff5050), color-stop(100%, #fb3e3e));
+	background: -webkit-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -o-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -ms-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: linear-gradient(to bottom, #ff5050 0%, #fb3e3e 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff5050', endColorstr='#fb3e3e', GradientType=0 );
+	border-radius: 3px;
+	margin-left: 20px;
+	margin-top: 3px;
+}
+
+/* キャンセルボタン */
+.cancelButton {
+	width: 80px;
+	height: 20px;
+	color: #FFFFFF;
+	text-align: center;
+	line-height: 20px;
+	cursor: pointer;
+	background: #ff5050;
+	background: -moz-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -webkit-gradient(left top, left bottom, color-stop(0%, #ff5050), color-stop(100%, #fb3e3e));
+	background: -webkit-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -o-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: -ms-linear-gradient(top, #ff5050 0%, #fb3e3e 100%);
+	background: linear-gradient(to bottom, #ff5050 0%, #fb3e3e 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff5050', endColorstr='#fb3e3e', GradientType=0 );
+	border-radius: 3px;
+	float: right;
+	margin-right: 20px;
+	margin-top: 3px;
+}
